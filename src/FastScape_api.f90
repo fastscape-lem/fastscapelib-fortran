@@ -40,6 +40,17 @@
 ! g1, g2 are the sediment fluvial transport/deposition coefficients (dimensionless) for bedrock and sediment respectively
 ! all parameters are double precision
 
+! FastScape_Set_Marine_Parameters (sealevel, poro1, poro2, zporo1, zporo2, ratio, length, kds1, kds2)
+! sets the value of the marine transport parameters
+! sl is sea level (in m)
+! poro1 is surface porosity for shale (dimensionless)
+! poro2 is surface porosity for sand (dimensionless)
+! zporo1 is e-folding porosity depth for shale (in m)
+! zporo2 is e-folding porosity depth for sand (in m)
+! ratio is the ratio of sand in the incoming flux from the continent (dimensionless)
+! length is the thickness of the "mixed" surface layer (in m) at the bottom of the ocean
+! kds1 and kds2 are the marine transport coefficients (diffusivities) for shale and sand respectively (in m^2/yr)
+
 ! FastScape_Set_DT (dt)
 ! sets the time step length (in yr)
 ! dt is double precision
@@ -216,11 +227,18 @@ subroutine FastScape_Execute_Step()
     timeDiffusion = timeDiffusion + time_out-time_in
   endif
 
+  if (runMarine) then
+     call cpu_time (time_in)
+     call Marine ()
+     call cpu_time (time_out)
+     timeMarine = timeMarine + time_out-time_in
+  endif
+
   if (runStrati) then
-    call cpu_time (time_in)
-    call Run_Strati ()
-    call cpu_time (time_out)
-    timeStrati = timeStrati + time_out-time_in
+     call cpu_time (time_in)
+     call Run_Strati ()
+     call cpu_time (time_out)
+     timeStrati = timeStrati + time_out-time_in
   endif
 
   step=step+1
@@ -453,6 +471,22 @@ subroutine FastScape_Set_Erosional_Parameters (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,
   return
 
 end subroutine FastScape_Set_Erosional_Parameters
+
+!--------------------------------------------------------------------------
+
+subroutine FastScape_Set_Marine_Parameters (sl, p1, p2, z1, z2, r, l, kds1, kds2)
+
+use FastScapeContext
+
+implicit none
+
+double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
+
+call SetMarineParam (sl, p1, p2, z1, z2, r, l, kds1, kds2)
+
+return
+
+end subroutine FastScape_Set_Marine_Parameters
 
 !--------------------------------------------------------------------------
 

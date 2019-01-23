@@ -8,7 +8,7 @@ module FastScapeContext
 
   integer :: nx, ny, nn, nstack
   integer :: step, ibc
-  integer :: nGSStreamPowerLaw
+  integer :: nGSStreamPowerLaw, nGSMarine
   logical :: setup_has_been_run
   double precision, target, dimension(:), allocatable :: h,u,vx,vy,length,a,erate,etot,catch,catch0,b,precip,kf,kd
   double precision, target, dimension(:), allocatable :: Sedflux, Fmix
@@ -17,8 +17,8 @@ module FastScapeContext
   double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
   integer, dimension(:), allocatable :: stack, ndon, rec
   integer, dimension(:,:), allocatable :: don
-  logical :: runSPL, runAdvect, runDiffusion, runStrati
-  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati
+  logical :: runSPL, runAdvect, runDiffusion, runMarine, runStrati
+  real :: timeSPL, timeAdvect, timeDiffusion, timeMarine, timeStrati
   double precision, dimension(:,:), allocatable :: reflector
   double precision, dimension(:,:,:), allocatable :: fields
   integer nfield, nfreq, nreflector, nfreqref, ireflector
@@ -35,7 +35,8 @@ module FastScapeContext
     timeSPL = 0.
     timeAdvect = 0.
     timeDiffusion = 0.
-    timeStrati = 0.
+	timeMarine = 0.
+	timeStrati = 0.
 
   end subroutine Init
 
@@ -82,9 +83,11 @@ module FastScapeContext
     runSPL = .false.
     runAdvect = .false.
     runDiffusion = .false.
-    runStrati = .false.
+    runMarine = .false.
+	runStrati = .false.
 
     nGSStreamPowerLaw = 0
+    nGSMarine = 0
 
     setup_has_been_run = .true.
 
@@ -355,6 +358,28 @@ module FastScapeContext
 
     return
 
+  end program
+
+  !---------------------------------------------------------------
+
+  subroutine SetMarineParam (sl, p1, p2, z1, z2, r, l, kds1, kds2)
+
+    double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
+
+    runMarine = .true.
+
+    sealevel = sl
+    poro1 = p1
+    poro2 = p2
+    zporo1 = z1
+    zporo2 = z2
+    ratio = r
+    layer = l
+    kdsea1 = kds1
+    kdsea2 = kds2
+
+    return
+
   end subroutine SetErosionalParam
 
   !---------------------------------------------------------------
@@ -444,12 +469,14 @@ module FastScapeContext
     write (*,*) 'Total number of local minima',counter
 
     write (*,*) 'Number of Gauss-Siedel iterations (SPL)',nGSStreamPowerLaw
+    write (*,*) 'Number of Crank-Nicholson iterations (Marine)',nGSMarine
 
     write (*,*) 'Timing:'
     if (runSPL) write (*,*) 'SPL:',timeSPL
     if (runDiffusion) write (*,*) 'Diffusion:',timeDiffusion
-    if (runAdvect) write (*,*) 'Advection:',timeAdvect
-    if (runStrati) write (*,*) 'Strati:',timeStrati
+    if (runMarine) write (*,*) 'Marine:',timeMarine
+	if (runAdvect) write (*,*) 'Advection:',timeAdvect
+	if (runStrati) write (*,*) 'Strati:',timeStrati
 
   end subroutine Debug
 

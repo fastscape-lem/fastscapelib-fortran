@@ -7,6 +7,7 @@ FastScape_ctx.o \
 Advect.o \
 Diffusion.o \
 LocalMinima.o \
+Marine.o \
 StreamPowerLaw.o \
 Strati.o \
 VTK.o \
