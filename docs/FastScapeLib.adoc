@@ -7,9 +7,9 @@ V2.6, 7/1/2019
 :toc: left
 :icons: font
 
-**FastScapeLib** is an interface or library (i.e. a set of subroutines) to model landscape evolution by river incision, sediment transport and deposition in continental environments.
+**FastScapeLib** is an interface or library (i.e. a set of subroutines) to model landscape evolution by river incision, sediment transport and deposition in continental and marine environments.
 
-**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019a in <<References>>) and (b) hillslope diffusion, using a set of highly efficient algorithms that are all O(n) complexity and implicit in time. These routines can be called from a ForTran, C or python main program and is ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
+**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019a in <<References>>), (b) hillslope diffusion, and (c) marine transport and deposition (see Yuan et al, 2019b in <<References>>), using a set of highly efficient algorithms that are all O(n) complexity and implicit in time. These routines can be called from a ForTran, C or python main program and is ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
 
 == Getting started
 
@@ -189,6 +189,55 @@ slope exponent for multi-direction flow; the distribution of flow among potentia
 [WARNING]
 ====
 `p = -1.d0` (or any negative value for `p`) corresponds to an exponent that varies with slope according to: `p = 0.5 + 0.6*slope`
+====
+
+=== FastScape_Set_Marine_Parameters
+
+This routine is used to set the marine transport/compaction parameters
+
+Arguments:
+
+`FastScape_Set_Marine_Parameters ( SL, p1, p2, z1, z2, r, L, kds1, kds2)`
+
+`SL` ::
+
+sea level in meters (double precision)
+
+`p1`::
+
+reference/surface porosity for sand (double precision)
+
+`p2`::
+
+reference/surface porosity for shale (double precision)
+
+`z1`::
+
+e-folding depth for exponential porosity law for sand (double precision)
+
+`z2`::
+
+e-folding depth for exponential porosity law for shale (double precision)
+
+`r` ::
+
+sand-shale ratio for material leaving the continent (double precision)
+
+`L` ::
+
+averaging depth/thickness needed to solve the sand-shale equation in meters (double precision)
+
+`kds1` ::
+
+marine transport coefficient (diffusivity) for sand in meters squared per year (double precision)
+
+`kds2` ::
+
+marine transport coefficient (diffusivity) for shale in meters squared per year (double precision)
+
+[WARNING]
+====
+When `kds2` is not equal to `kds1`, it is possible that the algorithm fails to converge; the time step should be decreased until the maximum amount of sediment deposited in one time step is less than `L` the averaging depth; in theory, the convergence should not be affected when the increment in deposited sediment is higher than `L` and Xiaoping and Jean aere working on solving this problem
 ====
 
 === FastScape_Set_BC
@@ -572,6 +621,14 @@ This is the basic square mountain problem where a landscape is formed by a unifo
 
 This model should run in approximately 60-70 seconds on a reasonably fast modern computer.
 
+=== Margin.f90
+
+Example showing the use of the Marine component of **FastScapeLib**.
+
+An area of 100x150 km is set to uplift on one half only. The other half is 1000 m below sea level and accumulate sediment eroded from the uplifting area. The erosion model is nonlinear (n = 2) and sediment transport affects erosion (g = 1). Multiple direction flow is selected. Marine transport is 10 x more efficient for silt than sand. No compaction. Resolution is 100x150. Boundary conditions are no flux boundaries except along the bottom boundary where base level is fixed at -1000 m.
+
+This model should run in approximately 90-95 seconds on a reasonably fast modern computer.
+
 === Fan.f90
 
 Example of the use of the continental transport/deposition component of **FastScapeLib**.
@@ -662,10 +719,10 @@ gfortran -O3 flexure_test.f90 -L. -lFastScape -lflexure -o flexure_test
 
 == Calling from Python
 
-The subroutines of **FastScapeLib** can be called from `python`. You will first need to create a library that can be called from `python`. For this, best is to use the `f2py` command:
+The subroutines of **FastScapeLib** can be called from `Python`. You will first need to create a library that can be called from `python`. For this, best is to use the `f2py` command:
 
 ----
-f2py -c --f90flags=-O3 -m FastScape FastScape_ctx.f90 FastScape_api.f90 StreamPowerLaw.f90 Diffusion.f90 Advect.f90 LocalMinima.f90
+f2py -c --f90flags=-O3 -m FastScape FastScape_ctx.f90 FastScape_api.f90 StreamPowerLaw.f90 Diffusion.f90 Advect.f90 LocalMinima.f90 Marine.f90
 
 cp FastScape.cpython-37m-darwin.so FastScape.so
 ----
@@ -687,3 +744,7 @@ Note that all routine names must be in lower caps in the calling python code.
 * link:https://www.sciencedirect.com/science/article/pii/S0169555X12004618[Braun, J. and Willett, S.D., 2013.] A very efficient, O(n), implicit and parallel method to solve the basic stream power law equation governing fluvial incision and landscape evolution. Geomorphology, 180-181, pp., 170-179.
 
 * Yuan, X., Braun, J., Guerit, L., Rouby, D. and Cordonnier, G., in revision. A new efficient, O(n), and implicit method to solve the Stream Power Law taking into account sediment transport and depositin. Journal of Geohysical Research - Surface.
+
+* Yuan, X., Braun, J., Guerit, L., Simon, B., Bovy, B., Rouby, D. and Robin, C., submitted. Linking continental deposition to marine sediment transport and deposition: a new implicit and o(n) method. Earth and Planetary Science Letters.
+
+
