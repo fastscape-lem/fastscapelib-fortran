@@ -358,7 +358,7 @@ module FastScapeContext
 
     return
 
-  end program
+  end subroutine SetErosionalParam
 
   !---------------------------------------------------------------
 
@@ -380,7 +380,7 @@ module FastScapeContext
 
     return
 
-  end subroutine SetErosionalParam
+  end subroutine SetMarineParam
 
   !---------------------------------------------------------------
 
@@ -475,8 +475,8 @@ module FastScapeContext
     if (runSPL) write (*,*) 'SPL:',timeSPL
     if (runDiffusion) write (*,*) 'Diffusion:',timeDiffusion
     if (runMarine) write (*,*) 'Marine:',timeMarine
-	if (runAdvect) write (*,*) 'Advection:',timeAdvect
-	if (runStrati) write (*,*) 'Strati:',timeStrati
+    if (runAdvect) write (*,*) 'Advection:',timeAdvect
+    if (runStrati) write (*,*) 'Strati:',timeStrati
 
   end subroutine Debug
 
