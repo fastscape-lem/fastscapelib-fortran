@@ -8,7 +8,7 @@ four1.o \
 realft.o \
 sinft.o
 
-FLAGS = -Wall -c -O3 #-fbounds-check
+FLAGS = -c -O3 #-fbounds-check
 
 .PHONY: all clean
 
