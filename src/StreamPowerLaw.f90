@@ -147,87 +147,87 @@ subroutine StreamPowerLaw ()
   nGSStreamPowerLaw=0
 
   do while (err.gt.tol)
-123  continue
-     nGSStreamPowerLaw=nGSStreamPowerLaw+1
-     ! guess/update the elevation at t+Δt (k)
-     hp=hwater
-     ! update the base elevation
-     b=min(hp,bt+u*dt)
-     ! calculate erosion/deposition at each node
-     dh=ht-hp
+123 continue
+    nGSStreamPowerLaw=nGSStreamPowerLaw+1
+    ! guess/update the elevation at t+Δt (k)
+    hp=hwater
+    ! update the base elevation
+    b=min(hp,bt+u*dt)
+    ! calculate erosion/deposition at each node
+    dh=ht-hp
 
-     ! sum the erosion in stack order
-     do ij=1,nn
+    ! sum the erosion in stack order
+    do ij=1,nn
+      ijk=mstack(ij)
+      do k=1,mnrec(ijk)
+        ijr=mrec(k,ijk)
+        dh(ijr)=dh(ijr)+dh(ijk)*mwrec(k,ijk)
+      enddo
+    enddo
+
+    where (bc)
+      elev=ht
+    elsewhere
+      elev=ht+(dh-(ht-hp))*g*dx*dy/a
+    endwhere
+
+    ! apply modified stream power law using lake surface (hwater)
+
+    if (abs(n-1.d0).lt.tiny(n)) then
+
+      do ij=nn,1,-1
         ijk=mstack(ij)
-        do k=1,mnrec(ijk)
-           ijr=mrec(k,ijk)
-           dh(ijr)=dh(ijr)+dh(ijk)*mwrec(k,ijk)
-        enddo
-     enddo
-
-     where (bc)
-        elev=ht
-     elsewhere
-        elev=ht+(dh-(ht-hp))*g*dx*dy/a
-     endwhere
-
-     ! apply modified stream power law using lake surface (hwater)
-
-     if (abs(n-1.d0).lt.tiny(n)) then
-
-        do ij=nn,1,-1
-           ijk=mstack(ij)
-           if (mnrec(ijk).gt.0) then
-              if (ht(ijk).ge.sealevel.or..not.runMarine) then
-                 f = elev(ijk)
-                 df = 1.d0
-                 do k=1,mnrec(ijk)
-                    if (ht(ijk).ge.ht(mrec(k,ijk))) then
-                       fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
-                       f = f + fact*hwater(mrec(k,ijk))
-                       df = df + fact
-                    endif
-                 enddo
-                 hwater(ijk)=f/df
+        if (mnrec(ijk).gt.0) then
+          if (ht(ijk).ge.sealevel.or..not.runMarine) then
+            f = elev(ijk)
+            df = 1.d0
+            do k=1,mnrec(ijk)
+              if (ht(ijk).ge.ht(mrec(k,ijk))) then
+                fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
+                f = f + fact*hwater(mrec(k,ijk))
+                df = df + fact
               endif
-           endif
-        enddo
+            enddo
+            hwater(ijk)=f/df
+          endif
+        endif
+      enddo
 
-     else
+    else
 
-        do ij=nn,1,-1
-           ijk=mstack(ij)
-           if (mnrec(ijk).gt.0) then
-              if (ht(ijk).ge.sealevel.or..not.runMarine) then
-                 omega=0.875d0/n
-                 tolp=1.d-3
-                 errp=2.d0*tolp
-                 h0=elev(ijk)
-                 do while (errp.gt.tolp)
-                    f=hwater(ijk)-h0
-                    df=1.d0
-                    do k=1,mnrec(ijk)
-                       if (ht(ijk).gt.ht(mrec(k,ijk))) then
-                          fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)**n
-                          f=f+fact*max(0.d0,hwater(ijk)-hwater(mrec(k,ijk)))**n
-                          df=df+fact*n*max(0.d0,hwater(ijk)-hwater(mrec(k,ijk)))**(n-1.d0)
-                       endif
-                    enddo
-                    hn=hwater(ijk)-f/df
-                    errp=abs(hn-hwater(ijk))
-                    hwater(ijk)=hwater(ijk)*(1.d0-omega)+hn*omega
-                 enddo
-              endif
-           endif
-        enddo
+      do ij=nn,1,-1
+        ijk=mstack(ij)
+        if (mnrec(ijk).gt.0) then
+          if (ht(ijk).ge.sealevel.or..not.runMarine) then
+            omega=0.875d0/n
+            tolp=1.d-3
+            errp=2.d0*tolp
+            h0=elev(ijk)
+            do while (errp.gt.tolp)
+              f=hwater(ijk)-h0
+              df=1.d0
+              do k=1,mnrec(ijk)
+                if (ht(ijk).gt.ht(mrec(k,ijk))) then
+                  fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)**n
+                  f=f+fact*max(0.d0,hwater(ijk)-hwater(mrec(k,ijk)))**n
+                  df=df+fact*n*max(0.d0,hwater(ijk)-hwater(mrec(k,ijk)))**(n-1.d0)
+                endif
+              enddo
+              hn=hwater(ijk)-f/df
+              errp=abs(hn-hwater(ijk))
+              hwater(ijk)=hwater(ijk)*(1.d0-omega)+hn*omega
+            enddo
+          endif
+        endif
+      enddo
 
-     endif
+    endif
 
-     err=maxval(abs(hwater-hp))
+    err=maxval(abs(hwater-hp))
 
-     if (nGSStreamPowerLaw.ge.100) then
-	stop 'too many Gauss-Seidl iterations in modified SPL'
-     endif
+    if (nGSStreamPowerLaw.ge.100) then
+      stop 'too many Gauss-Seidl iterations in modified SPL'
+    endif
   enddo
 
   ! transpose topography from lake surface to topographic surface
@@ -251,22 +251,22 @@ end subroutine StreamPowerLaw
 
 recursive subroutine find_stack	(ij,don,ndon,nn,stack,nstack,catch)
 
-! recursive routine to go through all nodes following donor information
+  ! recursive routine to go through all nodes following donor information
 
-implicit none
-integer don(8,nn),ndon(nn),stack(nn)
-double precision catch(nn)
-integer k,ij,ijk,nn,nstack
+  implicit none
+  integer don(8,nn),ndon(nn),stack(nn)
+  double precision catch(nn)
+  integer k,ij,ijk,nn,nstack
 
-do k=1,ndon(ij)
-  ijk=don(k,ij)
-  nstack=nstack+1
-  stack(nstack)=ijk
-  catch(ijk)=catch(ij)
-  call find_stack (ijk,don,ndon,nn,stack,nstack,catch)
-enddo
+  do k=1,ndon(ij)
+    ijk=don(k,ij)
+    nstack=nstack+1
+    stack(nstack)=ijk
+    catch(ijk)=catch(ij)
+    call find_stack (ijk,don,ndon,nn,stack,nstack,catch)
+  enddo
 
-return
+  return
 end subroutine find_stack
 
 !-----------------------------------------------------
