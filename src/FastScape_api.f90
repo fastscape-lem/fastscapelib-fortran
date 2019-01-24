@@ -134,13 +134,13 @@
 
 subroutine FastScape_Init()
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-call Init()
+  call Init()
 
-return
+  return
 
 end subroutine FastScape_Init
 
@@ -148,13 +148,13 @@ end subroutine FastScape_Init
 
 subroutine FastScape_Setup()
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-call SetUp()
+  call SetUp()
 
-return
+  return
 
 end subroutine FastScape_Setup
 
@@ -162,13 +162,13 @@ end subroutine FastScape_Setup
 
 subroutine FastScape_Destroy()
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-call Destroy()
+  call Destroy()
 
-return
+  return
 
 end subroutine FastScape_Destroy
 
@@ -176,56 +176,56 @@ end subroutine FastScape_Destroy
 
 subroutine FastScape_View()
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-call View()
+  call View()
 
-return
+  return
 
 end subroutine FastScape_View
 
 !--------------------------------------------------------------------------
 subroutine FastScape_Execute_Step()
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-real :: time_in, time_out
+  real :: time_in, time_out
 
-if (runAdvect) then
-call cpu_time (time_in)
-call Advect ()
-call cpu_time (time_out)
-timeAdvect = timeAdvect + time_out-time_in
-endif
+  if (runAdvect) then
+    call cpu_time (time_in)
+    call Advect ()
+    call cpu_time (time_out)
+    timeAdvect = timeAdvect + time_out-time_in
+  endif
 
-if (runSPL) then
-call cpu_time (time_in)
-call StreamPowerLaw ()
-call cpu_time (time_out)
-timeSPL = timeSPL + time_out-time_in
-endif
+  if (runSPL) then
+    call cpu_time (time_in)
+    call StreamPowerLaw ()
+    call cpu_time (time_out)
+    timeSPL = timeSPL + time_out-time_in
+  endif
 
-if (runDiffusion) then
-call cpu_time (time_in)
-call Diffusion ()
-call cpu_time (time_out)
-timeDiffusion = timeDiffusion + time_out-time_in
-endif
+  if (runDiffusion) then
+    call cpu_time (time_in)
+    call Diffusion ()
+    call cpu_time (time_out)
+    timeDiffusion = timeDiffusion + time_out-time_in
+  endif
 
-if (runStrati) then
-call cpu_time (time_in)
-call Run_Strati ()
-call cpu_time (time_out)
-timeStrati = timeStrati + time_out-time_in
-endif
+  if (runStrati) then
+    call cpu_time (time_in)
+    call Run_Strati ()
+    call cpu_time (time_out)
+    timeStrati = timeStrati + time_out-time_in
+  endif
 
-step=step+1
+  step=step+1
 
-return
+  return
 
 end subroutine FastScape_Execute_Step
 
@@ -233,15 +233,15 @@ end subroutine FastScape_Execute_Step
 
 subroutine FastScape_Init_H(hp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: hp
+  double precision, intent(inout), dimension(*) :: hp
 
-call InitH(hp)
+  call InitH(hp)
 
-return
+  return
 
 end subroutine FastScape_Init_H
 
@@ -249,15 +249,15 @@ end subroutine FastScape_Init_H
 
 subroutine FastScape_Init_F(Fmixp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: Fmixp
+  double precision, intent(inout), dimension(*) :: Fmixp
 
-call InitF (Fmixp)
+  call InitF (Fmixp)
 
-return
+  return
 
 end subroutine FastScape_Init_F
 
@@ -265,15 +265,15 @@ end subroutine FastScape_Init_F
 
 subroutine FastScape_Copy_H(hp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: hp
+  double precision, intent(inout), dimension(*) :: hp
 
-call CopyH(hp)
+  call CopyH(hp)
 
-return
+  return
 
 end subroutine FastScape_Copy_H
 
@@ -281,15 +281,15 @@ end subroutine FastScape_Copy_H
 
 subroutine FastScape_Copy_Basement(bp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: bp
+  double precision, intent(inout), dimension(*) :: bp
 
-call CopyBasement(bp)
+  call CopyBasement(bp)
 
-return
+  return
 
 end subroutine FastScape_Copy_Basement
 
@@ -297,15 +297,15 @@ end subroutine FastScape_Copy_Basement
 
 subroutine FastScape_Copy_Total_Erosion (etotp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: etotp
+  double precision, intent(inout), dimension(*) :: etotp
 
-call CopyEtot(etotp)
+  call CopyEtot(etotp)
 
-return
+  return
 
 end subroutine FastScape_Copy_Total_Erosion
 
@@ -313,15 +313,15 @@ end subroutine FastScape_Copy_Total_Erosion
 
 subroutine FastScape_Copy_Drainage_Area (ap)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: ap
+  double precision, intent(inout), dimension(*) :: ap
 
-call CopyArea(ap)
+  call CopyArea(ap)
 
-return
+  return
 
 end subroutine FastScape_Copy_Drainage_Area
 
@@ -329,15 +329,15 @@ end subroutine FastScape_Copy_Drainage_Area
 
 subroutine FastScape_Copy_Erosion_Rate (eratep)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: eratep
+  double precision, intent(inout), dimension(*) :: eratep
 
-call CopyERate(eratep)
+  call CopyERate(eratep)
 
-return
+  return
 
 end subroutine FastScape_Copy_Erosion_Rate
 
@@ -345,15 +345,15 @@ end subroutine FastScape_Copy_Erosion_Rate
 
 subroutine FastScape_Copy_Chi (chip)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: chip
+  double precision, intent(inout), dimension(*) :: chip
 
-call CopyChi(chip)
+  call CopyChi(chip)
 
-return
+  return
 
 end subroutine FastScape_Copy_Chi
 
@@ -361,15 +361,15 @@ end subroutine FastScape_Copy_Chi
 
 subroutine FastScape_Copy_Catchment (catchp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: catchp
+  double precision, intent(inout), dimension(*) :: catchp
 
-call CopyCatchment (catchp)
+  call CopyCatchment (catchp)
 
-return
+  return
 
 end subroutine FastScape_Copy_Catchment
 
@@ -377,15 +377,15 @@ end subroutine FastScape_Copy_Catchment
 
 subroutine FastScape_Copy_F(Fmixp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: Fmixp
+  double precision, intent(inout), dimension(*) :: Fmixp
 
-call CopyF(Fmixp)
+  call CopyF(Fmixp)
 
-return
+  return
 
 end subroutine FastScape_Copy_F
 
@@ -393,15 +393,15 @@ end subroutine FastScape_Copy_F
 
 subroutine FastScape_Set_NX_NY (nnx,nny)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-integer, intent(in) :: nnx,nny
+  integer, intent(in) :: nnx,nny
 
-call SetNXNY (nnx,nny)
+  call SetNXNY (nnx,nny)
 
-return
+  return
 
 end subroutine FastScape_Set_NX_NY
 
@@ -409,15 +409,15 @@ end subroutine FastScape_Set_NX_NY
 
 subroutine FastScape_Set_XL_YL (xxl,yyl)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(in) :: xxl,yyl
+  double precision, intent(in) :: xxl,yyl
 
-call SetXLYL (xxl,yyl)
+  call SetXLYL (xxl,yyl)
 
-return
+  return
 
 end subroutine FastScape_Set_XL_YL
 
@@ -425,15 +425,15 @@ end subroutine FastScape_Set_XL_YL
 
 subroutine FastScape_Set_DT (dtt)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(in) :: dtt
+  double precision, intent(in) :: dtt
 
-call SetDT (dtt)
+  call SetDT (dtt)
 
-return
+  return
 
 end subroutine FastScape_Set_DT
 
@@ -441,16 +441,16 @@ end subroutine FastScape_Set_DT
 
 subroutine FastScape_Set_Erosional_Parameters (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(in), dimension(*) :: kkf,kkd
-double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
+  double precision, intent(in), dimension(*) :: kkf,kkd
+  double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
 
-call SetErosionalParam (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
+  call SetErosionalParam (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
 
-return
+  return
 
 end subroutine FastScape_Set_Erosional_Parameters
 
@@ -458,15 +458,15 @@ end subroutine FastScape_Set_Erosional_Parameters
 
 subroutine FastScape_Get_Sizes (nnx,nny)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-integer, intent(out) :: nnx,nny
+  integer, intent(out) :: nnx,nny
 
-call GetSizes (nnx,nny)
+  call GetSizes (nnx,nny)
 
-return
+  return
 
 end subroutine FastScape_Get_Sizes
 
@@ -474,15 +474,15 @@ end subroutine FastScape_Get_Sizes
 
 subroutine FastScape_Get_Step (sstep)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-integer, intent(out) :: sstep
+  integer, intent(out) :: sstep
 
-call GetStep (sstep)
+  call GetStep (sstep)
 
-return
+  return
 
 end subroutine FastScape_Get_Step
 
@@ -490,13 +490,13 @@ end subroutine FastScape_Get_Step
 
 subroutine FastScape_Debug()
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-call Debug()
+  call Debug()
 
-return
+  return
 
 end subroutine FastScape_Debug
 
@@ -504,15 +504,15 @@ end subroutine FastScape_Debug
 
 subroutine FastScape_Set_BC(jbc)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-integer, intent(in) :: jbc
+  integer, intent(in) :: jbc
 
-call SetBC (jbc)
+  call SetBC (jbc)
 
-return
+  return
 
 end subroutine FastScape_Set_BC
 
@@ -520,15 +520,15 @@ end subroutine FastScape_Set_BC
 
 subroutine FastScape_Set_U (up)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(in), dimension(*) :: up
+  double precision, intent(in), dimension(*) :: up
 
-call SetU(up)
+  call SetU(up)
 
-return
+  return
 
 end subroutine FastScape_Set_U
 
@@ -536,15 +536,15 @@ end subroutine FastScape_Set_U
 
 subroutine FastScape_Set_V (ux,uy)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(in), dimension(*) :: ux,uy
+  double precision, intent(in), dimension(*) :: ux,uy
 
-call SetV(ux,uy)
+  call SetV(ux,uy)
 
-return
+  return
 
 end subroutine FastScape_Set_V
 
@@ -552,13 +552,13 @@ end subroutine FastScape_Set_V
 
 subroutine FastScape_Reset_Cumulative_Erosion ()
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-call ResetCumulativeErosion ()
+  call ResetCumulativeErosion ()
 
-return
+  return
 
 end subroutine FastScape_Reset_Cumulative_Erosion
 
@@ -566,15 +566,15 @@ end subroutine FastScape_Reset_Cumulative_Erosion
 
 subroutine FastScape_Set_H(hp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: hp
+  double precision, intent(inout), dimension(*) :: hp
 
-call SetH(hp)
+  call SetH(hp)
 
-return
+  return
 
 end subroutine FastScape_Set_H
 
@@ -582,15 +582,15 @@ end subroutine FastScape_Set_H
 
 subroutine FastScape_Set_All_Layers (dhp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: dhp
+  double precision, intent(inout), dimension(*) :: dhp
 
-call SetAllLayers(dhp)
+  call SetAllLayers(dhp)
 
-return
+  return
 
 end subroutine FastScape_Set_All_Layers
 
@@ -598,15 +598,15 @@ end subroutine FastScape_Set_All_Layers
 
 subroutine FastScape_Set_Basement(bp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: bp
+  double precision, intent(inout), dimension(*) :: bp
 
-call SetBasement(bp)
+  call SetBasement(bp)
 
-return
+  return
 
 end subroutine FastScape_Set_Basement
 
@@ -614,15 +614,15 @@ end subroutine FastScape_Set_Basement
 
 subroutine FastScape_Set_Precip (precipp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: precipp
+  double precision, intent(inout), dimension(*) :: precipp
 
-call SetPrecip (precipp)
+  call SetPrecip (precipp)
 
-return
+  return
 
 end subroutine FastScape_Set_Precip
 
@@ -630,16 +630,16 @@ end subroutine FastScape_Set_Precip
 
 subroutine FastScape_VTK (fp, vexp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: fp
-double precision, intent(inout) :: vexp
+  double precision, intent(inout), dimension(*) :: fp
+  double precision, intent(inout) :: vexp
 
-call Make_VTK (fp, vexp)
+  call Make_VTK (fp, vexp)
 
-return
+  return
 
 end subroutine FastScape_VTK
 
@@ -647,15 +647,15 @@ end subroutine FastScape_VTK
 
 subroutine FastScape_Strati (nstepp, nreflectorp, nfreqp, vexp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-integer, intent(inout) :: nstepp, nreflectorp, nfreqp
-double precision, intent(inout) :: vexp
+  integer, intent(inout) :: nstepp, nreflectorp, nfreqp
+  double precision, intent(inout) :: vexp
 
-call Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
+  call Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
 
-return
+  return
 
 end subroutine FastScape_Strati

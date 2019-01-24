@@ -1,32 +1,32 @@
 module FastScapeContext
 
-! Context module for FastScape api
-! should not be accessed or changed
-! see API for name of routines and externally accessible variables
+  ! Context module for FastScape api
+  ! should not be accessed or changed
+  ! see API for name of routines and externally accessible variables
 
-implicit none
+  implicit none
 
-integer :: nx, ny, nn, nstack
-integer :: step, ibc
-integer :: nGSStreamPowerLaw
-logical :: setup_has_been_run
-double precision, target, dimension(:), allocatable :: h,u,vx,vy,length,a,erate,etot,catch,catch0,b,precip,kf,kd
-double precision, target, dimension(:), allocatable :: Sedflux, Fmix
-double precision, dimension(:,:), pointer, contiguous :: h2, vx2, vy2, etot2, b2
-double precision :: xl, yl, dt, kfsed, m, n, kdsed, g1, g2, p
-double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
-integer, dimension(:), allocatable :: stack, ndon, rec
-integer, dimension(:,:), allocatable :: don
-logical :: runSPL, runAdvect, runDiffusion, runStrati
-real :: timeSPL, timeAdvect, timeDiffusion, timeStrati
-double precision, dimension(:,:), allocatable :: reflector
-double precision, dimension(:,:,:), allocatable :: fields
-integer nfield, nfreq, nreflector, nfreqref, ireflector
-double precision :: vexref
+  integer :: nx, ny, nn, nstack
+  integer :: step, ibc
+  integer :: nGSStreamPowerLaw
+  logical :: setup_has_been_run
+  double precision, target, dimension(:), allocatable :: h,u,vx,vy,length,a,erate,etot,catch,catch0,b,precip,kf,kd
+  double precision, target, dimension(:), allocatable :: Sedflux, Fmix
+  double precision, dimension(:,:), pointer, contiguous :: h2, vx2, vy2, etot2, b2
+  double precision :: xl, yl, dt, kfsed, m, n, kdsed, g1, g2, p
+  double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
+  integer, dimension(:), allocatable :: stack, ndon, rec
+  integer, dimension(:,:), allocatable :: don
+  logical :: runSPL, runAdvect, runDiffusion, runStrati
+  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati
+  double precision, dimension(:,:), allocatable :: reflector
+  double precision, dimension(:,:,:), allocatable :: fields
+  integer nfield, nfreq, nreflector, nfreqref, ireflector
+  double precision :: vexref
 
-contains
+  contains
 
-    subroutine Init()
+  subroutine Init()
 
     nx=0
     ny=0
@@ -37,11 +37,11 @@ contains
     timeDiffusion = 0.
     timeStrati = 0.
 
-    end subroutine Init
+  end subroutine Init
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetUp()
+  subroutine SetUp()
 
     implicit none
 
@@ -52,7 +52,7 @@ contains
 
     nn=nx*ny
 
-        call Destroy()
+    call Destroy()
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
@@ -90,42 +90,42 @@ contains
 
     return
 
-    end subroutine SetUp
+  end subroutine SetUp
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine Destroy()
+  subroutine Destroy()
 
     if (allocated(h)) deallocate(h)
-        if (allocated(u)) deallocate(u)
-        if (allocated(vx)) deallocate(vx)
-        if (allocated(vy)) deallocate(vy)
+    if (allocated(u)) deallocate(u)
+    if (allocated(vx)) deallocate(vx)
+    if (allocated(vy)) deallocate(vy)
     if (allocated(stack)) deallocate(stack)
     if (allocated(ndon)) deallocate(ndon)
     if (allocated(rec)) deallocate(rec)
     if (allocated(don)) deallocate(don)
-        if (allocated(catch0)) deallocate(catch0)
-        if (allocated(catch)) deallocate(catch)
+    if (allocated(catch0)) deallocate(catch0)
+    if (allocated(catch)) deallocate(catch)
     if (allocated(length)) deallocate (length)
-        if (allocated(a)) deallocate (a)
-        if (allocated(b)) deallocate (b)
-        if (allocated(sedflux)) deallocate (sedflux)
-        if (allocated(Fmix)) deallocate (Fmix)
+    if (allocated(a)) deallocate (a)
+    if (allocated(b)) deallocate (b)
+    if (allocated(sedflux)) deallocate (sedflux)
+    if (allocated(Fmix)) deallocate (Fmix)
     if (allocated(erate)) deallocate(erate)
     if (allocated(etot)) deallocate(etot)
-        if (allocated(precip)) deallocate(precip)
-        if (allocated(kd)) deallocate(kd)
-        if (allocated(kf)) deallocate(kf)
-        if (allocated(reflector)) deallocate(reflector)
-        if (allocated(fields)) deallocate(fields)
+    if (allocated(precip)) deallocate(precip)
+    if (allocated(kd)) deallocate(kd)
+    if (allocated(kf)) deallocate(kf)
+    if (allocated(reflector)) deallocate(reflector)
+    if (allocated(fields)) deallocate(fields)
 
     return
 
-    end subroutine Destroy
+  end subroutine Destroy
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine CopyH (hp)
+  subroutine CopyH (hp)
 
     double precision, intent(out), dimension(*) :: hp
 
@@ -135,11 +135,11 @@ contains
 
     return
 
-    end subroutine CopyH
+  end subroutine CopyH
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine CopyBasement (bp)
+  subroutine CopyBasement (bp)
 
     double precision, intent(out), dimension(*) :: bp
 
@@ -149,11 +149,11 @@ contains
 
     return
 
-    end subroutine CopyBasement
+  end subroutine CopyBasement
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine CopyEtot (etotp)
+  subroutine CopyEtot (etotp)
 
     double precision, intent(inout), dimension(*) :: etotp
 
@@ -163,11 +163,11 @@ contains
 
     return
 
-    end subroutine CopyEtot
+  end subroutine CopyEtot
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine CopyArea (ap)
+  subroutine CopyArea (ap)
 
     double precision, intent(inout), dimension(*) :: ap
 
@@ -177,11 +177,11 @@ contains
 
     return
 
-    end subroutine CopyArea
+  end subroutine CopyArea
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine CopyErate (eratep)
+  subroutine CopyErate (eratep)
 
     double precision, intent(inout), dimension(*) :: eratep
 
@@ -191,11 +191,11 @@ contains
 
     return
 
-    end subroutine CopyErate
+  end subroutine CopyErate
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine Copychi (chip)
+  subroutine Copychi (chip)
 
     double precision, intent(inout), dimension(*) :: chip
     double precision, dimension(:), allocatable :: chi
@@ -209,20 +209,20 @@ contains
     dx=xl/(nx-1)
     dy=yl/(ny-1)
     a0=dx*dy*10.d0
-      do ij=1,nn
+    do ij=1,nn
       ijk=stack(ij)
       if (a(ijk).gt.a0) chi(ijk)=chi(rec(ijk))+(a0/a(ijk))**(m/n)*length(ijk)
-      enddo
+    enddo
     chip(1:nn)=chi
     deallocate(chi)
 
     return
 
-    end subroutine CopyChi
+  end subroutine CopyChi
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine CopyCatchment (catchp)
+  subroutine CopyCatchment (catchp)
 
     double precision, intent(inout), dimension(*) :: catchp
 
@@ -232,11 +232,11 @@ contains
 
     return
 
-    end subroutine CopyCatchment
+  end subroutine CopyCatchment
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine CopyF (Fmixp)
+  subroutine CopyF (Fmixp)
 
     double precision, intent(out), dimension(*) :: Fmixp
 
@@ -246,11 +246,11 @@ contains
 
     return
 
-    end subroutine CopyF
+  end subroutine CopyF
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine InitH (hp)
+  subroutine InitH (hp)
 
     double precision, intent(in), dimension(*) :: hp
 
@@ -261,11 +261,11 @@ contains
 
     return
 
-    end subroutine InitH
+  end subroutine InitH
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine InitF (Fmixp)
+  subroutine InitF (Fmixp)
 
     double precision, intent(in), dimension(*) :: Fmixp
 
@@ -275,21 +275,21 @@ contains
 
     return
 
-    end subroutine InitF
+  end subroutine InitF
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine ResetCumulativeErosion ()
+  subroutine ResetCumulativeErosion ()
 
     etot = 0.d0
 
     return
 
-    end subroutine ResetCumulativeErosion
+  end subroutine ResetCumulativeErosion
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine View()
+  subroutine View()
 
     write (*,*) 'FastScapeContext:'
     write (*,*) 'nx,ny',nx,ny
@@ -304,11 +304,11 @@ contains
 
     return
 
-    end subroutine View
+  end subroutine View
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetNXNY (nnx,nny)
+  subroutine SetNXNY (nnx,nny)
 
     integer, intent(in) :: nnx,nny
 
@@ -317,11 +317,11 @@ contains
 
     return
 
-    end
+  end subroutine SetNXNY
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetXLYL (xxl,yyl)
+  subroutine SetXLYL (xxl,yyl)
 
     double precision, intent(in) :: xxl,yyl
 
@@ -330,36 +330,36 @@ contains
 
     return
 
-    end
+  end subroutine SetXLYL
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetErosionalParam (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
+  subroutine SetErosionalParam (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
 
-        double precision, intent(in), dimension(*) :: kkf,kkd
-        double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
+    double precision, intent(in), dimension(*) :: kkf,kkd
+    double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
 
     runSPL = .true.
 
-        kf(1:nn) = kkf(1:nn)
+    kf(1:nn) = kkf(1:nn)
     kfsed = kkfsed
     m = mm
     n = nnn
-        kd(1:nn) = kkd(1:nn)
+    kd(1:nn) = kkd(1:nn)
     kdsed = kkdsed
     g1 = gg1
     g2 = gg2
-        p = pp
+    p = pp
 
-        if (maxval(kd).gt.tiny(kd).or.kdsed.gt.tiny(kdsed)) runDiffusion = .true.
+    if (maxval(kd).gt.tiny(kd).or.kdsed.gt.tiny(kdsed)) runDiffusion = .true.
 
     return
 
-    end
+  end subroutine SetErosionalParam
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetDT (dtt)
+  subroutine SetDT (dtt)
 
     double precision, intent(in) :: dtt
 
@@ -367,11 +367,11 @@ contains
 
     return
 
-    end
+  end subroutine SetDT
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine GetSizes (nnx,nny)
+  subroutine GetSizes (nnx,nny)
 
     integer, intent(out) :: nnx,nny
 
@@ -380,11 +380,11 @@ contains
 
     return
 
-    end subroutine GetSizes
+  end subroutine GetSizes
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine GetStep (nstep)
+  subroutine GetStep (nstep)
 
     integer, intent(out) :: nstep
 
@@ -392,11 +392,11 @@ contains
 
     return
 
-    end Subroutine GetStep
+  end subroutine GetStep
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine Debug ()
+  subroutine Debug ()
 
     implicit none
 
@@ -418,9 +418,9 @@ contains
     write (*,*) 'Total number of donors',sum(ndon)
 
     counter=0
-      do ij=1,nn
+    do ij=1,nn
       if (rec(ij)==ij) counter=counter+1
-      enddo
+    enddo
 
     write (*,*) 'Total number of self donors',counter
 
@@ -434,12 +434,12 @@ contains
     if (cbc(2:2).eq.'1') i2=nx-1
     if (cbc(1:1).eq.'1') j1=2
     if (cbc(3:3).eq.'1') j2=ny-1
-      do j=j1,j2
-        do i=i1,i2
+    do j=j1,j2
+      do i=i1,i2
         ij=(j-1)*nx+i
         if (rec(ij)==ij) counter=counter+1
-        enddo
       enddo
+    enddo
 
     write (*,*) 'Total number of local minima',counter
 
@@ -451,11 +451,11 @@ contains
     if (runAdvect) write (*,*) 'Advection:',timeAdvect
     if (runStrati) write (*,*) 'Strati:',timeStrati
 
-    end subroutine Debug
+  end subroutine Debug
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetBC (jbc)
+  subroutine SetBC (jbc)
 
     integer, intent(in) :: jbc
 
@@ -463,28 +463,28 @@ contains
 
     return
 
-    end subroutine SetBC
+  end subroutine SetBC
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetU (up)
+  subroutine SetU (up)
 
     implicit none
 
     double precision, intent(in) :: up(*)
     integer i
 
-      do i=1,nn
+    do i=1,nn
       u(i) = up(i)
-      enddo
+    enddo
 
     return
 
-    end subroutine SetU
+  end subroutine SetU
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetV (ux,uy)
+  subroutine SetV (ux,uy)
 
     implicit none
 
@@ -493,18 +493,18 @@ contains
 
     runAdvect = .true.
 
-      do i=1,nn
+    do i=1,nn
       vx(i) = ux(i)
       vy(i) = uy(i)
-      enddo
+    enddo
 
     return
 
-    end subroutine SetV
+  end subroutine SetV
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetH (hp)
+  subroutine SetH (hp)
 
     double precision, intent(in), dimension(*) :: hp
 
@@ -512,43 +512,43 @@ contains
 
     return
 
-    end subroutine SetH
+  end subroutine SetH
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-        subroutine SetPrecip (precipp)
+  subroutine SetPrecip (precipp)
 
-        double precision, intent(in), dimension(*) :: precipp
+    double precision, intent(in), dimension(*) :: precipp
 
-        precip = precipp(1:nn)
+    precip = precipp(1:nn)
 
-        return
+    return
 
-        end subroutine SetPrecip
+  end subroutine SetPrecip
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-        subroutine SetAllLayers (dh)
+  subroutine SetAllLayers (dh)
 
-        double precision, intent(in), dimension(*) :: dh
+    double precision, intent(in), dimension(*) :: dh
 
-        integer i
+    integer i
 
-        h = h + dh(1:nn)
-        b = b + dh(1:nn)
-                if (runStrati) then
-                        do i = 0, nreflector
-                        reflector(:,i) = reflector(:,i) + dh(1:nn)
-                        enddo
-                endif
+    h = h + dh(1:nn)
+    b = b + dh(1:nn)
+    if (runStrati) then
+      do i = 0, nreflector
+        reflector(:,i) = reflector(:,i) + dh(1:nn)
+      enddo
+    endif
 
-        return
+    return
 
-        end subroutine SetAllLayers
+  end subroutine SetAllLayers
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-    subroutine SetBasement (bp)
+  subroutine SetBasement (bp)
 
     double precision, intent(in), dimension(*) :: bp
 
@@ -556,138 +556,138 @@ contains
 
     return
 
-    end subroutine SetBasement
+  end subroutine SetBasement
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-        subroutine Make_VTK (f, vex)
+  subroutine Make_VTK (f, vex)
 
-        ! subroutine to create a simple VTK file for plotting
+    ! subroutine to create a simple VTK file for plotting
 
-        implicit none
+    implicit none
 
-        double precision, intent(in) :: vex
-        double precision, intent(in), dimension(*) :: f
+    double precision, intent(in) :: vex
+    double precision, intent(in), dimension(*) :: f
 
-        integer nheader,nfooter,npart1,npart2
-        character header*1024,footer*1024,part1*1024,part2*1024,nxc*6,nyc*6,nnc*12
-        integer i,j
-        character*7 cstep
-        double precision dx,dy
+    integer nheader,nfooter,npart1,npart2
+    character header*1024,footer*1024,part1*1024,part2*1024,nxc*6,nyc*6,nnc*12
+    integer i,j
+    character*7 cstep
+    double precision dx,dy
 
-        dx = xl/(nx - 1)
-        dy = yl/(ny - 1)
+    dx = xl/(nx - 1)
+    dy = yl/(ny - 1)
 
-        write (cstep,'(i7)') step
-        if (step.lt.10) cstep(1:6)='000000'
-        if (step.lt.100) cstep(1:5)='00000'
-        if (step.lt.1000) cstep(1:4)='0000'
-        if (step.lt.10000) cstep(1:3)='000'
-        if (step.lt.100000) cstep(1:2)='00'
-        if (step.lt.1000000) cstep(1:1)='0'
+    write (cstep,'(i7)') step
+    if (step.lt.10) cstep(1:6)='000000'
+    if (step.lt.100) cstep(1:5)='00000'
+    if (step.lt.1000) cstep(1:4)='0000'
+    if (step.lt.10000) cstep(1:3)='000'
+    if (step.lt.100000) cstep(1:2)='00'
+    if (step.lt.1000000) cstep(1:1)='0'
 
-        call system ("mkdir -p VTK")
+    call system ("mkdir -p VTK")
 
-        write (nxc,'(i6)') nx
-        write (nyc,'(i6)') ny
-        write (nnc,'(i12)') nn
+    write (nxc,'(i6)') nx
+    write (nyc,'(i6)') ny
+    write (nnc,'(i12)') nn
 
-        header(1:1024)=''
-        header='# vtk DataFile Version 3.0'//char(10)//'FastScape'//char(10) &
-                //'BINARY'//char(10)//'DATASET STRUCTURED_GRID'//char(10) &
-                //'DIMENSIONS '//nxc//' '//nyc//' 1'//char(10)//'POINTS' &
-                //nnc//' float'//char(10)
-        nheader=len_trim(header)
-        footer(1:1024)=''
-        footer='POINT_DATA'//nnc//char(10)
-        nfooter=len_trim(footer)
-        part1(1:1024)=''
-        part1='SCALARS '
-        npart1=len_trim(part1)+1
-        part2(1:1024)=''
-        part2=' float 1'//char(10)//'LOOKUP_TABLE default'//char(10)
-        npart2=len_trim(part2)
+    header(1:1024)=''
+    header='# vtk DataFile Version 3.0'//char(10)//'FastScape'//char(10) &
+    //'BINARY'//char(10)//'DATASET STRUCTURED_GRID'//char(10) &
+    //'DIMENSIONS '//nxc//' '//nyc//' 1'//char(10)//'POINTS' &
+    //nnc//' float'//char(10)
+    nheader=len_trim(header)
+    footer(1:1024)=''
+    footer='POINT_DATA'//nnc//char(10)
+    nfooter=len_trim(footer)
+    part1(1:1024)=''
+    part1='SCALARS '
+    npart1=len_trim(part1)+1
+    part2(1:1024)=''
+    part2=' float 1'//char(10)//'LOOKUP_TABLE default'//char(10)
+    npart2=len_trim(part2)
 
-        open(unit=77,file='VTK/Topography'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
-        recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
-        +(npart1+5+npart2+4*nn),convert='big_endian')
-        write (77,rec=1) &
-        header(1:nheader), &
-        ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(h(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
-        footer(1:nfooter), &
-        part1(1:npart1)//'H'//part2(1:npart2),sngl(h(1:nn)), &
-        part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
-        close(77)
+    open(unit=77,file='VTK/Topography'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
+    recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
+    +(npart1+5+npart2+4*nn),convert='big_endian')
+    write (77,rec=1) &
+    header(1:nheader), &
+    ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(h(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
+    footer(1:nfooter), &
+    part1(1:npart1)//'H'//part2(1:npart2),sngl(h(1:nn)), &
+    part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
+    close(77)
 
-                if (vex.lt.0.d0) then
-                open(unit=77,file='VTK/Basement'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
-                recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
-                +(npart1+5+npart2+4*nn),convert='big_endian')
-                write (77,rec=1) &
-                header(1:nheader), &
-                ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(b(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
-                footer(1:nfooter), &
-                part1(1:npart1)//'B'//part2(1:npart2),sngl(b(1:nn)), &
-                part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
-                close(77)
-                endif
+    if (vex.lt.0.d0) then
+      open(unit=77,file='VTK/Basement'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
+      recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
+      +(npart1+5+npart2+4*nn),convert='big_endian')
+      write (77,rec=1) &
+      header(1:nheader), &
+      ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(b(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
+      footer(1:nfooter), &
+      part1(1:npart1)//'B'//part2(1:npart2),sngl(b(1:nn)), &
+      part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
+      close(77)
+    endif
 
-        return
-        end subroutine Make_VTK
+    return
+  end subroutine Make_VTK
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-        subroutine Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
+  subroutine Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
 
-        implicit none
+    implicit none
 
-        double precision, intent(in) :: vexp
-        integer, intent(in) :: nstepp, nreflectorp, nfreqp
+    double precision, intent(in) :: vexp
+    integer, intent(in) :: nstepp, nreflectorp, nfreqp
 
-        nfield = 10
+    nfield = 10
 
-        nfreqref = nstepp/nreflectorp
-        ireflector = 0
-        vexref = vexp
-        nreflector = nreflectorp
-        nfreq = nfreqp
+    nfreqref = nstepp/nreflectorp
+    ireflector = 0
+    vexref = vexp
+    nreflector = nreflectorp
+    nfreq = nfreqp
 
-        allocate (reflector(nn,0:nreflector),fields(nn,nfield,0:nreflector))
+    allocate (reflector(nn,0:nreflector),fields(nn,nfield,0:nreflector))
 
-        call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
-             fields, nfield, vexref, dt*nfreqref, stack, rec, length)
+    call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
+    fields, nfield, vexref, dt*nfreqref, stack, rec, length)
 
-        runStrati = .true.
+    runStrati = .true.
 
-        end subroutine Activate_Strati
+  end subroutine Activate_Strati
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
-        subroutine run_Strati ()
+  subroutine run_Strati ()
 
-        implicit none
+    implicit none
 
-        integer i
+    integer i
 
-                ! uplift reflectors
-                do i = 0, nreflector
-                reflector(:,i) = reflector(:,i) + u*dt
-                enddo
+    ! uplift reflectors
+    do i = 0, nreflector
+      reflector(:,i) = reflector(:,i) + u*dt
+    enddo
 
-                ! updates erosion below each reflector
-                do i=1, ireflector+1
-                fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
-                enddo
+    ! updates erosion below each reflector
+    do i=1, ireflector+1
+      fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
+    enddo
 
-                if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
-                if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
-                call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
-                     fields, nfield, vexref, dt*nfreqref, stack, rec, length)
-                endif
+    if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
+      if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
+      call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
+      fields, nfield, vexref, dt*nfreqref, stack, rec, length)
+    endif
 
-        end subroutine run_Strati
+  end subroutine run_Strati
 
 
-!---------------------------------------------------------------
+  !---------------------------------------------------------------
 
 end module FastScapeContext
