@@ -391,6 +391,22 @@ end subroutine FastScape_Copy_F
 
 !--------------------------------------------------------------------------
 
+subroutine FastScape_Copy_Lake_Depth(Lp)
+
+use FastScapeContext
+
+implicit none
+
+double precision, intent(inout), dimension(*) :: Lp
+
+call CopyLakeDepth(Lp)
+
+return
+
+end subroutine FastScape_Copy_Lake_Depth
+
+!--------------------------------------------------------------------------
+
 subroutine FastScape_Set_NX_NY (nnx,nny)
 
   use FastScapeContext

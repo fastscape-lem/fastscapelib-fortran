@@ -23,6 +23,7 @@ module FastScapeContext
   double precision, dimension(:,:,:), allocatable :: fields
   integer nfield, nfreq, nreflector, nfreqref, ireflector
   double precision :: vexref
+  double precision, dimension(:), allocatable :: lake_depth
 
   contains
 
@@ -56,6 +57,7 @@ module FastScapeContext
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
+    allocate (lake_depth(nn))
 
     h2(1:nx,1:ny) => h
     b2(1:nx,1:ny) => b
@@ -78,6 +80,7 @@ module FastScapeContext
     call random_number (catch0)
     sealevel = 0.d0
     Fmix = 0.5d0
+    lake_depth = 0.d0
 
     runSPL = .false.
     runAdvect = .false.
@@ -118,6 +121,7 @@ module FastScapeContext
     if (allocated(kf)) deallocate(kf)
     if (allocated(reflector)) deallocate(reflector)
     if (allocated(fields)) deallocate(fields)
+    if (allocated(lake_depth)) deallocate(lake_depth)
 
     return
 
@@ -247,6 +251,20 @@ module FastScapeContext
     return
 
   end subroutine CopyF
+
+  !---------------------------------------------------------------
+
+	subroutine CopyLakeDepth (Lp)
+
+    double precision, intent(out), dimension(*) :: Lp
+
+    if (.not.setup_has_been_run) stop 'CopyLakeDepth - You need to run SetUp first'
+
+    Lp(1:nn) = lake_depth
+
+    return
+
+	end subroutine CopyLakeDepth
 
   !---------------------------------------------------------------
 

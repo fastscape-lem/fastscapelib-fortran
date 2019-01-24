@@ -7,7 +7,7 @@ subroutine StreamPowerLaw ()
 
   implicit none
 
-  integer :: i,j,ij,ii,jj,iii,jjj,ijk,ijr,i1,i2,j1,j2,np,n_local_minima,k
+  integer :: i,j,ij,ii,jj,iii,jjj,ijk,ijr,i1,i2,j1,j2,np,n_local_minima,k,ijr1
   double precision :: dx,dy,smax,l,slope,fact,diff,tol,err,w_rcv
   double precision :: f,df,errp,h0,hn,omega,tolp,depos
   character cbc*4
@@ -18,9 +18,12 @@ subroutine StreamPowerLaw ()
   integer, dimension(:), allocatable :: mnrec,mstack
   integer, dimension(:,:), allocatable :: mrec
   double precision, dimension(:,:), allocatable :: mwrec,mlrec
+  double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
+  integer, dimension(:), allocatable :: lake_sill
 
   allocate (rhs(nn),ht(nn),g(nn),kfint(nn),bc(nn),bt(nn),dh(nn),hp(nn))
   allocate (elev(nn))
+  allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 
   ! sets boundary conditions
 
@@ -124,6 +127,8 @@ subroutine StreamPowerLaw ()
   allocate (mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn),hwater(nn))
   call find_mult_rec (h,rec,stack,hwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,p,ibc)
 
+  lake_depth = hwater - h
+
   if (count(mstack==0).ne.0) print*,'incomplete stack',count(mstack==0),nn
 
   ! computes drainage area
@@ -136,21 +141,23 @@ subroutine StreamPowerLaw ()
   enddo
 
   ! calculate the elevation / SPL, including sediment flux
-  tol=1.d-3
-  err=2*tol
+  tol=1.d-4*(maxval(abs(h))+1.d0)
+  err=2.d0*tol
 
   ! store the elevation at t
-  ht=hwater
+  ht=h
   bt=b
 
   ! Gauss-Seidel iteration
   nGSStreamPowerLaw=0
 
-  do while (err.gt.tol)
+  lake_sediment=0.d0
+
+	do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
     123 continue
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
     ! guess/update the elevation at t+Δt (k)
-    hp=hwater
+    hp=h
     ! update the base elevation
     b=min(hp,bt+u*dt)
     ! calculate erosion/deposition at each node
@@ -159,10 +166,24 @@ subroutine StreamPowerLaw ()
     ! sum the erosion in stack order
     do ij=1,nn
       ijk=mstack(ij)
-      do k=1,mnrec(ijk)
-        ijr=mrec(k,ijk)
-        dh(ijr)=dh(ijr)+dh(ijk)*mwrec(k,ijk)
-      enddo
+      ijr1=rec(ijk)
+      if (ijr1.ne.ijk) then
+        dh(ijk)=dh(ijk)-(ht(ijk)-hp(ijk))
+        if (lake_sill(ijk).eq.ijk) then
+          if (dh(ijk).le.0.d0) then
+            lake_sediment(ijk)=0.d0
+          else
+            lake_sediment(ijk)=dh(ijk)
+          endif
+        endif
+        dh(ijk)=dh(ijk)+(ht(ijk)-hp(ijk))
+        do k=1,mnrec(ijk)
+          ijr=mrec(k,ijk)
+          dh(ijr)=dh(ijr)+dh(ijk)*mwrec(k,ijk)
+        enddo
+      else
+        lake_sediment(ijk)=dh(ijk)
+      endif
     enddo
 
     where (bc)
@@ -177,19 +198,38 @@ subroutine StreamPowerLaw ()
 
       do ij=nn,1,-1
         ijk=mstack(ij)
-        if (mnrec(ijk).gt.0) then
-          if (ht(ijk).ge.sealevel) then
-            f = elev(ijk)
-            df = 1.d0
-            do k=1,mnrec(ijk)
-              if (ht(ijk).ge.ht(mrec(k,ijk))) then
-                fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
-                f = f + fact*hwater(mrec(k,ijk))
-                df = df + fact
-              endif
-            enddo
-            hwater(ijk)=f/df
+        ijr1=rec(ijk)
+        if (ijr1.eq.ijk) then
+          water(ijk)=ht(ijk)
+          lake_sill(ijk)=ijk
+          lake_water_volume(ijk)=0.d0
+        else
+          w_rcv=water(ijr1)
+          if (elev(ijk).gt.w_rcv) then
+            if (mnrec(ijk).gt.0) then
+              !						if (h(ijk).ge.sealevel.or..not.runMarine) then
+              f = elev(ijk)
+              df = 1.d0
+							do k=1,mnrec(ijk)
+                !if (ht(ijk).ge.ht(mrec(k,ijk))) then
+								if (ht(ijk).ge.ht(mrec(k,ijk))) then
+                  fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
+                  f = f + fact*h(mrec(k,ijk))
+                  df = df + fact
+								endif
+							enddo
+              h(ijk)=f/df
+              !						endif
+            endif
+            lake_sill(ijk)=ijk
+            lake_water_volume(ijk)=0.d0
+            if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
+          else
+            h(ijk)=elev(ijk)
+            lake_sill(ijk)=lake_sill(ijr1)
+            lake_water_volume(lake_sill(ijk))=lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
           endif
+          water(ijk)=max(w_rcv,h(ijk))
         endif
       enddo
 
@@ -225,14 +265,13 @@ subroutine StreamPowerLaw ()
 
     err=maxval(abs(hwater-hp))
 
-    if (nGSStreamPowerLaw.ge.100) then
-      stop 'too many Gauss-Seidl iterations in modified SPL'
-    endif
+	enddo
 
-  enddo
-
-  ! transpose topography from lake surface to topographic surface
-  h = h + hwater - ht
+	do ij=1,nn
+    if (lake_water_volume(lake_sill(ij)).gt.0.d0) h(ij)=h(ij) &
+    +max(0.d0,min(lake_sediment(lake_sill(ij)),lake_water_volume(lake_sill(ij))))/ &
+    lake_water_volume(lake_sill(ij))*(water(ij)-h(ij))
+	enddo
 
   deallocate (mrec,mwrec,mlrec,mnrec,mstack,hwater)
 
