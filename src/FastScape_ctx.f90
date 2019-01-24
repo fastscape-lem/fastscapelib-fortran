@@ -35,8 +35,8 @@ module FastScapeContext
     timeSPL = 0.
     timeAdvect = 0.
     timeDiffusion = 0.
-	timeMarine = 0.
-	timeStrati = 0.
+  timeMarine = 0.
+  timeStrati = 0.
 
   end subroutine Init
 
@@ -84,7 +84,7 @@ module FastScapeContext
     runAdvect = .false.
     runDiffusion = .false.
     runMarine = .false.
-	runStrati = .false.
+  runStrati = .false.
 
     nGSStreamPowerLaw = 0
     nGSMarine = 0
