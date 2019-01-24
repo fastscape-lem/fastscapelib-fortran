@@ -44,7 +44,7 @@ endif()
 OPTION(BUILD_LIBFASTSCAPE_STATIC "build fastscapelib as a static library" ON)
 OPTION(BUILD_LIBFASTSCAPE_SHARED "build fastscapelib as a shared library" OFF)
 OPTION(BUILD_PYTHON_MODULE "build fastscapelib library as a Python module" OFF)
-OPTION(USE_FLEXURE "also build the flexure separate module" OFF)
+OPTION(USE_FLEXURE "include flexure routines in the library" OFF)
 OPTION(BUILD_EXAMPLES "build usage examples that are in the 'examples' directory" OFF)
 
 if(BUILD_EXAMPLES)
@@ -95,4 +95,8 @@ if(BUILD_LIBFASTSCAPE_SHARED)
   set_target_properties(${LIBFASTSCAPE_SHARED}
     PROPERTIES
     OUTPUT_NAME ${LIBFASTSCAPE_NAME})
+endif()
+
+if(BUILD_EXAMPLES)
+  add_subdirectory(examples)
 endif()
