@@ -66,10 +66,12 @@ endif()
 # Fortran library (static/shared)
 # ===============================
 
-set(LIBFASTSCAPE_OBJECTS libfastscape_objects)
-add_library(${LIBFASTSCAPE_OBJECTS} OBJECT ${FASTSCAPELIB_SRC_FILES})
 
 set(LIBFASTSCAPE_NAME fastscape)
+if(BUILD_LIBFASTSCAPE_STATIC OR BUILD_LIBFASTSCAPE_SHARED)
+  set(LIBFASTSCAPE_OBJECTS libfastscape_objects)
+  add_library(${LIBFASTSCAPE_OBJECTS} OBJECT ${FASTSCAPELIB_SRC_FILES})
+endif()
 
 if(BUILD_LIBFASTSCAPE_STATIC)
   set(LIBFASTSCAPE_STATIC libfastscape_static)
