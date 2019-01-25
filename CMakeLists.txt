@@ -66,8 +66,8 @@ endif()
 # Fortran library (static/shared)
 # ===============================
 
+set(LIBFASTSCAPE_NAME fastscape_fortran)
 
-set(LIBFASTSCAPE_NAME fastscape)
 if(BUILD_LIBFASTSCAPE_STATIC OR BUILD_LIBFASTSCAPE_SHARED)
   set(LIBFASTSCAPE_OBJECTS libfastscape_objects)
   add_library(${LIBFASTSCAPE_OBJECTS} OBJECT ${FASTSCAPELIB_SRC_FILES})
@@ -102,9 +102,15 @@ if(BUILD_LIBFASTSCAPE_SHARED)
   install(TARGETS ${LIBFASTSCAPE_SHARED} DESTINATION lib)
 endif()
 
+# Examples
+# ========
+
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
+
+# Python module
+# =============
 
 if(BUILD_PYTHON_MODULE)
   if(NOT SKBUILD)
