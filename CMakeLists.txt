@@ -49,7 +49,6 @@ OPTION(BUILD_EXAMPLES "build usage examples that are in the 'examples' directory
 
 if(BUILD_EXAMPLES)
   set(BUILD_LIBFASTSCAPE_STATIC ON)
-  set(BUILD_PYTHON_MODULE ON)
   set(USE_FLEXURE ON)
 endif()
 
