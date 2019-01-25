@@ -33,3 +33,7 @@
 
 # Example specifics
 examples/VTK
+
+# Misc
+.DS_Store
+Fluxes.txt

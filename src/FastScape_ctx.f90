@@ -705,7 +705,50 @@ module FastScapeContext
 
   end subroutine run_Strati
 
-
   !---------------------------------------------------------------
+
+  subroutine compute_fluxes (tectonic_flux, erosion_flux, boundary_flux)
+
+    implicit none
+
+    double precision, intent(out) :: tectonic_flux, erosion_flux, boundary_flux
+    double precision :: surf
+    logical, dimension(:), allocatable :: bc
+    double precision, dimension(:), allocatable :: hwater,flux
+    double precision, dimension(:,:), allocatable :: mwrec,mlrec
+    integer, dimension(:), allocatable :: mnrec,mstack
+    integer, dimension(:,:), allocatable :: mrec
+    character*4 :: cbc
+    integer ij,ijk,k
+
+    surf = xl*yl/(nx - 1)/(ny - 1)
+
+    tectonic_flux = sum(u)*surf
+    erosion_flux = sum(erate)*surf
+
+    ! computes receiver and stack information for multi-direction flow
+    allocate (mrec(8,nn), mnrec(nn), mwrec(8,nn), mlrec(8,nn), mstack(nn), hwater(nn), flux(nn), bc(nn))
+    call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, ibc)
+    ! computes sediment flux
+    flux = erate
+    do ij = 1, nn
+      ijk = mstack(ij)
+      flux(ijk)=max(0.d0,flux(ijk))
+      do k = 1, mnrec(ijk)
+        flux(mrec(k,ijk)) = flux(mrec(k,ijk)) + flux(ijk)*mwrec(k,ijk)
+      enddo
+    enddo
+    ! compute boundary flux
+    write (cbc,'(i4)') ibc
+    bc=.FALSE.
+    if (cbc(4:4).eq.'1') bc(1:nn:nx) = .TRUE.
+    if (cbc(2:2).eq.'1') bc(nx:nn:nx) = .TRUE.
+    if (cbc(1:1).eq.'1') bc(1:nx) = .TRUE.
+    if (cbc(3:3).eq.'1') bc(nx*(ny - 1) + 1:nn) = .TRUE.
+    boundary_flux = sum(flux,bc)*surf
+
+    deallocate (mrec, mnrec, mwrec, mlrec, mstack, hwater, flux, bc)
+
+  end subroutine compute_fluxes
 
 end module FastScapeContext

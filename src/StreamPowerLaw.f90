@@ -8,8 +8,8 @@ subroutine StreamPowerLaw ()
   implicit none
 
   integer :: i,j,ij,ii,jj,iii,jjj,ijk,ijr,i1,i2,j1,j2,np,n_local_minima,k,ijr1
-  double precision :: dx,dy,smax,l,slope,fact,diff,tol,err,w_rcv
-  double precision :: f,df,errp,h0,hn,omega,tolp,depos
+  double precision :: dx,dy,smax,l,slope,fact,diff,tol,err
+  double precision :: f,df,errp,h0,hn,omega,tolp,depos,w_rcv
   character cbc*4
   logical xcyclic,ycyclic
   double precision, dimension(:), allocatable :: rhs,ht,g,kfint,bt,dh,hp
@@ -52,8 +52,8 @@ subroutine StreamPowerLaw ()
   ! defines g, dimensionless parameter for sediment transport and deposition
   g=g1
   kfint=kf
-  if (g2.gt.0.d0) where ((h-b).gt.1.d-6) g=g2
-  if (kfsed.gt.0.d0) where ((h-b).gt.1.d-6) kfint=kfsed
+  if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
+  if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
   ! uplift
 
@@ -154,7 +154,6 @@ subroutine StreamPowerLaw ()
   lake_sediment=0.d0
 
 	do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
-    123 continue
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
     ! guess/update the elevation at t+Δt (k)
     hp=h
@@ -207,7 +206,7 @@ subroutine StreamPowerLaw ()
           w_rcv=water(ijr1)
           if (elev(ijk).gt.w_rcv) then
             if (mnrec(ijk).gt.0) then
-              !						if (h(ijk).ge.sealevel.or..not.runMarine) then
+              !if (h(ijk).ge.sealevel.or..not.runMarine) then
               f = elev(ijk)
               df = 1.d0
 							do k=1,mnrec(ijk)
@@ -219,7 +218,7 @@ subroutine StreamPowerLaw ()
 								endif
 							enddo
               h(ijk)=f/df
-              !						endif
+              !endif
             endif
             lake_sill(ijk)=ijk
             lake_water_volume(ijk)=0.d0
@@ -238,7 +237,7 @@ subroutine StreamPowerLaw ()
       do ij=nn,1,-1
         ijk=mstack(ij)
         if (mnrec(ijk).gt.0) then
-          if (ht(ijk).ge.sealevel) then
+          !if (ht(ijk).ge.sealevel.or.not.runMarine) then
             omega=0.875d0/n
             tolp=1.d-3
             errp=2.d0*tolp
@@ -257,13 +256,13 @@ subroutine StreamPowerLaw ()
               errp=abs(hn-hwater(ijk))
               hwater(ijk)=hwater(ijk)*(1.d0-omega)+hn*omega
             enddo
-          endif
+          !endif
         endif
       enddo
 
     endif
 
-    err=maxval(abs(hwater-hp))
+    err=maxval(abs(h-hp))
 
 	enddo
 
@@ -279,6 +278,7 @@ subroutine StreamPowerLaw ()
   etot=etot+ht-h
   erate=(ht-h)/dt
   Sedflux=ht-h
+  !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
 
   !deallocate (rhs,hn,bt,g,kf,h0)
 
