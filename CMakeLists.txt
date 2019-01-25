@@ -100,3 +100,31 @@ endif()
 if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
+
+if(BUILD_PYTHON_MODULE)
+  if(NOT SKBUILD)
+    set(CMAKE_MODULE_PATH
+      ${PROJECT_SOURCE_DIR}/cmake
+      ${CMAKE_MODULE_PATH})
+  endif()
+
+  find_package(F2PY REQUIRED)
+
+  set(F2PY_MODULE_NAME "_fastscapelib_fortran")
+  set(F2PY_MODULE_FILE
+    ${CMAKE_CURRENT_BINARY_DIR}/${F2PY_MODULE_NAME}${PYTHON_EXTENSION_MODULE_SUFFIX}
+    )
+
+  add_custom_target(${F2PY_MODULE_NAME} ALL
+    DEPENDS ${F2PY_MODULE_FILE}
+    )
+
+  add_custom_command(
+    OUTPUT ${F2PY_MODULE_FILE}
+    COMMAND ${F2PY_EXECUTABLE}
+      -m ${F2PY_MODULE_NAME}
+      -c
+      ${FASTSCAPELIB_SRC_FILES}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  )
+endif()
