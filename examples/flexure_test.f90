@@ -83,7 +83,7 @@ program flexure_test
 	call FastScape_Set_Precip (p)
 	
 	nreflector = 5
-	!call FastScape_Strati (nstep, nreflector, nfreq, vex)
+	call FastScape_Strati (nstep, nreflector, nfreq, vex)
 	
 	call cpu_time (time_in)
 	
