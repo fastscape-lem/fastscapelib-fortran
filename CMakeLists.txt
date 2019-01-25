@@ -3,6 +3,8 @@ project(fastscapelib-fortran)
 
 enable_language(Fortran)
 
+set(FASTSCAPELIB_NAME fastscapelib_fortran)
+
 # Sources
 # =======
 
@@ -41,14 +43,14 @@ endif()
 # Build options
 # =============
 
-OPTION(BUILD_LIBFASTSCAPE_STATIC "build fastscapelib as a static library" ON)
-OPTION(BUILD_LIBFASTSCAPE_SHARED "build fastscapelib as a shared library" OFF)
+OPTION(BUILD_FASTSCAPELIB_STATIC "build fastscapelib as a static library" ON)
+OPTION(BUILD_FASTSCAPELIB_SHARED "build fastscapelib as a shared library" OFF)
 OPTION(BUILD_PYTHON_MODULE "build fastscapelib library as a Python module" OFF)
 OPTION(USE_FLEXURE "include flexure routines in the library" OFF)
 OPTION(BUILD_EXAMPLES "build usage examples that are in the 'examples' directory" OFF)
 
 if(BUILD_EXAMPLES)
-  set(BUILD_LIBFASTSCAPE_STATIC ON)
+  set(BUILD_FASTSCAPELIB_STATIC ON)
   set(USE_FLEXURE ON)
 endif()
 
@@ -66,40 +68,38 @@ endif()
 # Fortran library (static/shared)
 # ===============================
 
-set(LIBFASTSCAPE_NAME fastscape_fortran)
-
-if(BUILD_LIBFASTSCAPE_STATIC OR BUILD_LIBFASTSCAPE_SHARED)
-  set(LIBFASTSCAPE_OBJECTS libfastscape_objects)
-  add_library(${LIBFASTSCAPE_OBJECTS} OBJECT ${FASTSCAPELIB_SRC_FILES})
+if(BUILD_FASTSCAPELIB_STATIC OR BUILD_FASTSCAPELIB_SHARED)
+  set(FASTSCAPELIB_OBJECTS libfastscape_objects)
+  add_library(${FASTSCAPELIB_OBJECTS} OBJECT ${FASTSCAPELIB_SRC_FILES})
 endif()
 
-if(BUILD_LIBFASTSCAPE_STATIC)
-  set(LIBFASTSCAPE_STATIC libfastscape_static)
+if(BUILD_FASTSCAPELIB_STATIC)
+  set(FASTSCAPELIB_STATIC libfastscape_static)
 
-  add_library(${LIBFASTSCAPE_STATIC} STATIC $<TARGET_OBJECTS:${LIBFASTSCAPE_OBJECTS}>)
+  add_library(${FASTSCAPELIB_STATIC} STATIC $<TARGET_OBJECTS:${FASTSCAPELIB_OBJECTS}>)
 
-  set_target_properties(${LIBFASTSCAPE_STATIC}
+  set_target_properties(${FASTSCAPELIB_STATIC}
     PROPERTIES
-    OUTPUT_NAME ${LIBFASTSCAPE_NAME})
+    OUTPUT_NAME ${FASTSCAPELIB_NAME})
 
-  install(TARGETS ${LIBFASTSCAPE_STATIC} DESTINATION lib)
+  install(TARGETS ${FASTSCAPELIB_STATIC} DESTINATION lib)
 endif()
 
-if(BUILD_LIBFASTSCAPE_SHARED)
-  set(LIBFASTSCAPE_SHARED libfastscape_shared)
+if(BUILD_FASTSCAPELIB_SHARED)
+  set(FASTSCAPELIB_SHARED libfastscape_shared)
 
   # shared libraries need PIC
-  set_target_properties(${LIBFASTSCAPE_OBJECTS}
+  set_target_properties(${FASTSCAPELIB_OBJECTS}
     PROPERTIES
     POSITION_INDEPENDENT_CODE 1)
 
-  add_library(${LIBFASTSCAPE_SHARED} SHARED $<TARGET_OBJECTS:${LIBFASTSCAPE_OBJECTS}>)
+  add_library(${FASTSCAPELIB_SHARED} SHARED $<TARGET_OBJECTS:${FASTSCAPELIB_OBJECTS}>)
 
-  set_target_properties(${LIBFASTSCAPE_SHARED}
+  set_target_properties(${FASTSCAPELIB_SHARED}
     PROPERTIES
-    OUTPUT_NAME ${LIBFASTSCAPE_NAME})
+    OUTPUT_NAME ${FASTSCAPELIB_NAME})
 
-  install(TARGETS ${LIBFASTSCAPE_SHARED} DESTINATION lib)
+  install(TARGETS ${FASTSCAPELIB_SHARED} DESTINATION lib)
 endif()
 
 # Examples
@@ -140,6 +140,6 @@ if(BUILD_PYTHON_MODULE)
     )
 
   if(SKBUILD)
-    install(FILES ${F2PY_MODULE_FILE} DESTINATION fastscapelib_fortran)
+    install(FILES ${F2PY_MODULE_FILE} DESTINATION ${FASTSCAPELIB_NAME})
   endif()
 endif()

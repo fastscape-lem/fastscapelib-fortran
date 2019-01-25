@@ -12,5 +12,5 @@ foreach(EXAMPLE_SRC_FILE ${FASTSCAPELIB_EXAMPLES_SRC_FILES})
 
   add_executable(${EXAMPLE_EXE_FILE} ${EXAMPLE_SRC_FILE})
 
-  target_link_libraries(${EXAMPLE_EXE_FILE} ${LIBFASTSCAPE_STATIC})
+  target_link_libraries(${EXAMPLE_EXE_FILE} ${FASTSCAPELIB_STATIC})
 endforeach(EXAMPLE_SRC_FILE)
