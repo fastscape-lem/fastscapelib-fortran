@@ -23,6 +23,7 @@ module FastScapeContext
   double precision, dimension(:,:,:), allocatable :: fields
   integer nfield, nfreq, nreflector, nfreqref, ireflector
   double precision :: vexref
+  double precision, dimension(:), allocatable :: lake_depth
 
   contains
 
@@ -57,6 +58,7 @@ module FastScapeContext
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
+    allocate (lake_depth(nn))
 
     h2(1:nx,1:ny) => h
     b2(1:nx,1:ny) => b
@@ -79,6 +81,7 @@ module FastScapeContext
     call random_number (catch0)
     sealevel = 0.d0
     Fmix = 0.5d0
+    lake_depth = 0.d0
 
     runSPL = .false.
     runAdvect = .false.
@@ -121,6 +124,7 @@ module FastScapeContext
     if (allocated(kf)) deallocate(kf)
     if (allocated(reflector)) deallocate(reflector)
     if (allocated(fields)) deallocate(fields)
+    if (allocated(lake_depth)) deallocate(lake_depth)
 
     return
 
@@ -250,6 +254,20 @@ module FastScapeContext
     return
 
   end subroutine CopyF
+
+  !---------------------------------------------------------------
+
+	subroutine CopyLakeDepth (Lp)
+
+    double precision, intent(out), dimension(*) :: Lp
+
+    if (.not.setup_has_been_run) stop 'CopyLakeDepth - You need to run SetUp first'
+
+    Lp(1:nn) = lake_depth
+
+    return
+
+	end subroutine CopyLakeDepth
 
   !---------------------------------------------------------------
 
@@ -657,6 +675,14 @@ module FastScapeContext
       part1(1:npart1)//'B'//part2(1:npart2),sngl(b(1:nn)), &
       part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
       close(77)
+      open(unit=77,file='VTK/SeaLevel'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
+      recl=nheader+3*4*nn+nfooter+(npart1+2+npart2+4*nn),convert='big_endian')
+      write (77,rec=1) &
+      header(1:nheader), &
+      ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(sealevel*abs(vex)),i=1,nx),j=1,ny), &
+      footer(1:nfooter), &
+      part1(1:npart1)//'SL'//part2(1:npart2),(sngl(sealevel),i=1,nn)
+      close(77)
     endif
 
     return
@@ -681,6 +707,8 @@ module FastScapeContext
 
     allocate (reflector(nn,0:nreflector),fields(nn,nfield,0:nreflector))
 
+    fields=0.d0
+
     call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
     fields, nfield, vexref, dt*nfreqref, stack, rec, length)
 
@@ -702,8 +730,16 @@ module FastScapeContext
     enddo
 
     ! updates erosion below each reflector
-    do i=1, ireflector+1
+    do i=0, ireflector
       fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
+    enddo
+
+    do i = 0, ireflector - 1
+      reflector(:,i) = min(reflector(:,i),h)
+    enddo
+
+    do i = ireflector, nreflector
+      reflector(:,i) = h
     enddo
 
     if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
@@ -714,7 +750,50 @@ module FastScapeContext
 
   end subroutine run_Strati
 
-
   !---------------------------------------------------------------
+
+  subroutine compute_fluxes (tectonic_flux, erosion_flux, boundary_flux)
+
+    implicit none
+
+    double precision, intent(out) :: tectonic_flux, erosion_flux, boundary_flux
+    double precision :: surf
+    logical, dimension(:), allocatable :: bc
+    double precision, dimension(:), allocatable :: hwater,flux
+    double precision, dimension(:,:), allocatable :: mwrec,mlrec
+    integer, dimension(:), allocatable :: mnrec,mstack
+    integer, dimension(:,:), allocatable :: mrec
+    character*4 :: cbc
+    integer ij,ijk,k
+
+    surf = xl*yl/(nx - 1)/(ny - 1)
+
+    tectonic_flux = sum(u)*surf
+    erosion_flux = sum(erate)*surf
+
+    ! computes receiver and stack information for multi-direction flow
+    allocate (mrec(8,nn), mnrec(nn), mwrec(8,nn), mlrec(8,nn), mstack(nn), hwater(nn), flux(nn), bc(nn))
+    call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, ibc)
+    ! computes sediment flux
+    flux = erate
+    do ij = 1, nn
+      ijk = mstack(ij)
+      flux(ijk)=max(0.d0,flux(ijk))
+      do k = 1, mnrec(ijk)
+        flux(mrec(k,ijk)) = flux(mrec(k,ijk)) + flux(ijk)*mwrec(k,ijk)
+      enddo
+    enddo
+    ! compute boundary flux
+    write (cbc,'(i4)') ibc
+    bc=.FALSE.
+    if (cbc(4:4).eq.'1') bc(1:nn:nx) = .TRUE.
+    if (cbc(2:2).eq.'1') bc(nx:nn:nx) = .TRUE.
+    if (cbc(1:1).eq.'1') bc(1:nx) = .TRUE.
+    if (cbc(3:3).eq.'1') bc(nx*(ny - 1) + 1:nn) = .TRUE.
+    boundary_flux = sum(flux,bc)*surf
+
+    deallocate (mrec, mnrec, mwrec, mlrec, mstack, hwater, flux, bc)
+
+  end subroutine compute_fluxes
 
 end module FastScapeContext

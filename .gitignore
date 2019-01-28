@@ -30,3 +30,11 @@
 *.exe
 *.out
 *.app
+
+# Example specifics
+examples/VTK
+
+# Misc
+.DS_Store
+Fluxes.txt
+examples/a.out.dSYM/Contents/Info.plist
