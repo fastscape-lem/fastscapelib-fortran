@@ -34,17 +34,23 @@ set(FLEXURE_SRC_FILES
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     set(dialect "-ffree-form -std=f2008 -fimplicit-none")
     set(bounds "-fbounds-check")
+    set(warnings "-Wall")
 endif()
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     set(dialect "-stand f08 -free -implicitnone")
     set(bounds "-check bounds")
+    set(warnings "-warn all")
 endif()
 if(CMAKE_Fortran_COMPILER_ID MATCHES "PGI")
     set(dialect "-Mfreeform -Mdclchk -Mstandard -Mallocatable=03")
     set(bounds "-C")
+    set(warnings "-Wall")
 endif()
 
-# set(CMAKE_Fortran_FLAGS_DEBUG "${CMAKE_Fortran_FLAGS_DEBUG} ${bounds}")
+set(CMAKE_Fortran_FLAGS_DEBUG
+  "${CMAKE_Fortran_FLAGS_DEBUG} ${bounds} ${warnings}")
+
+# TODO: check dialect flags and other release optimization flags
 # set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
 
 # Build options
