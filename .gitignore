@@ -60,3 +60,6 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Notebooks
+examples/.ipynb_checkpoints/
