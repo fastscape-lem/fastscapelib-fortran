@@ -648,6 +648,14 @@ module FastScapeContext
       part1(1:npart1)//'B'//part2(1:npart2),sngl(b(1:nn)), &
       part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
       close(77)
+      open(unit=77,file='VTK/SeaLevel'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
+      recl=nheader+3*4*nn+nfooter+(npart1+2+npart2+4*nn),convert='big_endian')
+      write (77,rec=1) &
+      header(1:nheader), &
+      ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(sealevel*abs(vex)),i=1,nx),j=1,ny), &
+      footer(1:nfooter), &
+      part1(1:npart1)//'SL'//part2(1:npart2),(sngl(sealevel),i=1,nn)
+      close(77)
     endif
 
     return
@@ -672,6 +680,8 @@ module FastScapeContext
 
     allocate (reflector(nn,0:nreflector),fields(nn,nfield,0:nreflector))
 
+    fields=0.d0
+
     call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
     fields, nfield, vexref, dt*nfreqref, stack, rec, length)
 
@@ -693,8 +703,16 @@ module FastScapeContext
     enddo
 
     ! updates erosion below each reflector
-    do i=1, ireflector+1
+    do i=0, ireflector
       fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
+    enddo
+
+    do i = 0, ireflector - 1
+      reflector(:,i) = min(reflector(:,i),h)
+    enddo
+
+    do i = ireflector, nreflector
+      reflector(:,i) = h
     enddo
 
     if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
