@@ -63,3 +63,6 @@ MANIFEST
 
 # Notebooks
 examples/.ipynb_checkpoints/
+
+# Docs
+docs/FastScapeLib.html
