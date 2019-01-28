@@ -11,23 +11,86 @@ V2.6, 7/1/2019
 
 **FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019a in <<References>>) and (b) hillslope diffusion, using a set of highly efficient algorithms that are all O(n) complexity and implicit in time. These routines can be called from a ForTran, C or python main program and is ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
 
-== Getting started
+== Build and install FastScapeLib
 
-To install **FastScapeLib**, you must first compile it. It has been written in ForTran 90. To compile it you will need the gnu ForTran compiler, gForTran, as well as the make utility/command. To compile, simply issue the following set of line commands:
+**FastScapeLib** is not yet available as a binary package, so you need
+to build and install it manually.
+
+=== Download the source files
+
+First, download the sources using git:
+
 ----
-tar xzvf FastScapeLib_V2.5.tar.gz
-cd FastScapeLib_V2.5
+git clone https://github.com/fastscape-lem/fastscapelib-fortran
+----
+
+Alternatively, you can visit the URL of the source repository
+(https://github.com/fastscape-lem/fastscapelib-fortran) and download
+the source files as an archive (see the "clone or download button").
+
+=== Requirements
+
+To build FastScapelib, you need a Fortran compiler (e.g., `gfortran`,
+part of GCC) and CMake (https://cmake.org/). Both can easily be
+installed on major platforms, e.g., using Homebrew on MacOS or apt-get
+on Linux/Debian. GCC compilers are also available for Windows platforms
+(see http://www.mingw.org/).
+
+=== Build using CMake
+
+Run the following commands from the source directory to build the
+**FastScapeLib** Fortran library:
+
+----
+mkdir build
+cd build
+cmake <options> ..
 make
 ----
 
-To use **FastScapeLib** you will need to first write a program (in your favorite language) which calls the **FastScapeLib** subroutines. Several examples can be found in the `Examples` folder.
+There are several build options, here shown with their default values:
 
-=== Installing ForTran
+- `-DBUILD_FASTSCAPELIB_STATIC=ON`: build fastscapelib as a static library
+- `-DBUILD_FASTSCAPELIB_SHARED=OFF`: build fastscapelib as a shared library
+- `-DBUILD_PYTHON_MODULE=OFF`: build the fastscapelib library as a Python module
+- `-DUSE_FLEXURE=OFF`: include flexure routines in the library
+- `-DBUILD_EXAMPLES=OFF`: "build usage examples that are in the 'examples' directory
 
-The best way to install a ForTran compiler on a Mac OS machine is to download it at link:http://hpc.sourceforge.net[SourceForge]. However you will first need to install `XCode` from the Apple App Store (free but voluminous) and make sure that you have access to the command-line tools by issuing (after installing XCode) the following command in a terminal:
+=== Install the Fortran library
+
+If you want to install the **FastScapeLib** Fortran static/shared
+libraries in your system, then simply run:
+
 ----
-xcode-select --install
+make install
 ----
+
+You should now be able to link your programs using **FastScapeLib**
+routines, e.g., with `-lfastscapelib_fortran`. See some Fortran programs
+in the 'examples' folder.
+
+=== Install the Python package
+
+The recommended way of installing **FastScapeLib** as a Python package
+is to run the following command from the source directory (i.e., the
+top-level folder containing the file `setup.py`):
+
+----
+pip install .
+----
+
+This will also temporarily install all the tools needed to build the
+package (except a Fortran compiler and Python/NumPy, which must be
+both already installed). Note: you need pip >= 10.
+
+You should now be able to import the package from within Python, e.g.,
+
+----
+>>> import fastscapelib_fortran as fs
+----
+
+There is a Jupyter notebook in the 'examples' folder showing simple
+usage of the library.
 
 == List of subroutines
 
@@ -686,4 +749,4 @@ Note that all routine names must be in lower caps in the calling python code.
 
 * link:https://www.sciencedirect.com/science/article/pii/S0169555X12004618[Braun, J. and Willett, S.D., 2013.] A very efficient, O(n), implicit and parallel method to solve the basic stream power law equation governing fluvial incision and landscape evolution. Geomorphology, 180-181, pp., 170-179.
 
-* Yuan, X., Braun, J., Guerit, L., Rouby, D. and Cordonnier, G., in revision. A new efficient, O(n), and implicit method to solve the Stream Power Law taking into account sediment transport and depositin. Journal of Geohysical Research - Surface.
+* Yuan, X., Braun, J., Guerit, L., Rouby, D. and Cordonnier, G., in revision. A new efficient, O(n), and implicit method to solve the Stream Power Law taking into account sediment transport and deposition. Journal of Geohysical Research - Surface.
