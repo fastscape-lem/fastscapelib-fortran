@@ -119,6 +119,7 @@ if(BUILD_PYTHON_MODULE)
       ${CMAKE_MODULE_PATH})
   endif()
 
+  find_package(PythonExtensions)
   find_package(F2PY REQUIRED)
 
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
