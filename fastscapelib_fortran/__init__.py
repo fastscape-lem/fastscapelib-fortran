@@ -1,1 +1,1 @@
-from _fastscapelib_fortran import *
+from ._fastscapelib_fortran import *
