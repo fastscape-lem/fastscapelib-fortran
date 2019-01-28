@@ -42,44 +42,44 @@ subroutine Diffusion ()
   res=0.d0
   do j=2,ny-1
     do i=2,nx-1
-      factxp=(kdint(i+1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
-      factxm=(kdint(i-1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
+    factxp=(kdint(i+1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
+    factxm=(kdint(i-1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
       factyp=(kdint(i,j+1)+kdint(i,j))/2.d0*(dt/2.)/dy**2
-      factym=(kdint(i,j-1)+kdint(i,j))/2.d0*(dt/2.)/dy**2
-      diag(i)=1.d0+factxp+factxm
-      sup(i)=-factxp
-      inf(i)=-factxm
-      f(i)=zint(i,j)+factyp*zint(i,j+1)-(factyp+factym)*zint(i,j)+factym*zint(i,j-1)
+    factym=(kdint(i,j-1)+kdint(i,j))/2.d0*(dt/2.)/dy**2
+    diag(i)=1.d0+factxp+factxm
+    sup(i)=-factxp
+    inf(i)=-factxm
+    f(i)=zint(i,j)+factyp*zint(i,j+1)-(factyp+factym)*zint(i,j)+factym*zint(i,j-1)
     enddo
-    ! left bc
+! left bc
     if (cbc(4:4).eq.'1') then
-      diag(1)=1.
-      sup(1)=0.
-      f(1)=zint(1,j)
+    diag(1)=1.
+    sup(1)=0.
+    f(1)=zint(1,j)
     else
-      factxp=(kdint(2,j)+kdint(1,j))/2.d0*(dt/2.)/dx**2
-      factyp=(kdint(1,j+1)+kdint(1,j))/2.d0*(dt/2.)/dy**2
-      factym=(kdint(1,j-1)+kdint(1,j))/2.d0*(dt/2.)/dy**2
-      diag(1)=1.d0+factxp
-      sup(1)=-factxp
-      f(1)=zint(1,j)+factyp*zint(1,j+1)-(factyp+factym)*zint(1,j)+factym*zint(1,j-1)
+    factxp=(kdint(2,j)+kdint(1,j))/2.d0*(dt/2.)/dx**2
+    factyp=(kdint(1,j+1)+kdint(1,j))/2.d0*(dt/2.)/dy**2
+    factym=(kdint(1,j-1)+kdint(1,j))/2.d0*(dt/2.)/dy**2
+    diag(1)=1.d0+factxp
+    sup(1)=-factxp
+    f(1)=zint(1,j)+factyp*zint(1,j+1)-(factyp+factym)*zint(1,j)+factym*zint(1,j-1)
     endif
-    ! right bc
+! right bc
     if (cbc(2:2).eq.'1') then
-      diag(nx)=1.
-      inf(nx)=0.
-      f(nx)=zint(nx,j)
+    diag(nx)=1.
+    inf(nx)=0.
+    f(nx)=zint(nx,j)
     else
-      factxm=(kdint(nx-1,j)+kdint(nx,j))/2.d0*(dt/2.)/dx**2
-      factyp=(kdint(nx,j+1)+kdint(nx,j))/2.d0*(dt/2.)/dy**2
-      factym=(kdint(nx,j-1)+kdint(nx,j))/2.d0*(dt/2.)/dy**2
-      diag(nx)=1.d0+factxm
-      inf(nx)=-factxm
-      f(nx)=zint(nx,j)+factyp*zint(nx,j+1)-(factyp+factym)*zint(nx,j)+factym*zint(nx,j-1)
+    factxm=(kdint(nx-1,j)+kdint(nx,j))/2.d0*(dt/2.)/dx**2
+    factyp=(kdint(nx,j+1)+kdint(nx,j))/2.d0*(dt/2.)/dy**2
+    factym=(kdint(nx,j-1)+kdint(nx,j))/2.d0*(dt/2.)/dy**2
+    diag(nx)=1.d0+factxm
+    inf(nx)=-factxm
+    f(nx)=zint(nx,j)+factyp*zint(nx,j+1)-(factyp+factym)*zint(nx,j)+factym*zint(nx,j-1)
     endif
-    call tridag (inf,diag,sup,f,res,nx)
+  call tridag (inf,diag,sup,f,res,nx)
     do i=1,nx
-      zint(i,j)=res(i)
+    zint(i,j)=res(i)
     enddo
   enddo
   deallocate (f,diag,sup,inf,res)
@@ -94,44 +94,44 @@ subroutine Diffusion ()
   res=0.d0
   do i=2,nx-1
     do j=2,ny-1
-      factxp=(kdint(i+1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
-      factxm=(kdint(i-1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
-      factyp=(kdint(i,j+1)+kdint(i,j))/2.d0*(dt/2.)/dy**2
-      factym=(kdint(i,j-1)+kdint(i,j))/2.d0*(dt/2.)/dy**2
-      diag(j)=1.d0+factyp+factym
-      sup(j)=-factyp
-      inf(j)=-factym
-      f(j)=zint(i,j)+factxp*zint(i+1,j)-(factxp+factxm)*zint(i,j)+factxm*zint(i-1,j)
+    factxp=(kdint(i+1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
+    factxm=(kdint(i-1,j)+kdint(i,j))/2.d0*(dt/2.)/dx**2
+    factyp=(kdint(i,j+1)+kdint(i,j))/2.d0*(dt/2.)/dy**2
+    factym=(kdint(i,j-1)+kdint(i,j))/2.d0*(dt/2.)/dy**2
+    diag(j)=1.d0+factyp+factym
+    sup(j)=-factyp
+    inf(j)=-factym
+    f(j)=zint(i,j)+factxp*zint(i+1,j)-(factxp+factxm)*zint(i,j)+factxm*zint(i-1,j)
     enddo
-    ! bottom bc
+! bottom bc
     if (cbc(1:1).eq.'1') then
-      diag(1)=1.
-      sup(1)=0.
-      f(1)=zint(i,1)
+    diag(1)=1.
+    sup(1)=0.
+    f(1)=zint(i,1)
     else
-      factxp=(kdint(i+1,1)+kdint(i,j))/2.d0*(dt/2.)/dx**2
-      factxm=(kdint(i-1,1)+kdint(i,1))/2.d0*(dt/2.)/dx**2
-      factyp=(kdint(i,2)+kdint(i,1))/2.d0*(dt/2.)/dy**2
-      diag(1)=1.d0+factyp
-      sup(1)=-factyp
-      f(1)=zint(i,1)+factxp*zint(i+1,1)-(factxp+factxm)*zint(i,1)+factxm*zint(i-1,1)
+    factxp=(kdint(i+1,1)+kdint(i,j))/2.d0*(dt/2.)/dx**2
+    factxm=(kdint(i-1,1)+kdint(i,1))/2.d0*(dt/2.)/dx**2
+    factyp=(kdint(i,2)+kdint(i,1))/2.d0*(dt/2.)/dy**2
+    diag(1)=1.d0+factyp
+    sup(1)=-factyp
+    f(1)=zint(i,1)+factxp*zint(i+1,1)-(factxp+factxm)*zint(i,1)+factxm*zint(i-1,1)
     endif
-    ! top bc
+! top bc
     if (cbc(3:3).eq.'1') then
-      diag(ny)=1.
-      inf(ny)=0.
-      f(ny)=zint(i,ny)
+    diag(ny)=1.
+    inf(ny)=0.
+    f(ny)=zint(i,ny)
     else
-      factxp=(kdint(i+1,ny)+kdint(i,ny))/2.d0*(dt/2.)/dx**2
-      factxm=(kdint(i-1,ny)+kdint(i,ny))/2.d0*(dt/2.)/dx**2
-      factym=(kdint(i,ny-1)+kdint(i,ny))/2.d0*(dt/2.)/dy**2
-      diag(ny)=1.d0+factym
-      inf(ny)=-factym
-      f(ny)=zint(i,ny)+factxp*zint(i+1,ny)-(factxp+factxm)*zint(i,ny)+factxm*zint(i-1,ny)
+    factxp=(kdint(i+1,ny)+kdint(i,ny))/2.d0*(dt/2.)/dx**2
+    factxm=(kdint(i-1,ny)+kdint(i,ny))/2.d0*(dt/2.)/dx**2
+    factym=(kdint(i,ny-1)+kdint(i,ny))/2.d0*(dt/2.)/dy**2
+    diag(ny)=1.d0+factym
+    inf(ny)=-factym
+    f(ny)=zint(i,ny)+factxp*zint(i+1,ny)-(factxp+factxm)*zint(i,ny)+factxm*zint(i-1,ny)
     endif
-    call tridag (inf,diag,sup,f,res,ny)
+  call tridag (inf,diag,sup,f,res,ny)
     do j=1,ny
-      zint(i,j)=res(j)
+    zint(i,j)=res(j)
     enddo
   enddo
   deallocate (f,diag,sup,inf,res)
@@ -159,19 +159,19 @@ end subroutine Diffusion
 
 ! subroutine to solve a tri-diagonal system of equations (from Numerical Recipes)
 
-SUBROUTINE tridag(a,b,c,r,u,n)
+      SUBROUTINE tridag(a,b,c,r,u,n)
 
-implicit none
+      implicit none
 
-INTEGER n
-double precision a(n),b(n),c(n),r(n),u(n)
-INTEGER j
-double precision bet
-double precision,dimension(:),allocatable::gam
+      INTEGER n
+      double precision a(n),b(n),c(n),r(n),u(n)
+      INTEGER j
+      double precision bet
+      double precision,dimension(:),allocatable::gam
 
-allocate (gam(n))
+      allocate (gam(n))
 
-if(b(1).eq.0.d0) stop 'in tridag'
+      if(b(1).eq.0.d0) stop 'in tridag'
 
 ! first pass
 

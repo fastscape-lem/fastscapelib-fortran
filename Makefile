@@ -1,4 +1,4 @@
-LIB = fastscapelib.a
+LIB = libfastscape.a
 
 SRC_DIR = src
 
@@ -12,7 +12,7 @@ Strati.o \
 VTK.o \
 FastScape_api.o
 
-FLAGS = -Wall -c -O3 #-fbounds-check
+FLAGS = -c -O3 #-fbounds-check
 
 .PHONY: all clean
 

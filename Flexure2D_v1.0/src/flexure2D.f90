@@ -1,6 +1,6 @@
-subroutine flexure (h,hp,nx,ny,xl,yl,rhos,rhoa,eet,ibc)
+subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
 
-  ! Routine to compute the flexural response of erosin
+  ! Routine to compute the flexural response of erosion
   ! in input:
   ! hp(nx,ny), the topography (in isostatic equilibrium) before erosion, in m,
   ! h(nx,ny), the topography (out of isostatic equilibrium) after erosion, in m,
@@ -20,15 +20,29 @@ subroutine flexure (h,hp,nx,ny,xl,yl,rhos,rhoa,eet,ibc)
 
   implicit none
 
-  integer nx,ny,ibc
-  double precision h(nx,ny),hp(nx,ny),xl,yl,rhos(nx,ny)
-  integer nflex,i,j,ii,jj
-  double precision, dimension(:,:), allocatable :: w
-  double precision hx,dflex,d,rhoa,xk,pihx,g,fi,fj,tij,rat,dx,dy,eet,r,s,h1,h2,h3,h4,pi
+  integer, intent(in) :: nx,ny,ibc
+  double precision, intent(inout), dimension(*) :: hh2
+  double precision, intent(in), dimension(*) :: hp2,rhos2
+  double precision, intent(in) :: xl,yl,rhoa,eet
+
+  integer nflex,i,j,ii,jj,ij
+  double precision, dimension(:,:), allocatable :: w,h,hp,rhos
+  double precision hx,dflex,d,xk,pihx,g,fi,fj,tij,rat,dx,dy,r,s,h1,h2,h3,h4,pi
   double precision ddxf,ddyf,xloc,yloc,hh,hhp,rrhos,dw
   integer iflexmin,iflexmax,jflexmin,jflexmax
   character*4 cbc
 
+  allocate (h(nx,ny),hp(nx,ny),rhos(nx,ny))
+
+  do j=1,ny
+    do i=1,nx
+      ij=(j-1)*nx+i
+      h(i,j)=hh2(ij)
+      hp(i,j)=hp2(ij)
+      rhos(i,j)=rhos2(ij)
+    enddo
+  enddo
+  
   write (cbc,'(i4)') ibc
 
   ! allocate memory
@@ -163,6 +177,13 @@ subroutine flexure (h,hp,nx,ny,xl,yl,rhos,rhoa,eet,ibc)
 
   ! deallocate memory
 
-  deallocate (w)
+do j=1,ny
+  do i=1,nx
+    ij=(j-1)*nx+i
+    hh2(ij)=h(i,j)
+  enddo
+enddo
+
+  deallocate (w,h,hp,rhos)
 
 end subroutine flexure
