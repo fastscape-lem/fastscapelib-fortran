@@ -19,6 +19,15 @@ set(FASTSCAPELIB_SRC_FILES
   ${FASTSCAPELIB_SRC_DIR}/VTK.f90
   )
 
+set(FLEXURE_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Flexure2D_v1.0/src)
+
+set(FLEXURE_SRC_FILES
+    ${FLEXURE_SRC_DIR}/flexure2D.f90
+    ${FLEXURE_SRC_DIR}/four1.f
+    ${FLEXURE_SRC_DIR}/realft.f
+    ${FLEXURE_SRC_DIR}/sinft.f
+    )
+
 # Flags
 # =====
 
@@ -53,13 +62,6 @@ if(BUILD_EXAMPLES)
 endif()
 
 if(USE_FLEXURE)
-  set(FLEXURE_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Flexure2D_v1.0/src)
-  set(FLEXURE_SRC_FILES
-    ${FLEXURE_SRC_DIR}/flexure2D.f90
-    ${FLEXURE_SRC_DIR}/four1.f
-    ${FLEXURE_SRC_DIR}/realft.f
-    ${FLEXURE_SRC_DIR}/sinft.f
-    )
   list(APPEND FASTSCAPELIB_SRC_FILES ${FLEXURE_SRC_FILES})
 endif()
 
