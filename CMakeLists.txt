@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(fastscapelib-fortran)
-
-enable_language(Fortran)
+project(fastscapelib-fortran C Fortran)
 
 set(FASTSCAPELIB_NAME fastscapelib_fortran)
 
