@@ -12,7 +12,6 @@ subroutine Strati (h,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
   double precision, dimension(nx*ny) :: length
   integer, dimension(nx*ny) :: stack,rec
   character*30 names(nfield)
-  integer ibc
 
   double precision, dimension(:), allocatable :: s,dist
   character*3 :: ref
@@ -33,14 +32,6 @@ subroutine Strati (h,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
 
   dx = xl/(nx - 1)
   dy = yl/(ny - 1)
-
-  do i = 0, ireflector - 1
-    reflector(:,i) = min(reflector(:,i),h)
-  enddo
-
-  do i = ireflector, nreflector
-    reflector(:,i) = h
-  enddo
 
   do i = 0, nreflector
     fields(:,1,i) = reflector(:,i)

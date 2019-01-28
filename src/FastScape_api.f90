@@ -391,6 +391,22 @@ end subroutine FastScape_Copy_F
 
 !--------------------------------------------------------------------------
 
+subroutine FastScape_Copy_Lake_Depth(Lp)
+
+use FastScapeContext
+
+implicit none
+
+double precision, intent(inout), dimension(*) :: Lp
+
+call CopyLakeDepth(Lp)
+
+return
+
+end subroutine FastScape_Copy_Lake_Depth
+
+!--------------------------------------------------------------------------
+
 subroutine FastScape_Set_NX_NY (nnx,nny)
 
   use FastScapeContext
@@ -659,3 +675,19 @@ subroutine FastScape_Strati (nstepp, nreflectorp, nfreqp, vexp)
   return
 
 end subroutine FastScape_Strati
+
+!--------------------------------------------------------------------------
+
+subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
+  
+  use FastScapeContext
+  
+  implicit none
+  
+  double precision, intent(out) :: ttectonic_flux, eerosion_flux, bboundary_flux
+  
+  call compute_fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
+  
+  return
+  
+end subroutine FastScape_Get_Fluxes

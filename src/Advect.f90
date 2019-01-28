@@ -36,7 +36,6 @@ subroutine Advect ()
         sup(i)=vx2(i,j)*dt/dx
       endif
     enddo
-
     sup(1)=0.d0
     diag(1)=1.d0
     diag(nx)=1.d0
@@ -77,7 +76,6 @@ subroutine Advect ()
         sup(j)=vy2(i,j)*dt/dy
       endif
     enddo
-
     sup(1)=0.d0
     diag(1)=1.d0
     diag(ny)=1.d0
