@@ -153,7 +153,7 @@ subroutine StreamPowerLaw ()
 
   lake_sediment=0.d0
 
-	do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
+  do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
     ! guess/update the elevation at t+Δt (k)
     hp=h
@@ -209,14 +209,14 @@ subroutine StreamPowerLaw ()
               !if (h(ijk).ge.sealevel.or..not.runMarine) then
               f = elev(ijk)
               df = 1.d0
-							do k=1,mnrec(ijk)
+              do k=1,mnrec(ijk)
                 !if (ht(ijk).ge.ht(mrec(k,ijk))) then
-								if (ht(ijk).ge.ht(mrec(k,ijk))) then
+                if (ht(ijk).ge.ht(mrec(k,ijk))) then
                   fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
                   f = f + fact*h(mrec(k,ijk))
                   df = df + fact
-								endif
-							enddo
+                endif
+              enddo
               h(ijk)=f/df
               !endif
             endif
@@ -264,13 +264,13 @@ subroutine StreamPowerLaw ()
 
     err=maxval(abs(h-hp))
 
-	enddo
+  enddo
 
-	do ij=1,nn
+  do ij=1,nn
     if (lake_water_volume(lake_sill(ij)).gt.0.d0) h(ij)=h(ij) &
     +max(0.d0,min(lake_sediment(lake_sill(ij)),lake_water_volume(lake_sill(ij))))/ &
     lake_water_volume(lake_sill(ij))*(water(ij)-h(ij))
-	enddo
+  enddo
 
   deallocate (mrec,mwrec,mlrec,mnrec,mstack,hwater)
 
