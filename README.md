@@ -12,6 +12,12 @@ online for more details on how to build, install and use the library.
 
 GPLv3. See [License file](https://github.com/fastscape-lem/fastscapelib-fortran/blob/master/LICENSE).
 
+## Acknowledgment
+
+This project is supported by the
+[Earth Surface Process Modelling](http://www.gfz-potsdam.de/en/section/earth-surface-process-modelling/)
+group of the GFZ Helmholtz Centre Potsdam.
+
 ## Citation
 
 If you use Fastscapelib-fortran in a scientific publication, we would
