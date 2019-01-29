@@ -1,0 +1,7 @@
+language: ruby
+
+before_install:
+  - gem install asciidoctor
+
+script:
+  - asciidoctor docs/index.adoc -o index.html
