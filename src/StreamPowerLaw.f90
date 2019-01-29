@@ -162,6 +162,8 @@ subroutine StreamPowerLaw ()
     ! calculate erosion/deposition at each node
     dh=ht-hp
 
+    lake_sill = 0
+
     ! sum the erosion in stack order
     do ij=1,nn
       ijk=mstack(ij)
