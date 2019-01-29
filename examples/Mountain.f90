@@ -42,15 +42,15 @@ program Mountain
   ! set erosional parameters
   allocate (kf(nx*ny),kd(nx*ny))
   kf = 2.d-6
-  kfsed = 2.d-6
+  kfsed = -1.d0
   m = 0.6d0
   n = 1.5d0
   kd = 1.d-1
-  kdsed = 1.d-1
+  kdsed = -1.d0
   g = 0.d0
-  call FastScape_Set_Erosional_Parameters (kf, kfsed, m, n, kd, kdsed, g, g, 20.d0)
+  call FastScape_Set_Erosional_Parameters (kf, kfsed, m, n, kd, kdsed, g, g, 10.d0)
 
-  ! set uplift rate
+  ! set uplift rate (uniform while keeping bounaries at base level)
   allocate (u(nx*ny))
   u = 1.d-3
   u(1:nx)=0.d0
@@ -66,6 +66,7 @@ program Mountain
   nstep = 100
   call FastScape_Get_Step (istep)
 
+  !allocate memory to extract chi
   allocate (chi(nx*ny))
 
   ! loop on time stepping
@@ -80,7 +81,7 @@ program Mountain
     call FastScape_VTK (chi, 2.d0)
     ! outputs h values
     call FastScape_Copy_h (h)
-    print*,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
+    print*,'step',istep,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
   enddo
 
   ! output timing

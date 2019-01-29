@@ -91,7 +91,7 @@ program DippingDyke
     call FastScape_VTK (chi, 2.d0)
     ! outputs h values
     call FastScape_Copy_h (h)
-    print*,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
+    print*,'step',istep,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
   enddo
 
   ! output timing

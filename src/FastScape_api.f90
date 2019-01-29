@@ -713,15 +713,15 @@ end subroutine FastScape_Strati
 !--------------------------------------------------------------------------
 
 subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
-  
+
   use FastScapeContext
-  
+
   implicit none
-  
+
   double precision, intent(out) :: ttectonic_flux, eerosion_flux, bboundary_flux
-  
+
   call compute_fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
-  
+
   return
-  
+
 end subroutine FastScape_Get_Fluxes

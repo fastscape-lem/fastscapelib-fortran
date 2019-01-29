@@ -186,9 +186,9 @@ subroutine StreamPowerLaw ()
     enddo
 
     where (bc)
-      elev=ht
-    elsewhere
-      elev=ht+(dh-(ht-hp))*g*dx*dy/a
+    elev=ht
+  elsewhere
+    elev=ht+(dh-(ht-hp))*g*dx*dy/a
     endwhere
 
     ! apply modified stream power law using lake surface (hwater)
@@ -206,19 +206,18 @@ subroutine StreamPowerLaw ()
           w_rcv=water(ijr1)
           if (elev(ijk).gt.w_rcv) then
             if (mnrec(ijk).gt.0) then
-              !if (h(ijk).ge.sealevel.or..not.runMarine) then
-              f = elev(ijk)
-              df = 1.d0
-							do k=1,mnrec(ijk)
-                !if (ht(ijk).ge.ht(mrec(k,ijk))) then
-								if (ht(ijk).ge.ht(mrec(k,ijk))) then
-                  fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
-                  f = f + fact*h(mrec(k,ijk))
-                  df = df + fact
-								endif
-							enddo
-              h(ijk)=f/df
-              !endif
+              if (h(ijk).ge.sealevel.or..not.runMarine) then
+                f = elev(ijk)
+                df = 1.d0
+                do k=1,mnrec(ijk)
+                  if (ht(ijk).ge.ht(mrec(k,ijk))) then
+                    fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
+                    f = f + fact*h(mrec(k,ijk))
+                    df = df + fact
+                  endif
+                enddo
+                h(ijk)=f/df
+              endif
             endif
             lake_sill(ijk)=ijk
             lake_water_volume(ijk)=0.d0
@@ -236,27 +235,45 @@ subroutine StreamPowerLaw ()
 
       do ij=nn,1,-1
         ijk=mstack(ij)
-        if (mnrec(ijk).gt.0) then
-          if (ht(ijk).ge.sealevel.or..not.runMarine) then
-            omega=0.875d0/n
-            tolp=1.d-3
-            errp=2.d0*tolp
-            h0=elev(ijk)
-            do while (errp.gt.tolp)
-              f=hwater(ijk)-h0
-              df=1.d0
-              do k=1,mnrec(ijk)
-                if (ht(ijk).gt.ht(mrec(k,ijk))) then
-                  fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)**n
-                  f=f+fact*max(0.d0,hwater(ijk)-hwater(mrec(k,ijk)))**n
-                  df=df+fact*n*max(0.d0,hwater(ijk)-hwater(mrec(k,ijk)))**(n-1.d0)
-                endif
-              enddo
-              hn=hwater(ijk)-f/df
-              errp=abs(hn-hwater(ijk))
-              hwater(ijk)=hwater(ijk)*(1.d0-omega)+hn*omega
-            enddo
+        ijr1=rec(ijk)
+        if (ijr1.eq.ijk) then
+          water(ijk)=ht(ijk)
+          lake_sill(ijk)=ijk
+          lake_water_volume(ijk)=0.d0
+        else
+          w_rcv=water(ijr1)
+          if (elev(ijk).gt.w_rcv) then
+            if (mnrec(ijk).gt.0) then
+              if (ht(ijk).ge.sealevel.or..not.runMarine) then
+                omega=0.875d0/n
+                tolp=1.d-3
+                errp=2.d0*tolp
+                h0=elev(ijk)
+                do while (errp.gt.tolp)
+                  f=h(ijk)-h0
+                  df=1.d0
+                  do k=1,mnrec(ijk)
+                    if (ht(ijk).gt.ht(mrec(k,ijk))) then
+                      fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)**n
+                      f=f+fact*max(0.d0,h(ijk)-h(mrec(k,ijk)))**n
+                      df=df+fact*n*max(0.d0,h(ijk)-h(mrec(k,ijk)))**(n-1.d0)
+                    endif
+                  enddo
+                  hn=h(ijk)-f/df
+                  errp=abs(hn-h(ijk))
+                  h(ijk)=h(ijk)*(1.d0-omega)+hn*omega
+                enddo
+              endif
+            endif
+            lake_sill(ijk)=ijk
+            lake_water_volume(ijk)=0.d0
+            if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
+          else
+            h(ijk)=elev(ijk)
+            lake_sill(ijk)=lake_sill(ijr1)
+            lake_water_volume(lake_sill(ijk))=lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
           endif
+          water(ijk)=max(w_rcv,h(ijk))
         endif
       enddo
 
@@ -290,22 +307,22 @@ end subroutine StreamPowerLaw
 
 recursive subroutine find_stack	(ij,don,ndon,nn,stack,nstack,catch)
 
-  ! recursive routine to go through all nodes following donor information
+! recursive routine to go through all nodes following donor information
 
-  implicit none
-  integer don(8,nn),ndon(nn),stack(nn)
-  double precision catch(nn)
-  integer k,ij,ijk,nn,nstack
+implicit none
+integer don(8,nn),ndon(nn),stack(nn)
+double precision catch(nn)
+integer k,ij,ijk,nn,nstack
 
-  do k=1,ndon(ij)
-    ijk=don(k,ij)
-    nstack=nstack+1
-    stack(nstack)=ijk
-    catch(ijk)=catch(ij)
-    call find_stack (ijk,don,ndon,nn,stack,nstack,catch)
-  enddo
+do k=1,ndon(ij)
+  ijk=don(k,ij)
+  nstack=nstack+1
+  stack(nstack)=ijk
+  catch(ijk)=catch(ij)
+  call find_stack (ijk,don,ndon,nn,stack,nstack,catch)
+enddo
 
-  return
+return
 end subroutine find_stack
 
 !-----------------------------------------------------

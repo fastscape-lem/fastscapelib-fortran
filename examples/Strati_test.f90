@@ -15,13 +15,9 @@ program Strati_test
 
   implicit none
 
-  integer :: nx, ny, istep, nstep, nfreq, i, j, nfreqref
+  integer :: nx, ny, istep, nstep, nfreq, i, j, nreflector
   double precision :: xl, yl, dt, kfsed, m, n, kdsed, g, sealevel, poro, zporo, ratio, L, kds, vex, pi
-  double precision, dimension(:), allocatable :: h, u, x, y, kf, kd, fd
-
-  double precision, dimension(:,:), allocatable :: reflector
-  double precision, dimension(:,:,:), allocatable :: fields
-  integer nreflector, ireflector, nfield
+  double precision, dimension(:), allocatable :: h, u, x, y, kf, kd
 
   pi=atan(1.d0)*4.d0
 
@@ -104,7 +100,7 @@ program Strati_test
     ! message to the screen
     if (mod(istep,nfreq).eq.0) then
       call FastScape_Copy_H (h)
-      print*,'Calling Strati',minval(h),sum(h)/(nx*ny),maxval(h)
+      print*,'Calling Strati','step',istep,'h-range:',minval(h),sum(h)/(nx*ny),maxval(h)
     endif
   enddo
 

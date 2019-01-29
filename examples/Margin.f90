@@ -3,7 +3,7 @@ program Margin
   ! Example of the use of the FastScapeInterface
   ! where a square domain (100x100km) is subjected to constant and uniform uplift
   ! of 1 mm/yr while adjacent area (100x100 km) is kept 1000 m below sea level
-  ! all boundaries are at base level
+  ! bottom boundary is at base level, top is nu flux and left and rigth are cyclic
   ! initial random topography
   ! nonlinear erosion law (n=2, m=0.8)
   ! transport coefficient g = 1
@@ -18,7 +18,6 @@ program Margin
   integer :: nx, ny, istep, nstep, nfreq, i, j
   double precision :: xl, yl, dt, kfsed, m, n, kdsed, g, sealevel, poro, zporo, ratio, L, kds
   double precision, dimension(:), allocatable :: h, u, x, y, kf, kd, fd
-  character*20, dimension(:), allocatable :: name
 
   ! initialize FastScape
   call FastScape_Init ()
@@ -67,17 +66,13 @@ program Margin
   zporo = 1.d3
   ratio = 0.5d0
   L = 1.d2
-  kds = 1.d2
+  kds = 3.d2
   call FastScape_Set_Marine_Parameters &
-       (sealevel, poro, poro, zporo, zporo, ratio, L, kds, kds/10.d0)
+       (sealevel, poro, poro, zporo, zporo, ratio, L, kds, kds/2.d0)
 
   ! set uplift rate
   allocate (u(nx*ny))
   u = 1.d-3
-  !u(1:nx)=0.d0
-  !u(nx:nx*ny:nx)=0.d0
-  !u(1:nx*ny:nx)=0.d0
-  !u(nx*(ny-1)+1:nx*ny)=0.d0
   where (y<yl/2.d0) u = 0.d0
   call FastScape_Set_U (u)
 

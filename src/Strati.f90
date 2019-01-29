@@ -1,5 +1,5 @@
-subroutine Strati (h,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,nfield,vex,dt, &
-  stack,rec,length)
+subroutine Strati (h,b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,nfield,vex,dt, &
+  stack,rec,length,sealevel)
 
   ! this routine tracks information (fields) on a set of reflectors (reflector)
   ! and outputs it to a set of VTKs.
@@ -7,8 +7,8 @@ subroutine Strati (h,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
   implicit none
 
   integer :: nx, ny, nn, nreflector, ireflector, i, nfield, istep
-  double precision reflector(nx*ny,0:nreflector), h(nx*ny), F(nx*ny), dx, dy, vex, dt
-  double precision fields(nx*ny,nfield,0:nreflector), xl, yl
+  double precision reflector(nx*ny,nreflector), h(nx*ny), b(nx*ny), F(nx*ny), dx, dy, vex, dt
+  double precision fields(nx*ny,nfield,nreflector), xl, yl,sealevel
   double precision, dimension(nx*ny) :: length
   integer, dimension(nx*ny) :: stack,rec
   character*30 names(nfield)
@@ -33,17 +33,19 @@ subroutine Strati (h,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
   dx = xl/(nx - 1)
   dy = yl/(ny - 1)
 
-  do i = 0, nreflector
+  do i = 1, nreflector
     fields(:,1,i) = reflector(:,i)
     call slope (reflector(:,i),s,nx,ny,dx,dy)
     fields(:,2,i) = s
-    call distance_to_shore (reflector(:,i),dist,nx,ny,stack,rec,length)
-    if (i.gt.0) then
+    if (rec(1).ne.0) call distance_to_shore (reflector(:,i),dist,nx,ny,stack,rec,length)
+    if (i.gt.1) then
       fields(:,3,i) = reflector(:,i)-reflector(:,i-1)
-      fields(:,4,i) = reflector(:,i)-reflector(:,0)
+    else
+      fields(:,3,i) = reflector(:,i)-b
     endif
+    fields(:,4,i) = reflector(:,i)-b
     if (i.ge.ireflector) then
-      fields(:,5,i) = reflector(:,i)
+      fields(:,5,i) = reflector(:,i) + sealevel
       fields(:,6,i) = s
       fields(:,7,i) = dist
       fields(:,8,i) = F
@@ -62,7 +64,7 @@ subroutine Strati (h,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
   names(9) = '9.ReflectorAge(yr)'
   names(10) = 'A.ThicknessErodedBelow(m)'
 
-  do i = 0, nreflector
+  do i = 1, nreflector
     write (ref,'(i3)') i
     if (i.lt.10) ref(1:2)='00'
     if (i.lt.100) ref(1:1)='0'
@@ -84,7 +86,7 @@ subroutine slope (h,s,nx,ny,dx,dy)
   implicit none
 
   double precision h(nx*ny),s(nx*ny),dx,dy
-  integer nx,ny,nn
+  integer nx,ny
 
   integer i,j,ij,ia,ib,ic,id,ie,if,ig,ih,ii
   double precision dzdx,dzdy,con
@@ -121,7 +123,6 @@ subroutine distance_to_shore (h,d,nx,ny,stack,rec,length)
 
   integer nx, ny
   double precision, dimension(nx*ny) :: h, d
-  double precision dx, dy
   integer, dimension(nx*ny) :: stack, rec
   double precision, dimension(nx*ny) :: length
 

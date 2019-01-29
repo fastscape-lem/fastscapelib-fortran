@@ -138,7 +138,7 @@ sediment river incision (SPL) rate parameter (or Kf) in meters (to the power 1-2
 
 [NOTE]
 ====
-bedrock refers to situations/locations where deposited sediment thickness is nil, whereas sediment referes to situations/locations where sediment thickness is finite
+bedrock refers to situations/locations where deposited sediment thickness is less than 1 meter, whereas sediment refers to situations/locations where sediment thickness is greater than 1 meter
 ====
 
 `m` ::
@@ -479,6 +479,18 @@ array of dimension `(nx*ny)` containing a different index for each catchment (do
 the catchment index is the node number (in a series going from 1 to nx*ny from bottom left corner to upper right corner) corresponding to the outlet (base level node) of the catchment
 ====
 
+=== FastScape_Copy_Lake_Depth
+
+This routine is used to extract from the model the geometry and depth of lakes (ie., regions draining into a local minimum)
+
+Arguments:
+
+`FastScape_Copy_Lake_Depth ( Ld)`
+
+`Ld` ::
+
+array of dimension `(nx*ny)` containing the depth of lakes in meters (double precision)
+
 === FastScape_Get_Sizes
 
 This routine is used to extract from the model the model dimensions
@@ -492,6 +504,23 @@ Resolution or number of grid points in the x-direction (integer)
 
 `ny` ::
 Resolution or number of grid points in the y-direction (integer)
+
+=== FastScape_Get_Fluxes
+
+This routine is used to extract three fluxes from the model at the current time step: the tectonic flux which is the integral over the model of the uplift/subsidence function, the erosion flux which is the integral over the model of the erosion/deposition rate and the boundary flux which is the integral of sedimentary flux across the four boundaries (all in cubic meters per year)
+
+Arguments:
+
+`FastScape_Get_Fluxes ( tflux, eflux, bflux)`
+
+`tflux` ::
+tectonic flux in in cubic meters per year (double precision)
+
+`teflux` ::
+erosion flux in in cubic meters per year (double precision)
+
+`bflux` ::
+boundary flux in in cubic meters per year (double precision)
 
 === FastScape_View
 
@@ -519,7 +548,7 @@ This routine has no argument:
 
 === FastScape_VTK
 
-This routine creates a `.vtk` file for visualization in **Paraview** (see `http://www.paraview.org`); the file will be named `Topographyxxxxxx.vtk` where `xxxxxx` is the current time step number and stored in a directory called `VTK`. If  `vex < 0`, it also creates another `.vtk` file named `Basementxxxxxx.vtk`.
+This routine creates a `.vtk` file for visualization in **Paraview** (see `http://www.paraview.org`); the file will be named `Topographyxxxxxx.vtk` where `xxxxxx` is the current time step number and stored in a directory called `VTK`. If  `vex < 0`, it also creates other `.vtk` files named `Basementxxxxxx.vtk` (containing the basement geometry in m) and `SeaLevelxxxxxx.vtk` (containing the current sea level in m).
 
 [WARNING]
 ====
