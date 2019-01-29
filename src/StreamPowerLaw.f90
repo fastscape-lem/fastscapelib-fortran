@@ -7,9 +7,9 @@ subroutine StreamPowerLaw ()
 
   implicit none
 
-  integer :: i,j,ij,ii,jj,iii,jjj,ijk,ijr,i1,i2,j1,j2,np,n_local_minima,k,ijr1
-  double precision :: dx,dy,smax,l,slope,fact,diff,tol,err
-  double precision :: f,df,errp,h0,hn,omega,tolp,depos,w_rcv
+  integer :: i,j,ij,ii,jj,iii,jjj,ijk,ijr,i1,i2,j1,j2,k,ijr1
+  double precision :: dx,dy,smax,l,slope,fact,tol,err
+  double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
   character cbc*4
   logical xcyclic,ycyclic
   double precision, dimension(:), allocatable :: rhs,ht,g,kfint,bt,dh,hp
@@ -432,7 +432,7 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
     pp = p
     if (pp<0.d0) then
       slope = 0.d0
-      if (nrec(ij).ne.0) slope = sum(wrec(1:nrec(ij),ij))/nrec(ij)
+      if (nrec(ij).ne.0) slope = real(sum(wrec(1:nrec(ij),ij))/nrec(ij))
       pp = 0.5 + 0.6*slope
     endif
     do k=1,nrec(ij)

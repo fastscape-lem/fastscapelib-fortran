@@ -34,7 +34,7 @@ set(FLEXURE_SRC_FILES
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
     set(dialect "-ffree-form -std=f2008 -fimplicit-none")
     set(bounds "-fbounds-check")
-    set(warnings "-Wall")
+    set(warnings "-Wall -Wno-unused-dummy-argument")
 endif()
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     set(dialect "-stand f08 -free -implicitnone")
