@@ -46,8 +46,6 @@ module FastScapeContext
 
     implicit none
 
-    integer i,j,ij
-
     if (nx.eq.0) stop 'FastScapeSetup - You need to set nx first'
     if (ny.eq.0) stop 'FastScapeSetup - You need to set ny first'
 
@@ -254,7 +252,7 @@ module FastScapeContext
 
   !---------------------------------------------------------------
 
-	subroutine CopyLakeDepth (Lp)
+  subroutine CopyLakeDepth (Lp)
 
     double precision, intent(out), dimension(*) :: Lp
 
@@ -264,7 +262,7 @@ module FastScapeContext
 
     return
 
-	end subroutine CopyLakeDepth
+  end subroutine CopyLakeDepth
 
   !---------------------------------------------------------------
 
@@ -555,7 +553,7 @@ module FastScapeContext
     h = h + dh(1:nn)
     b = b + dh(1:nn)
     if (runStrati) then
-      do i = 0, nreflector
+      do i = 1, nreflector
         reflector(:,i) = reflector(:,i) + dh(1:nn)
       enddo
     endif
@@ -673,17 +671,17 @@ module FastScapeContext
     nfield = 10
 
     nfreqref = nstepp/nreflectorp
-    ireflector = 0
+    ireflector = 1
     vexref = vexp
     nreflector = nreflectorp
     nfreq = nfreqp
 
-    allocate (reflector(nn,0:nreflector),fields(nn,nfield,0:nreflector))
+    allocate (reflector(nn,nreflector),fields(nn,nfield,nreflector))
 
     fields=0.d0
 
-    call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
-    fields, nfield, vexref, dt*nfreqref, stack, rec, length)
+    !call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
+    !fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
 
     runStrati = .true.
 
@@ -698,16 +696,16 @@ module FastScapeContext
     integer i
 
     ! uplift reflectors
-    do i = 0, nreflector
+    do i = 1, nreflector
       reflector(:,i) = reflector(:,i) + u*dt
     enddo
 
     ! updates erosion below each reflector
-    do i=0, ireflector
+    do i= 1, ireflector
       fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
     enddo
 
-    do i = 0, ireflector - 1
+    do i = 1, ireflector - 1
       reflector(:,i) = min(reflector(:,i),h)
     enddo
 
@@ -717,8 +715,8 @@ module FastScapeContext
 
     if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
       if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
-      call Strati (h, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
-      fields, nfield, vexref, dt*nfreqref, stack, rec, length)
+      call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
+      fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
     endif
 
   end subroutine run_Strati

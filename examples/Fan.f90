@@ -17,26 +17,25 @@ program Fan
   double precision, dimension(:), allocatable :: h,hp,x,y,kf,kd,b
   real :: time_in,time_out
   double precision :: kfsed,m,n,kdsed,g1,g2,expp
-  double precision xl,yl,dx,dy,dt,pi,vex
+  double precision xl,yl,dt,pi,vex
 
-  integer i,j,ij
+  integer i,j
 
+  ! set model resolution
   nx = 101
   ny = 201
   nn = nx*ny
 
   pi=atan(1.d0)*4.d0
 
-  vex = 3.d0
-
+  ! initialize FastScape
   call FastScape_Init ()
   call FastScape_Set_NX_NY (nx,ny)
   call FastScape_Setup ()
 
+  ! set model dimensions
   xl=10.d3
   yl=20.d3
-  dx=xl/(nx-1)
-  dy=yl/(ny-1)
   call FastScape_Set_XL_YL (xl,yl)
 
   ! construct nodal coordinate arrays x and y
@@ -44,6 +43,7 @@ program Fan
   x = (/((xl*float(i-1)/(nx-1), i=1,nx),j=1,ny)/)
   y = (/((yl*float(j-1)/(ny-1), i=1,nx),j=1,ny)/)
 
+  ! set time step
   dt=2.d3
   call FastScape_Set_DT (dt)
 
@@ -70,41 +70,42 @@ program Fan
   where (y.gt.yl/2.d0) h=h+1000.d0
   call FastScape_Init_H (h)
 
+  ! set number of time steps
   nstep = 200
 
-  call FastScape_View()
-  istep = nstep
+  ! echo model setup
+  call FastScape_View ()
 
-  ! we store the sedimentary flux inm a file named Fluxes.txt
-  ! the two columns correspond to the total flux coming out of the
-  ! landscape and the flux coming out of the plateau only
-  open (88,file='Fluxes.txt',status='unknown')
+  ! initializes time step
+  call FastScape_Get_Step (istep)
 
+   ! set vertical exaggeration
+  vex = 3.d0
+
+  ! start of time loop
   call cpu_time (time_in)
-  do while (istep.le.nstep)
+  do while (istep.lt.nstep)
 
-    call FastScape_Copy_H (hp)
+    ! execute FastScape step
     call FastScape_Execute_Step ()
-
     call FastScape_Get_Step (istep)
 
+    ! output vtk with sediment thickness information
     call FastScape_Copy_H (h)
-    write (88,*) sum(hp-h)*dx*dy/dt, sum(hp-h, y.gt.yl/2.d0)*dx*dy/dt
-
     call FastScape_Copy_Basement (b)
     call FastScape_VTK (h-b, vex)
 
   enddo
 
+  ! display timing information
   call FastScape_Debug()
-
-  close (88)
-
   call cpu_time (time_out)
   print*,'Total run time',time_out-time_in
 
+  ! exits FastScape
   call FastScape_Destroy ()
 
+  ! deallocate memory
   deallocate (h,x,y,kf,kd,b,hp)
 
 end program Fan

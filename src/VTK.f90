@@ -71,7 +71,7 @@ subroutine VTK_CUBE (fields, nx, ny, nf, nreflector, xl, yl, fname)
 
     implicit none
 
-    double precision, dimension(nx,ny,nf,0:nreflector) :: fields
+    double precision, dimension(nx,ny,nf,nreflector) :: fields
     integer :: nx, ny, nf, nreflector
     double precision :: xl, yl
     integer nheader,nfooter,npart1,npart2,nn,namel
@@ -89,7 +89,7 @@ subroutine VTK_CUBE (fields, nx, ny, nf, nreflector, xl, yl, fname)
     nn=nx*ny*(nreflector + 1)
     write (nxc,'(i6)') nx
     write (nyc,'(i6)') ny
-    write (nrefc,'(i3)') nreflector + 1
+    write (nrefc,'(i3)') nreflector
     write (nnc,'(i12)') nn
 
     header(1:1024)=''
@@ -112,7 +112,7 @@ subroutine VTK_CUBE (fields, nx, ny, nf, nreflector, xl, yl, fname)
     recl=nheader+3*4*nn+nfooter+nf*(npart1+npart2+4*nn)+namel,convert='big_endian')
     write (77,rec=1) &
     header(1:nheader), &
-    (((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(dz*(k-1)),i=1,nx),j=1,ny),k=1,nreflector+1), &
+    (((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(dz*(k-1)),i=1,nx),j=1,ny),k=1,nreflector), &
     footer(1:nfooter), &
     (part1(1:npart1)//trim(fname(k))//part2(1:npart2),sngl(fields(:,:,k,:)),k=1,nf)
     close(77)
