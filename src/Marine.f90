@@ -40,7 +40,7 @@ subroutine Marine()
   where (h.gt.sealevel) flux=0.d0
 
   ! set nodes at transition between ocean and continent
-  where (flux.gt.tiny(flux)) flag=1
+  !where (flux.gt.tiny(flux)) flag=1
 
   ! decompact volume of pure solid phase (silt and sand) from onshore
   ratio1=ratio/(1.d0-poro1)
@@ -71,10 +71,10 @@ subroutine Marine()
       endif
     enddo
   enddo
- ! end modifications
+  ! end modifications
 
- ! passes the flux across the shelf
- ! modifications made by Jean
+  ! passes the flux across the shelf
+  ! modifications made by Jean
 
   where (h.lt.sealevel) flux=flux+(h-shelfdepth)
   do ij=1,nn
@@ -84,7 +84,7 @@ subroutine Marine()
       flux(ijr)=flux(ijr)+max(0.d0,flux(ijk)*mwrec(k,ijk))
     enddo
   enddo
- ! modifications made by Jean
+  ! modifications made by Jean
 
   deallocate (mrec,mnrec,mwrec,mlrec,mstack,mwater)
 
@@ -108,7 +108,7 @@ subroutine Marine()
 
   ! silt and sand coupling diffusion in ocean
   call SiltSandCouplingDiffusion (h,Fmix,flux*Fs,flux*(1.d0-Fs), &
-       nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag)
+  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,ibc)
 
   ! pure silt and sand during deposition/erosion
   dh1=((h-ht)*Fmix+layer*(Fmix-Fmixt))*(1.d0-poro1)
@@ -164,7 +164,7 @@ end subroutine Marine
 !----------------------------------------------------------------------------------
 
 subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
-     sealevel,L,kdsea1,kdsea2,niter,flag)
+  sealevel,L,kdsea1,kdsea2,niter,flag,ibc)
 
   implicit none
 
@@ -174,10 +174,14 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
   double precision, dimension(:), allocatable :: diag,sup,inf,rhs,res,tint
   integer flag(nx*ny)
 
-  integer i,j,ij,ipj,imj,ijp,ijm,nn,nx,ny,niter
+  integer i,j,ij,ipj,imj,ijp,ijm,nn,nx,ny,niter,ibc
   double precision dx,dy,dt,sealevel,L,kdsea1,kdsea2
   double precision K1,K2,tol,err1,err2
   double precision Ap,Bp,Cp,Dp,Ep,Mp,Np
+
+  character*4 cbc
+
+  write (cbc,'(i4)') ibc
 
   K1=kdsea1
   K2=kdsea2
@@ -217,24 +221,44 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
         ! in ocean and not at ocean-continent transition
         if (ht(ij).le.sealevel.and.flag(ij).eq.0) then
           if (i.eq.1) then
-            Ap=dt/2.d0*(K2+(K1-K2)*(fhalfp(ipj)+fhalfp(ij))/2.d0)/dx**2
-            diag(i)=1.d0+Ap
-            sup(i)=-Ap
+            if (cbc(4:4).eq.'1') then
+              diag(i)=1.d0
+              sup(i)=0.d0
+              rhs(i)=ht(ij)
+            else
+              Ap=dt/2.d0*(K2+(K1-K2)*(fhalfp(ipj)+fhalfp(ij))/2.d0)/dx**2
+              diag(i)=1.d0+Ap
+              sup(i)=-Ap
+              Cp=dt/2.d0*(K2+(K1-K2)*(ft(ijp)+ft(ij))/2.d0)*(ht(ijp)-ht(ij))/dy**2 &
+              -dt/2.d0*(K2+(K1-K2)*(ft(ij)+ft(ijm))/2.d0)*(ht(ij)-ht(ijm))/dy**2 &
+              +(Q1(ij)+Q2(ij))*dt/2.d0
+              rhs(i)=Cp+ht(ij)
+            endif
           elseif (i.eq.nx) then
-            Bp=-dt/2.d0*(K2+(K1-K2)*(fhalfp(ij)+fhalfp(imj))/2.d0)/dx**2
-            diag(i)=1.d0-Bp
-            inf(i)=Bp
+            if (cbc(2:2).eq.'1') then
+              diag(i)=1.d0
+              inf(i)=0.d0
+              rhs(i)=ht(ij)
+            else
+              Bp=-dt/2.d0*(K2+(K1-K2)*(fhalfp(ij)+fhalfp(imj))/2.d0)/dx**2
+              diag(i)=1.d0-Bp
+              inf(i)=Bp
+              Cp=dt/2.d0*(K2+(K1-K2)*(ft(ijp)+ft(ij))/2.d0)*(ht(ijp)-ht(ij))/dy**2 &
+              -dt/2.d0*(K2+(K1-K2)*(ft(ij)+ft(ijm))/2.d0)*(ht(ij)-ht(ijm))/dy**2 &
+              +(Q1(ij)+Q2(ij))*dt/2.d0
+              rhs(i)=Cp+ht(ij)
+            endif
           else
             Ap=dt/2.d0*(K2+(K1-K2)*(fhalfp(ipj)+fhalfp(ij))/2.d0)/dx**2
             Bp=-dt/2.d0*(K2+(K1-K2)*(fhalfp(ij)+fhalfp(imj))/2.d0)/dx**2
             diag(i)=1.d0+Ap-Bp
             sup(i)=-Ap
             inf(i)=Bp
+            Cp=dt/2.d0*(K2+(K1-K2)*(ft(ijp)+ft(ij))/2.d0)*(ht(ijp)-ht(ij))/dy**2 &
+            -dt/2.d0*(K2+(K1-K2)*(ft(ij)+ft(ijm))/2.d0)*(ht(ij)-ht(ijm))/dy**2 &
+            +(Q1(ij)+Q2(ij))*dt/2.d0
+            rhs(i)=Cp+ht(ij)
           endif
-          Cp=dt/2.d0*(K2+(K1-K2)*(ft(ijp)+ft(ij))/2.d0)*(ht(ijp)-ht(ij))/dy**2 &
-               -dt/2.d0*(K2+(K1-K2)*(ft(ij)+ft(ijm))/2.d0)*(ht(ij)-ht(ijm))/dy**2 &
-               +(Q1(ij)+Q2(ij))*dt/2.d0
-          rhs(i)=Cp+ht(ij)
           ! in continent
         else
           diag(i)=1.d0
@@ -276,8 +300,8 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
             Ep=K1/2.d0*(hhalf(ipj)-hhalf(ij))/dx**2
             Mp=-K1/2.d0*(hhalf(ij)-hhalf(imj))/dx**2
             Np=K1/2.d0*(ft(ijp)+ft(ij))*(ht(ijp)-ht(ij))/dy**2 &
-                 -K1/2.d0*(ft(ij)+ft(ijm))*(ht(ij)-ht(ijm))/dy**2 &
-                 +Q1(ij)
+            -K1/2.d0*(ft(ij)+ft(ijm))*(ht(ij)-ht(ijm))/dy**2 &
+            +Q1(ij)
             diag(i)=2.d0*L/dt+Dp-Mp-Ep
             sup(i)=-Ep
             inf(i)=-Mp
@@ -328,24 +352,44 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
         ! in ocean and not at ocean-continent transition
         if (ht(ij).le.sealevel.and.flag(ij).eq.0) then
           if (j.eq.1) then
-            Ap=dt/2.d0*(K2+(K1-K2)*(fp(ijp)+fp(ij))/2.d0)/dy**2
-            diag(j)=1.d0+Ap
-            sup(j)=-Ap
+            if (cbc(1:1).eq.'1') then
+              diag(j)=1.d0
+              sup(j)=0.d0
+              rhs(j)=hhalf(ij)
+            else
+              Ap=dt/2.d0*(K2+(K1-K2)*(fp(ijp)+fp(ij))/2.d0)/dy**2
+              diag(j)=1.d0+Ap
+              sup(j)=-Ap
+              Cp=dt/2.d0*(K2+(K1-K2)*(fhalf(ipj)+fhalf(ij))/2.d0)*(hhalf(ipj)-hhalf(ij))/dx**2 &
+              -dt/2.d0*(K2+(K1-K2)*(fhalf(ij)+fhalf(imj))/2.d0)*(hhalf(ij)-hhalf(imj))/dx**2 &
+              +(Q1(ij)+Q2(ij))*dt/2.d0
+              rhs(j)=Cp+hhalf(ij)
+            endif
           elseif (j.eq.ny) then
-            Bp=-dt/2.d0*(K2+(K1-K2)*(fp(ij)+fp(ijm))/2.d0)/dy**2
-            diag(j)=1.d0-Bp
-            inf(j)=Bp
+            if (cbc(3:3).eq.'1') then
+              diag(j)=1.d0
+              inf(j)=0.d0
+              rhs(j)=hhalf(ij)
+            else
+              Bp=-dt/2.d0*(K2+(K1-K2)*(fp(ij)+fp(ijm))/2.d0)/dy**2
+              diag(j)=1.d0-Bp
+              inf(j)=Bp
+              Cp=dt/2.d0*(K2+(K1-K2)*(fhalf(ipj)+fhalf(ij))/2.d0)*(hhalf(ipj)-hhalf(ij))/dx**2 &
+              -dt/2.d0*(K2+(K1-K2)*(fhalf(ij)+fhalf(imj))/2.d0)*(hhalf(ij)-hhalf(imj))/dx**2 &
+              +(Q1(ij)+Q2(ij))*dt/2.d0
+              rhs(j)=Cp+hhalf(ij)
+            endif
           else
             Ap=dt/2.d0*(K2+(K1-K2)*(fp(ijp)+fp(ij))/2.d0)/dy**2
             Bp=-dt/2.d0*(K2+(K1-K2)*(fp(ij)+fp(ijm))/2.d0)/dy**2
             diag(j)=1.d0+Ap-Bp
             sup(j)=-Ap
             inf(j)=Bp
+            Cp=dt/2.d0*(K2+(K1-K2)*(fhalf(ipj)+fhalf(ij))/2.d0)*(hhalf(ipj)-hhalf(ij))/dx**2 &
+            -dt/2.d0*(K2+(K1-K2)*(fhalf(ij)+fhalf(imj))/2.d0)*(hhalf(ij)-hhalf(imj))/dx**2 &
+            +(Q1(ij)+Q2(ij))*dt/2.d0
+            rhs(j)=Cp+hhalf(ij)
           endif
-          Cp=dt/2.d0*(K2+(K1-K2)*(fhalf(ipj)+fhalf(ij))/2.d0)*(hhalf(ipj)-hhalf(ij))/dx**2 &
-               -dt/2.d0*(K2+(K1-K2)*(fhalf(ij)+fhalf(imj))/2.d0)*(hhalf(ij)-hhalf(imj))/dx**2 &
-               +(Q1(ij)+Q2(ij))*dt/2.d0
-          rhs(j)=Cp+hhalf(ij)
           ! in continent
         else
           diag(j)=1.d0
@@ -387,8 +431,8 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
             Ep=K1/2.d0*(h(ijp)-h(ij))/dy**2
             Mp=-K1/2.d0*(h(ij)-h(ijm))/dy**2
             Np=K1/2.d0*(fhalf(ipj)+fhalf(ij))*(hhalf(ipj)-hhalf(ij))/dx**2 &
-                 -K1/2.d0*(fhalf(ij)+fhalf(imj))*(hhalf(ij)-hhalf(imj))/dx**2 &
-                 +Q1(ij)
+            -K1/2.d0*(fhalf(ij)+fhalf(imj))*(hhalf(ij)-hhalf(imj))/dx**2 &
+            +Q1(ij)
             diag(j)=2.d0*L/dt+Dp-Mp-Ep
             sup(j)=-Ep
             inf(j)=-Mp
@@ -465,9 +509,9 @@ subroutine compaction (F1,F2,poro1,poro2,z1,z2,nn,dh,zi,zo)
   zo=zi
   ! iteration process
   do k=1,nn
-1000 continue
+    1000 continue
     fx=zo(k)-zi(k)+F1(k)*poro1*z1*(exp(-zo(k)/z1)-exp(-zi(k)/z1)) &
-         +F2(k)*poro2*z2*(exp(-zo(k)/z2)-exp(-zi(k)/z2))-dh(k)
+    +F2(k)*poro2*z2*(exp(-zo(k)/z2)-exp(-zi(k)/z2))-dh(k)
     dfx=1.d0-F1(k)*poro1*exp(-zo(k)/z1)-F2(k)*poro2*exp(-zo(k)/z2)
     zo(k)=zo(k)-fx/dfx
     if (abs(fx/dfx).gt.1.d-6) goto 1000
@@ -476,3 +520,4 @@ subroutine compaction (F1,F2,poro1,poro2,z1,z2,nn,dh,zi,zo)
   return
 
 end subroutine compaction
+
