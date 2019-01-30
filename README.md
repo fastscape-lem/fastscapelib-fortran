@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/fastscape-lem/fastscapelib-fortran.svg?branch=master)](https://travis-ci.org/fastscape-lem/fastscapelib-fortran)
 
+[![DOI](https://zenodo.org/badge/167184498.svg)](https://zenodo.org/badge/latestdoi/167184498)
+
 A Fortran (+ Python bindings) library of efficient algorithms for
 landscape evolution modeling.
 
@@ -22,4 +24,4 @@ group of the GFZ Helmholtz Centre Potsdam.
 
 If you use Fastscapelib-fortran in a scientific publication, we would
 appreciate a citation. See the documentation for a list of related
-publications.
+publications or click on the DOI badge here above.
