@@ -1,0 +1,6 @@
+[#references]
+== References
+
+* link:https://www.sciencedirect.com/science/article/pii/S0169555X12004618[Braun, J. and Willett, S.D., 2013.] A very efficient, O(n), implicit and parallel method to solve the basic stream power law equation governing fluvial incision and landscape evolution. Geomorphology, 180-181, pp., 170-179.
+
+* Yuan, X., Braun, J., Guerit, L., Rouby, D. and Cordonnier, G., in revision. A new efficient, O(n), and implicit method to solve the Stream Power Law taking into account sediment transport and deposition. Journal of Geohysical Research - Surface.

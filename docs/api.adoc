@@ -1,0 +1,600 @@
+[#fortran-api]
+== Fortran API
+
+**FastScapeLib** contains the following routines:
+
+=== FastScape_Init
+
+This routine must be called first, i.e. before calling any other subroutine of the inteface. It resets internal variables.
+
+This routine has no argument:
+
+`FastScape_Init ()`
+
+=== FastScape_Set_NX_NY
+
+This routine is used to set the resolution of the landscape evolution model. It must be called immediately after `FastScape_Init`.
+
+Arguments:
+
+`FastScape_Set_NX_NY ( nx, ny)`
+
+`nx` ::
+Resolution or number of grid points in the x-direction (integer)
+
+`ny` ::
+Resolution or number of grid points in the y-direction (integer)
+[NOTE]
+====
+`ny` can be different from `nx`
+====
+
+=== FastScape_Setup
+
+This routine creates internal arrays by allocating memory. It must be called right after `FastScape_Set_NX_NY`.
+
+This routine has no argument:
+
+`FastScape_Setup ()`
+
+=== FastScape_Set_XL_YL
+
+This routine is used to set the dimensions of the model, `xl` and `yl` in meters
+
+Arguments:
+
+`FastScape_Set_XL_YL ( xl, yl)`
+
+`xl` ::
+
+x-dimension of the model in meters (double precision)
+
+`yl` ::
+
+y-dimension of the model in meters (double precision)
+
+=== FastScape_Set_DT
+
+This routine is used to set the time step in years
+
+Arguments:
+
+`FastScape_Set_DT (dt)`
+
+`dt` ::
+
+length of the time step in years (double precision)
+
+=== FastScape_Init_H
+
+This routine is used to initialize the topography in meters
+
+Arguments:
+
+`FastScape_Init_H ( h)`
+
+`h` ::
+
+array of dimension `(nx*ny)` containing the initial topography in meters (double precision)
+
+=== FastScape_Init_F
+
+This routine is used to initialize the sand-shale ratio
+
+Arguments:
+
+`FastScape_Init_F( F)`
+
+`F` ::
+
+array of dimension `(nx*ny)` containing the initial sand-shale ratio (double precision)
+
+
+=== FastScape_Set_Erosional_Parameters
+
+This routine is used to set the continental erosional parameters
+
+Arguments:
+
+`FastScape_Set_Erosional_Parameters ( kf, kfsed, m, n, kd, kdsed, g, gsed, p)`
+
+`kf` ::
+
+array of dimension `(nx*ny)` containing the bedrock river incision (SPL) rate parameter (or Kf) in meters (to the power 1-2m) per year (double precision)
+
+`kfsed` ::
+
+sediment river incision (SPL) rate parameter (or Kf) in meters (to the power 1-2m) per year (double precision); note that when `kfsed < 0`, its value is not used, i.e., kf for sediment and bedrock have the same value, regardless of sediment thickness
+
+[NOTE]
+====
+bedrock refers to situations/locations where deposited sediment thickness is less than 1 meter, whereas sediment refers to situations/locations where sediment thickness is greater than 1 meter
+====
+
+`m` ::
+
+drainage area exponent in the SPL (double precision)
+
+`n` ::
+
+slope exponent in the SPL (double precision)
+
+[WARNING]
+====
+Valuers of `n` different from unity will cause the algorithm to perform Newton-Raphson iterations, which will cause it to slow down substantially (by a factor order `n` when `n > 1`)
+====
+
+`kd` ::
+
+array of dimension `(nx*ny)`  containing the bedrock transport coefficient (or diffusivity) for hillslope processes in meter squared per year (double precision)
+
+`kdsed` ::
+
+sediment transport coefficient (or diffusivity) for hillslope processes in meter squared per year (double precision; )note that when `kdsed < 0`, its value is not used, i.e., kd for sediment and bedrock have the same value, regardless of sediment thickness
+
+`g` ::
+
+bedrock dimensionless deposition/transport coefficient for the enriched SPL (double precision)
+
+[WARNING]
+====
+When `g > 0`, the algorithm requires that Gauss-Seidel iterations be performed; depending on the value of `g`, the number of iterations can be significant (from 1 when `g` is near 0 to 20 when `g` is near 1)
+====
+
+`gsed` ::
+
+sediment dimensionless deposition/transport coefficient for the enriched SPL (double precision); note that when `gsed < 0`, its value is not used, i.e., g for sediment and bedrock have the same value, regardless of sediment thickness
+
+`p` ::
+
+slope exponent for multi-direction flow; the distribution of flow among potential receivers (defined as the neighbouring nodes that define a negative slope)is proportional to local slope to power `p`
+
+[NOTE]
+====
+`p = 0.d0` corresponds to a uniform distribution of flow among receivers, regardless of the slope;
+
+`p = 10.d0` (equivalent to `p` = infinity) corresponds to single direction flow or steepest descent;
+====
+
+[WARNING]
+====
+`p = -1.d0` (or any negative value for `p`) corresponds to an exponent that varies with slope according to: `p = 0.5 + 0.6*slope`
+====
+
+=== FastScape_Set_BC
+
+This routine is used to set the boundary conditions
+
+Arguments:
+
+`FastScape_Set_BC ( ibc)`
+
+`ibc` ::
+
+`ibc` is made of four digits which can be one or zero (ex: `1111` or `0101` or `1000`); each digit corresponds to a type of boundary conditions (`0` = reflective and `1` = fixed height boundary); when two reflective boundaris face each other they become cyclic. The four bonudaries of the domain correspond to each of the four digits of ibc; the first one is the bottom boundary (`y=0`), the second is the right-hand side boundary (`x=xl`), the third one is the top boundary (`y=yl`) and the fourth one is the left-hand side boundary (`x=0`) (integer).
+
+[#img-bc]
+.Order of the boundaries in argument `ibc`.
+image::IMAGES/BC.jpg[Fan,300,200]
+
+[NOTE]
+====
+The fixed boundary condition does not imply that the boundary cannot be uplifted; i.e. the uplift array can be finite (not nil) on fixed height boundaries. To keep a boundary at base level, this must be specified in the uplift rate array, `u`, used in `FastScape_Set_U (u)` subroutine.
+====
+
+=== FastScape_Set_U
+
+This routine is used to set the uplift velocity in meters per year
+
+Arguments:
+
+`FastScape_Set_U ( u)`
+
+`u` ::
+
+array of dimension `(nx*ny)` containing the uplift rate in meters per year (double precision)
+
+[NOTE]
+====
+A fixed boundary condition does not imply that the boundary cannot be uplifted; i.e. the uplift array can be finite (not nil) on fixed height boundaries. To keep a boundary at base level, this must be specified in the uplift rate array, `u`, used in `FastScape_Set_U (u)` subroutine.
+====
+
+=== FastScape_Set_V
+
+This routine is used to set the advection horizontal velocities in meters per year
+
+Arguments:
+
+`FastScape_Set_V ( ux, uy)`
+
+`ux` ::
+
+array of dimension `(nx*ny)` containing the advection x-velocity in meters per year (double precision)
+
+`uy` ::
+
+array of dimension `(nx*ny)` containing the advection y-velocity in meters per year (double precision)
+
+=== FastScape_Set_Precip
+
+This routine is used to set the precipitation rate in meters per year
+
+Arguments:
+
+`FastScape_Set_Precip ( p)`
+
+`p` ::
+
+array of dimension `(nx*ny)` containing the relative precipitation rate, i.e. with respect to a mean value already contained in `Kf` and `g` (double precision)
+
+[WARNING]
+====
+The value of this array should be considered as describing the spatial and temporal variation of relative precipitation rate, not its absolute value which is already contained in the definition of `Kf` and `g`.
+====
+
+=== FastScape_Execute_Step
+
+This routine is used to execute one time step  of the model
+
+This routine has no argument:
+
+`FastScape_Execute_Step ()`
+
+=== FastScape_Get_Step
+
+This routine is used to extract from the model the current time step
+
+Arguments:
+
+`FastScape_Get_Step ( istep)`
+
+`istep` ::
+
+step number; this counter is incremented by one unit each time the routine `FastScape_Execute_Step` is called; its initial value is 0 (integer)
+
+=== FastScape_Set_H
+
+This routine is used to set the topography in meters
+[NOTE]
+====
+This routine can be used to artificially impose a value to `h` ; for example to add an uplift that is due to isostasy
+====
+
+Arguments:
+
+`FastScape_Set_H ( h)`
+
+`h` ::
+
+array of dimension `(nx*ny)` containing the topography in meters (double precision)
+
+=== FastScape_Set_Basement
+
+This routine is used to set the basement height in meters
+
+Arguments:
+
+`FastScape_Set_Basement ( b)`
+
+`b` ::
+
+array of dimension `(nx*ny)` containing the basement height in meters (double precision)
+
+=== FastScape_Set_All_Layers
+
+This routine is used to increment (or uplift) the topography `h`, the basement height `b` and the stratigraphic horizons
+
+Arguments:
+
+`FastScape_Set_All_Layers ( dh)`
+
+`dh` ::
+
+array of dimension `(nx*ny)` containing the topographic increment in meters to be added to the topography `h`, the basement `b` and the stratigraphic horizons created when the **Stratigraphy** option has been turned on by calling the `FastScape_Strati` routine (double precision)
+
+=== FastScape_Copy_H
+
+This routine is used to extract from the model the current topography in meters
+
+Arguments:
+
+`FastScape_Copy_H ( h)`
+
+`h` ::
+
+array of dimension `(nx*ny)` containing the extracted topography in meters (double precision)
+
+=== FastScape_Copy_F
+
+This routine is used to extract from the model the current sand-shale ratio
+
+Arguments:
+
+`FastScape_Copy_F ( F)`
+
+`F` ::
+
+array of dimension `(nx*ny)` containing the extracted sand-shale ratio (double precision)
+
+=== FastScape_Copy_Basement
+
+This routine is used to extract from the model the current basement height in meters
+
+Arguments:
+
+`FastScape_Copy_Basement ( b)`
+
+`b` ::
+
+array of dimension `(nx*ny)` containing the extracted basement height in meters (double precision)
+
+=== FastScape_Copy_Total_Erosion
+
+This routine is used to extract from the model the current total erosion in meters
+
+Arguments:
+
+`FastScape_Copy_Total_Erosion ( e)`
+
+`e` ::
+
+array of dimension `(nx*ny)` containing the extracted total erosion in meters (double precision)
+
+=== FastScape_Reset_Cumulative_Erosion
+
+This routine is used to reset the total erosion to zero
+
+This routine has no argument:
+
+`FastScape_Reset_Cumulative_Erosion ()`
+
+=== FastScape_Copy_Drainage_Area
+
+This routine is used to extract from the model the current drainage area in meters squared
+
+Arguments:
+
+`FastScape_Copy_Drainage_Area ( a)`
+
+`a` ::
+
+array of dimension `(nx*ny)` containing the extracted drainage area in meters squared (double precision)
+
+=== FastScape_Copy_Erosion_Rate
+
+This routine is used to extract from the model the current erosion rate in meters per year
+
+Arguments:
+
+`FastScape_Copy_Erosion_Rate ( er)`
+
+`er` ::
+
+array of dimension `(nx*ny)` containing the extracted erosion rate in meters per year (double precision)
+
+=== FastScape_Copy_Chi
+
+This routine is used to extract from the model the current chi parameter
+
+Arguments:
+
+`FastScape_Copy_Chi ( c)`
+
+`c` ::
+
+array of dimension `(nx*ny)` containing the extracted chi-parameter (double precision)
+
+=== FastScape_Copy_Catchment
+
+This routine is used to extract from the model the current catchment area in meter squared
+
+Arguments:
+
+`FastScape_Copy_Catchment ( c)`
+
+`c` ::
+
+array of dimension `(nx*ny)` containing a different index for each catchment (double precision)
+[NOTE]
+====
+the catchment index is the node number (in a series going from 1 to nx*ny from bottom left corner to upper right corner) corresponding to the outlet (base level node) of the catchment
+====
+
+=== FastScape_Copy_Lake_Depth
+
+This routine is used to extract from the model the geometry and depth of lakes (ie., regions draining into a local minimum)
+
+Arguments:
+
+`FastScape_Copy_Lake_Depth ( Ld)`
+
+`Ld` ::
+
+array of dimension `(nx*ny)` containing the depth of lakes in meters (double precision)
+
+=== FastScape_Get_Sizes
+
+This routine is used to extract from the model the model dimensions
+
+Arguments:
+
+`FastScape_Get_Sizes ( nx, ny)`
+
+`nx` ::
+Resolution or number of grid points in the x-direction (integer)
+
+`ny` ::
+Resolution or number of grid points in the y-direction (integer)
+
+=== FastScape_Get_Fluxes
+
+This routine is used to extract three fluxes from the model at the current time step: the tectonic flux which is the integral over the model of the uplift/subsidence function, the erosion flux which is the integral over the model of the erosion/deposition rate and the boundary flux which is the integral of sedimentary flux across the four boundaries (all in m^3^/yr)
+
+Arguments:
+
+`FastScape_Get_Fluxes ( tflux, eflux, bflux)`
+
+`tflux` ::
+tectonic flux in m^3^/yr (double precision)
+
+`teflux` ::
+erosion flux in m^3^/yr (double precision)
+
+`bflux` ::
+boundary flux in m^3^/yr (double precision)
+
+=== FastScape_View
+
+This routine is used to display on the screen basic information about the model
+
+This routine has no argument:
+
+`FastScape_View ()`
+
+=== FastScape_Debug
+
+This routine is used to display debug information and routine timing
+
+This routine has no argument:
+
+`FastScape_Debug()`
+
+=== FastScape_Destroy
+
+This routine is used to terminate a landscape evolution model. Its main purpose is to release memory that has been previously allocated by the interface
+
+This routine has no argument:
+
+`FastScape_Destroy ()`
+
+=== FastScape_VTK
+
+This routine creates a `.vtk` file for visualization in **Paraview** (see `http://www.paraview.org`); the file will be named `Topographyxxxxxx.vtk` where `xxxxxx` is the current time step number and stored in a directory called `VTK`. If  `vex < 0`, it also creates other `.vtk` files named `Basementxxxxxx.vtk` (containing the basement geometry in m) and `SeaLevelxxxxxx.vtk` (containing the current sea level in m).
+
+[WARNING]
+====
+If the directory `VTK` does not exist it is created
+====
+
+Arguments:
+
+`FastScape_VTK ( f, vex)`
+
+`f` ::
+array of dimension `(nx*ny)` containing the field to be displayed on the topography (double precision)
+
+`vex` ::
+
+vertical exaggeration used to scale the topographic height with respect to the horizontal coordinates (double precision)
+
+=== FastScape_Strati
+
+routine to produce a set of `.vtk` files containing stratigraphic information and to be opened in **Paraview** (see `http://www.paraview.org`). The stratigraphic files are called `Horizonxxx-yyyyyyy.vtk`, where `xxx` is the name (or number) of the horizon and `yyyyyyy` the time step. They are stored in a `VTK` directory. The name (or number) of the basement is `000` and the name of the last horizon is `nhorizon`
+
+[WARNING]
+====
+If the directory `VTK` does not exist it is created
+====
+
+Arguments:
+
+`FastScape_Strati ( nstep, nhorizon, nfreq, vex)`
+
+`nstep`::
+
+Total number of steps in the run (integer)
+
+`nhorizon`::
+
+Total number of horizons to be stored/created (integer)
+
+`nfreq`::
+
+Frequency of output of the horizons VTKs/files (integer); if `nfreq = 10`, a horizon file will be created every 10 time steps
+
+`vex`::
+
+vertical exaggeration used to scale the horizons with respect to the horizontal coordinates (double precision)
+
+[NOTE]
+====
+The routine `FastScape_Strati` should only be called once before the beginning of the time loop
+====
+
+What is stored on each horizon:
+
+[cols="10,20,70"]
+|===
+|*Field*|*Name*|*Description*
+|H|Topography|Topography expressed in meters
+|1|CurrentDepth|Current depth expressed in meters (identical to H)
+|2|CurrentSlope|Current Slope in degrees
+|3|ThicknessToNextHorizon|Sediment thikness from current horizon to the next horizon in meters
+|4|ThicknessToBasement|Total sediment thickness from current horizon/horizon to basement in meters
+|5|DepositionalBathymetry|Bathymetry at time of deposition in meters
+|6|DepositionalSlope| Slope at time of depostion in degrees
+|7|DistanceToSHore| Distance to shore at time of deposition in meters
+|8|Sand/ShaleRatio|Sand to shale ratio at time of deposition
+|9|HorizonAge|Age of the current horizon in years
+|A|ThicknessErodedBelow|Sediment thickness eroded below current horizon in meters
+|===
+
+[#fortran-api-extra]
+== Auxiliary routines
+
+=== Flexure
+
+We provide a Fortran subroutine called `flexure` to compute the flexural isostatic rebound associated with erosional loading/unloading. To use this routine, you need to enable the CMake option `-DUSE_FLEXURE=ON` when building **FastScapeLib** (see <<install>> section). By default, flexure is not part of the **FastScapeLib** library as it rather corresponds to a simple example of a tectonic model that uses the library interface.
+
+Here we only describe the main subroutine. It takes an initial (at time `t`) and final topography (at time `t+Dt`) (i.e. before and after erosion/deposition) and returns a corrected final topography that includes the effect of erosional/depositional unloading/loading.
+
+The routine assumes a value of 10^11^ Pa for Young's modulus, 0.25 for Poisson's ratio and 9.81 m/s^2^ for g, the gravitational acceleration. It uses a spectral method to solve the bi-harmonic equation governing the bending/flexure of a thin elastic plate floating on an inviscid fluid (the asthenosphere).
+
+Arguments:
+
+`flexure ( h, hp, nx, ny, xl, yl, rhos, rhoa, eet, ibc)`
+
+`h` ::
+array of dimension (`nx*ny`) containing the topography at time `t+Dt`; on return it will be replaced by the topography at time t+Dt corrected for isostatic rebound (double precision)
+
+`hp` ::
+array of dimension (`nx*ny`) containing the topography at time `t`, assumed to be at isostatic equilibrium (double precision)
+
+`nx` ::
+model topography (`h`) resolution or number of grid points in the x-direction (integer)
+
+`ny` ::
+model topography (`h`) resolution or number of grid points in the y-direction (integer)
+
+`xl` ::
+x-dimension of the model topography in meters (double precision)
+
+`yl` ::
+y-dimension of the model topography in meters (double precision)
+
+`rhos` ::
+array of dimension(`nx*ny`) containing the surface rock density in kg/m^3^ (double precision)
+
+`rhoa` ::
+asthenospheric rhoc density in kg/m^3^ (double precision)
+
+`eet` ::
+effective elastic plate thickness in m (double precision)
+
+`ibc` ::
+same as in <<FastScape_Set_BC>>
+
+[#python-api]
+== Python API
+
+All **FastScapeLib** routines above can be called from within
+Python. See <<install>> section for more
+details on how install the Python package. See also the Jupyter
+Notebook in the `examples` directory for further instructions on how
+to use **FastScapeLib** from within Python.
+
+[WARNING]
+====
+Note that all routine names must be in lower caps in
+the calling python code.
+====
