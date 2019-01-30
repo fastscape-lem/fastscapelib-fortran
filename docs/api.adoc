@@ -428,20 +428,20 @@ Resolution or number of grid points in the y-direction (integer)
 
 === FastScape_Get_Fluxes
 
-This routine is used to extract three fluxes from the model at the current time step: the tectonic flux which is the integral over the model of the uplift/subsidence function, the erosion flux which is the integral over the model of the erosion/deposition rate and the boundary flux which is the integral of sedimentary flux across the four boundaries (all in cubic meters per year)
+This routine is used to extract three fluxes from the model at the current time step: the tectonic flux which is the integral over the model of the uplift/subsidence function, the erosion flux which is the integral over the model of the erosion/deposition rate and the boundary flux which is the integral of sedimentary flux across the four boundaries (all in m^3^/yr)
 
 Arguments:
 
 `FastScape_Get_Fluxes ( tflux, eflux, bflux)`
 
 `tflux` ::
-tectonic flux in in cubic meters per year (double precision)
+tectonic flux in m^3^/yr (double precision)
 
 `teflux` ::
-erosion flux in in cubic meters per year (double precision)
+erosion flux in m^3^/yr (double precision)
 
 `bflux` ::
-boundary flux in in cubic meters per year (double precision)
+boundary flux in m^3^/yr (double precision)
 
 === FastScape_View
 
