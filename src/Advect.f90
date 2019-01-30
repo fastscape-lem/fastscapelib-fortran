@@ -10,7 +10,7 @@ subroutine Advect ()
 
   double precision, dimension(:), allocatable :: diag,sup,inf,rhs,res
   double precision dx,dy
-  integer i,j,k
+  integer i,j
 
   !print*,'Advect'
 

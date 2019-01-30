@@ -1,35 +1,5 @@
-= **FastScapeLib** User Guide
-:author_name: Jean Braun
-:author_email: jbraun@gfz-potsdam.de
-:author: {author_name}
-:email: {author_email}
-V2.6, 7/1/2019
-:toc: left
-:icons: font
-
-**FastScapeLib** is an interface or library (i.e. a set of subroutines) to model landscape evolution by river incision, sediment transport and deposition in continental and marine environments.
-
-**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019a in <<References>>), (b) hillslope diffusion, and (c) marine transport and deposition (see Yuan et al, 2019b in <<References>>), using a set of highly efficient algorithms that are all O(n) complexity and implicit in time. These routines can be called from a ForTran, C or python main program and is ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
-
-== Getting started
-
-To install **FastScapeLib**, you must first compile it. It has been written in ForTran 90. To compile it you will need the gnu ForTran compiler, gForTran, as well as the make utility/command. To compile, simply issue the following set of line commands:
-----
-tar xzvf FastScapeLib_V2.5.tar.gz
-cd FastScapeLib_V2.5
-make
-----
-
-To use **FastScapeLib** you will need to first write a program (in your favorite language) which calls the **FastScapeLib** subroutines. Several examples can be found in the `Examples` folder.
-
-=== Installing ForTran
-
-The best way to install a ForTran compiler on a Mac OS machine is to download it at link:http://hpc.sourceforge.net[SourceForge]. However you will first need to install `XCode` from the Apple App Store (free but voluminous) and make sure that you have access to the command-line tools by issuing (after installing XCode) the following command in a terminal:
-----
-xcode-select --install
-----
-
-== List of subroutines
+[#fortran-api]
+== Fortran API
 
 **FastScapeLib** contains the following routines:
 
@@ -507,20 +477,20 @@ Resolution or number of grid points in the y-direction (integer)
 
 === FastScape_Get_Fluxes
 
-This routine is used to extract three fluxes from the model at the current time step: the tectonic flux which is the integral over the model of the uplift/subsidence function, the erosion flux which is the integral over the model of the erosion/deposition rate and the boundary flux which is the integral of sedimentary flux across the four boundaries (all in cubic meters per year)
+This routine is used to extract three fluxes from the model at the current time step: the tectonic flux which is the integral over the model of the uplift/subsidence function, the erosion flux which is the integral over the model of the erosion/deposition rate and the boundary flux which is the integral of sedimentary flux across the four boundaries (all in m^3^/yr)
 
 Arguments:
 
 `FastScape_Get_Fluxes ( tflux, eflux, bflux)`
 
 `tflux` ::
-tectonic flux in in cubic meters per year (double precision)
+tectonic flux in m^3^/yr (double precision)
 
 `teflux` ::
-erosion flux in in cubic meters per year (double precision)
+erosion flux in m^3^/yr (double precision)
 
 `bflux` ::
-boundary flux in in cubic meters per year (double precision)
+boundary flux in m^3^/yr (double precision)
 
 === FastScape_View
 
@@ -618,83 +588,12 @@ What is stored on each horizon:
 |A|ThicknessErodedBelow|Sediment thickness eroded below current horizon in meters
 |===
 
-== Examples
-
-Several examples are provided in the `examples` directory. They are meant to be used as templates by the user. To compile them, first copy (and create them if you have not done so yet) the libraries `libFastScape.a` and `FastScape.so` from the `FastScapeLib` directory (where you have compiled/created them) into the `examples` directory:
-
-----
-cp libFastScape.a examples/.
-cp FastScape.so examples/.
-----
-
-Then, in the `examples` directory, compile the ForTran examples using the `gForTran` compiler:
-
-----
-gForTran -O Mountain.f90 -L. -lFastScape -o Mountain
-gForTran -O Margin.f90 -L. -lFastScape -o Margin
-gForTran -O Fan.f90 -L. -lFastScape -o Fan
-----
-
-This should create executables that you can then execute. For example for the `Mountain` examples:
-
-----
-rm VTK/*.vtk
-./Mountain
-----
-
-The first line is needed to remove any pre-existing `.vtk` file in the `VTK` directory.
-
-=== Mountain.f90
-
-This is the basic square mountain problem where a landscape is formed by a uniform uplift, all four boundaries being kept at base level. The resolution is medium (400x400). The SPL is non linear (n = 1.5) but no sediment effect is included (g = 0). Single direction flow is selected by setting `expp = 20`. The model run lasts for 10 Myr (100 time steps of 100 kyr each).
-
-This model should run in approximately 60-70 seconds on a reasonably fast modern computer.
-
-=== Margin.f90
-
-Example showing the use of the Marine component of **FastScapeLib**.
-
-An area of 100x150 km is set to uplift on one half only. The other half is 1000 m below sea level and accumulate sediment eroded from the uplifting area. The erosion model is nonlinear (n = 2) and sediment transport affects erosion (g = 1). Multiple direction flow is selected. Marine transport is 10 x more efficient for silt than sand. No compaction. Resolution is 100x150. Boundary conditions are no flux boundaries except along the bottom boundary where base level is fixed at -1000 m.
-
-This model should run in approximately 90-95 seconds on a reasonably fast modern computer.
-
-=== Fan.f90
-
-Example of the use of the continental transport/deposition component of **FastScapeLib**.
-
-Here we create a sedimentary fan at the base of an initially 1000 m high plateau. The model is relatively small (10x20 km) and low resolution (101x201). The erosion law is linear (n = 1) but sediments are more easily eroded (by a factor 1.5). Sediment transport/deposition is strong (g = 1). Multiple direction flow is selected. Boundary conditions are no flux boundaries except along the bottom boundary where base level is fixed at sea level (0 m).
-
-This model should run in approximately 10 seconds on a reasonably fast modern computer.
-
-=== DippingDyke.f90
-
-Example of the use of spatially and temporally variable erodibility
-
-Here we look at the effect of a resistant dyke dipping at 30 degree angle and being progressively exhumed. The dyke's surface expression progressively traverses the landscape and affects the drainage pattern.
-
-The model, otherwise, is very simple: block uplift, all boundaries at base level, linear SPL, multiple direction flow and no sediment.
-
-=== FastScape_test.ipynb
-
-**FastScapeLib** Fortran routines can also be called directly from Python (and potentially from other languages such as C, C++ or MatLab) as illustrated in this example.
-
-This is a simple (low resolution) example where the right-hand side of a rectangular model is an initially 100 m high plateau subjected to erosion, while the left-hand side is kept fixed at base level. The SPL is linear (`n = 1`) but completed by a sediment transport/deposition algoithm with `g = 1`.
-
-Boundary conditions are closed except for the left hand-side (bounday number 4) set to base level.
-
-The model is run for 200 time steps and the results are stored in `.vtk` files where the drainage area is also stored.
-
-The drainage area of the last time step is also shown as a contour plot as shown in Figure <<#img-FastScapePyhton>>
-
-[#img-FastScapePyhton]
-.Fan example.
-image::IMAGES/FastScapePython.jpg[FastScapePyhton,600,300]
-
+[#fortran-api-extra]
 == Auxiliary routines
 
 === Flexure
 
-We provide a ForTran subroutine called `flexure` to compute the flexural isostatic rebound associated with erosional loading/unloading. This routine is not part of **FastScapeLib** and should be regarded as a simple example of a tectonic model that uses the interface. For this reason, it is provided as part of a different library or set of subroutines that do not have access to the **FastScapeLib** internal variabiles. All necessary variables must be passed to `flexure`.
+We provide a Fortran subroutine called `flexure` to compute the flexural isostatic rebound associated with erosional loading/unloading. To use this routine, you need to enable the CMake option `-DUSE_FLEXURE=ON` when building **FastScapeLib** (see <<install>> section). By default, flexure is not part of the **FastScapeLib** library as it rather corresponds to a simple example of a tectonic model that uses the library interface.
 
 Here we only describe the main subroutine. It takes an initial (at time `t`) and final topography (at time `t+Dt`) (i.e. before and after erosion/deposition) and returns a corrected final topography that includes the effect of erosional/depositional unloading/loading.
 
@@ -734,46 +633,17 @@ effective elastic plate thickness in m (double precision)
 `ibc` ::
 same as in <<FastScape_Set_BC>>
 
-An example of code using the flexure routine can be found in the `EXAMPLE` directory. It is called `flexure_test.f90`. It shows how to use `flexure` but also how it interacts with **FastScapeLib**: it needs the topography computed by **FastScapeLib** as input to `flexure` but also needs to set the topography and basement geometry to the new values estimated by `flexure`.
+[#python-api]
+== Python API
 
-To compile it, the user must first make the `flexure` library (`libflexure.a`) that must then be copied from the `Flexure2D_V1.0` directory into the `EXAMPLE` directory:
+All **FastScapeLib** routines above can be called from within
+Python. See <<install>> section for more
+details on how install the Python package. See also the Jupyter
+Notebook in the `examples` directory for further instructions on how
+to use **FastScapeLib** from within Python.
 
-----
-cd Flexure2D_V1.0
-make
-cd ../examples
-cp ../Flexure2D_V1.0/libflexure.a .
-gfortran -O3 flexure_test.f90 -L. -lFastScape -lflexure -o flexure_test
-----
-
-== Calling from Python
-
-The subroutines of **FastScapeLib** can be called from `Python`. You will first need to create a library that can be called from `python`. For this, best is to use the `f2py` command:
-
-----
-f2py -c --f90flags=-O3 -m FastScape FastScape_ctx.f90 FastScape_api.f90 StreamPowerLaw.f90 Diffusion.f90 Advect.f90 LocalMinima.f90 Marine.f90
-
-cp FastScape.cpython-37m-darwin.so FastScape.so
-----
-
-Once the `FastScape.so` library is created, you can import it in python, using:
-----
-import FastScape as Fp
-----
-for example.
-
-See the Jupyter Notebook in the `examples` directory for further instructions on how to use **FastScapeLib** from within Python.
 [WARNING]
 ====
-Note that all routine names must be in lower caps in the calling python code.
+Note that all routine names must be in lower caps in
+the calling python code.
 ====
-
-== References
-
-* link:https://www.sciencedirect.com/science/article/pii/S0169555X12004618[Braun, J. and Willett, S.D., 2013.] A very efficient, O(n), implicit and parallel method to solve the basic stream power law equation governing fluvial incision and landscape evolution. Geomorphology, 180-181, pp., 170-179.
-
-* Yuan, X., Braun, J., Guerit, L., Rouby, D. and Cordonnier, G., in revision. A new efficient, O(n), and implicit method to solve the Stream Power Law taking into account sediment transport and depositin. Journal of Geohysical Research - Surface.
-
-* Yuan, X., Braun, J., Guerit, L., Simon, B., Bovy, B., Rouby, D. and Robin, C., submitted. Linking continental deposition to marine sediment transport and deposition: a new implicit and o(n) method. Earth and Planetary Science Letters.
-
-

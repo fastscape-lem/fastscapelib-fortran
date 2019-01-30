@@ -27,7 +27,7 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
 
   integer nflex,i,j,ii,jj,ij
   double precision, dimension(:,:), allocatable :: w,h,hp,rhos
-  double precision hx,dflex,d,xk,pihx,g,fi,fj,tij,rat,dx,dy,r,s,h1,h2,h3,h4,pi
+  double precision hx,dflex,d,xk,pihx,g,fi,fj,tij,dx,dy,r,s,h1,h2,h3,h4
   double precision ddxf,ddyf,xloc,yloc,hh,hhp,rrhos,dw
   integer iflexmin,iflexmax,jflexmin,jflexmax
   character*4 cbc
@@ -42,7 +42,7 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
       rhos(i,j)=rhos2(ij)
     enddo
   enddo
-  
+
   write (cbc,'(i4)') ibc
 
   ! allocate memory
@@ -70,20 +70,20 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
   ! compute weigths corresponding to the increase in topography by interpolation
   ! from the nx,ny grid to the nflex, nflex grid, using a bilinear interpolation scheme
 
-  iflexmin=1+(0.d0-xl/2.d0+hx/2.d0)/ddxf
-  iflexmax=1+(xl-xl/2.d0+hx/2.d0)/ddxf
-  jflexmin=1+(0.d0-yl/2.d0+hx/2.d0)/ddyf
-  jflexmax=1+(yl-yl/2.d0+hx/2.d0)/ddyf
+  iflexmin=int(1+(0.d0-xl/2.d0+hx/2.d0)/ddxf)
+  iflexmax=int(1+(xl-xl/2.d0+hx/2.d0)/ddxf)
+  jflexmin=int(1+(0.d0-yl/2.d0+hx/2.d0)/ddyf)
+  jflexmax=int(1+(yl-yl/2.d0+hx/2.d0)/ddyf)
 
   w=0.d0
   do j=jflexmin,jflexmax
     yloc=(j-1)*hx/(nflex-1)+yl/2.d0-hx/2.d0
-    jj=1+(ny-1)*yloc/yl
+    jj=int(1+(ny-1)*yloc/yl)
     jj=min(jj,ny-1)
     jj=max(1,jj)
     do i=iflexmin,iflexmax
       xloc=(i-1)*hx/(nflex-1)+xl/2.d0-hx/2.d0
-      ii=1+(nx-1)*xloc/xl
+      ii=int(1+(nx-1)*xloc/xl)
       ii=min(ii,nx-1)
       ii=max(1,ii)
       r=(xloc-(ii-1)*dx)/dx*2.d0-1.d0
@@ -111,7 +111,7 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
       w(iflexmin-(i-iflexmin+1),jflexmax+(jflexmax-j+1))+dw
       if (cbc(4:4).eq.'0'.and.cbc(1:1).eq.'0') w(iflexmin-(i-iflexmin+1),jflexmin-(j-jflexmin+1))= &
       w(iflexmin-(i-iflexmin+1),jflexmin-(j-jflexmin+1))+dw
-      1111 continue
+      !1111 continue
     enddo
   enddo
 
@@ -157,12 +157,12 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
 
   do j=1,ny
     yloc=(j-1)*dy+hx/2.d0-yl/2.d0
-    jj=1+(nflex-1)*yloc/hx
+    jj=int(1+(nflex-1)*yloc/hx)
     jj=min(jj,nflex-1)
     jj=max(1,jj)
     do i=1,nx
       xloc=(i-1)*dx+hx/2.d0-xl/2.d0
-      ii=1+(nflex-1)*xloc/hx
+      ii=int(1+(nflex-1)*xloc/hx)
       ii=min(ii,nflex-1)
       ii=max(1,ii)
       r=(xloc-(ii-1)*ddxf)/ddxf*2.d0-1.d0

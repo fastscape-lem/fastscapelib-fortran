@@ -560,7 +560,7 @@ subroutine correct_receivers(receivers,dist2receivers,outlets,conn_basins,conn_n
   double precision dist2receivers(nx*ny),elevation(nx*ny)
   double precision dx,dy
 
-  integer i,ii,node_from,node_to,outlet_from,outlet_to
+  integer i,ii,node_from,node_to,outlet_from
 
   do ii=1,ntree
     i=tree(ii)
@@ -625,7 +625,7 @@ subroutine correct_receivers_v2(receivers,dist2receivers,outlets,conn_basins, &
   double precision dist2receivers(nx*ny),elevation(nx*ny)
   double precision dx,dy,ddx,ddy,previous_dist,tmp
 
-  integer i,ii,node_from,node_to,outlet_from,outlet_to
+  integer i,ii,node_from,node_to,outlet_from
 
   do ii=1,ntree
     i=tree(ii)

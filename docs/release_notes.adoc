@@ -1,0 +1,8 @@
+[#release_notes]
+== Release notes
+
+=== Version 2.8.0 (Unreleased)
+
+=== Version 2.7.0 (30 January 2019)
+
+- First release in VCS.

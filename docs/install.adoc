@@ -1,0 +1,81 @@
+[#install]
+== Build and install FastScapeLib
+
+**FastScapeLib** is not yet available as a binary package, so you need
+to build and install it manually.
+
+=== Download the source files
+
+First, download the sources using git:
+
+----
+git clone https://github.com/fastscape-lem/fastscapelib-fortran
+----
+
+Alternatively, you can visit the URL of the source repository
+(https://github.com/fastscape-lem/fastscapelib-fortran) and download
+the source files as an archive (see the "clone or download button").
+
+=== Requirements
+
+To build FastScapelib, you need a Fortran compiler (e.g., `gfortran`,
+part of GCC) and CMake (https://cmake.org/). Both can easily be
+installed on major platforms, e.g., using Homebrew on MacOS or apt-get
+on Linux/Debian. GCC compilers are also available for Windows platforms
+(see http://www.mingw.org/).
+
+=== Build using CMake
+
+Run the following commands from the source directory to build the
+**FastScapeLib** Fortran library:
+
+----
+mkdir build
+cd build
+cmake <options> ..
+make
+----
+
+There are several build options, here shown with their default values:
+
+- `-DBUILD_FASTSCAPELIB_STATIC=ON`: build fastscapelib as a static library
+- `-DBUILD_FASTSCAPELIB_SHARED=OFF`: build fastscapelib as a shared library
+- `-DBUILD_PYTHON_MODULE=OFF`: build the fastscapelib library as a Python module
+- `-DUSE_FLEXURE=OFF`: include flexure routines in the library
+- `-DBUILD_EXAMPLES=OFF`: "build usage examples that are in the 'examples' directory
+
+=== Install the Fortran library
+
+If you want to install the **FastScapeLib** Fortran static/shared
+libraries in your system, then simply run:
+
+----
+make install
+----
+
+You should now be able to link your programs using **FastScapeLib**
+routines, e.g., with `-lfastscapelib_fortran`. See some Fortran programs
+in the 'examples' folder.
+
+=== Install the Python package
+
+The recommended way of installing **FastScapeLib** as a Python package
+is to run the following command from the source directory (i.e., the
+top-level folder containing the file `setup.py`):
+
+----
+pip install .
+----
+
+This will also temporarily install all the tools needed to build the
+package (except a Fortran compiler and Python/NumPy, which must be
+both already installed). Note: you need pip >= 10.
+
+You should now be able to import the package from within Python, e.g.,
+
+----
+>>> import fastscapelib_fortran as fs
+----
+
+There is a Jupyter notebook in the 'examples' folder showing simple
+usage of the library.

@@ -1,0 +1,32 @@
+= **FastScapeLib** Documentation
+:author_name: Jean Braun
+:author_email: jbraun@gfz-potsdam.de
+:author: {author_name}
+:email: {author_email}
+:toc: left
+:icons: font
+:math:
+:stem: latexmath
+
+**FastScapeLib** is an interface or library (i.e. a set of subroutines) to model landscape evolution by river incision, sediment transport and deposition in continental and marine environments.
+
+**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019a in <<References>>) (b) hillslope diffusion and (c) marine transport and deposition (see Yuan et al, 2019b in <<References>>), using a set of highly efficient algorithms that are all latexmath:[\mathcal{O}(n)] complexity and implicit in time. These routines can be called from a Fortran, C or Python main program and are ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
+
+Basic partial differential equation solved by **FastScapeLib** is:
+
+[latexmath]
+++++
+\frac{\partial h}{\partial t} = U - K_f A^m S^n + \frac{G}{A} \int_A \left(U - \frac{\partial h}{\partial t}\right) dA + K_d \nabla^2 h
+++++
+
+where latexmath:[h] is topography, latexmath:[U] is uplift, latexmath:[S] is slope, latexmath:[A] is drainage area, and latexmath:[K_f], latexmath:[m], latexmath:[n], latexmath:[G] and latexmath:[K_d] are parameters (see further down for unit and meaning).
+
+include::install.adoc[]
+
+include::api.adoc[]
+
+include::examples.adoc[]
+
+include::references.adoc[]
+
+include::release_notes.adoc[]

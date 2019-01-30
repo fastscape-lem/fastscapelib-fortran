@@ -7,9 +7,9 @@ subroutine StreamPowerLaw ()
 
   implicit none
 
-  integer :: i,j,ij,ii,jj,iii,jjj,ijk,ijr,i1,i2,j1,j2,np,n_local_minima,k,ijr1
-  double precision :: dx,dy,smax,l,slope,fact,diff,tol,err
-  double precision :: f,df,errp,h0,hn,omega,tolp,depos,w_rcv
+  integer :: i,j,ij,ii,jj,iii,jjj,ijk,ijr,i1,i2,j1,j2,k,ijr1
+  double precision :: dx,dy,smax,l,slope,fact,tol,err
+  double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
   character cbc*4
   logical xcyclic,ycyclic
   double precision, dimension(:), allocatable :: rhs,ht,g,kfint,bt,dh,hp
@@ -153,7 +153,7 @@ subroutine StreamPowerLaw ()
 
   lake_sediment=0.d0
 
-	do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
+  do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
     ! guess/update the elevation at t+Δt (k)
     hp=h
@@ -161,6 +161,8 @@ subroutine StreamPowerLaw ()
     b=min(hp,bt+u*dt)
     ! calculate erosion/deposition at each node
     dh=ht-hp
+
+    lake_sill = 0
 
     ! sum the erosion in stack order
     do ij=1,nn
@@ -281,13 +283,13 @@ subroutine StreamPowerLaw ()
 
     err=maxval(abs(h-hp))
 
-	enddo
+  enddo
 
-	do ij=1,nn
+  do ij=1,nn
     if (lake_water_volume(lake_sill(ij)).gt.0.d0) h(ij)=h(ij) &
     +max(0.d0,min(lake_sediment(lake_sill(ij)),lake_water_volume(lake_sill(ij))))/ &
     lake_water_volume(lake_sill(ij))*(water(ij)-h(ij))
-	enddo
+  enddo
 
   deallocate (mrec,mwrec,mlrec,mnrec,mstack,hwater)
 
@@ -431,7 +433,7 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
     pp = p
     if (pp<0.d0) then
       slope = 0.d0
-      if (nrec(ij).ne.0) slope = sum(wrec(1:nrec(ij),ij))/nrec(ij)
+      if (nrec(ij).ne.0) slope = real(sum(wrec(1:nrec(ij),ij))/nrec(ij))
       pp = 0.5 + 0.6*slope
     endif
     do k=1,nrec(ij)
