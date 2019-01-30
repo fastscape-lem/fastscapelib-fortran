@@ -1,0 +1,6 @@
+[#release_notes]
+== Release notes
+
+=== Version 2.7.0 (Unreleased)
+
+- First release in VCS.

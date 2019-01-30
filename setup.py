@@ -2,7 +2,7 @@ from skbuild import setup
 
 setup(
     name="fastscapelib-fortran",
-    version="2.6.0",
+    version="2.7.0",
     description=("A library of efficient algorithms"
                  "for landscape evolution modeling"),
     author='Jean Braun',
