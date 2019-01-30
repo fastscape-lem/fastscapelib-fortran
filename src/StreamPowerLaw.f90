@@ -307,7 +307,7 @@ end subroutine StreamPowerLaw
 
 !----------
 
-recursive subroutine find_stack	(ij,don,ndon,nn,stack,nstack,catch)
+recursive subroutine find_stack (ij,don,ndon,nn,stack,nstack,catch)
 
 ! recursive routine to go through all nodes following donor information
 

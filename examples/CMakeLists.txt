@@ -5,7 +5,7 @@ set(FASTSCAPELIB_EXAMPLES_SRC_FILES
   Fan.f90
   Margin.f90
   Mountain.f90
-  Starti_test.f90
+  Strati_test.f90
   flexure_test.f90
   )
 
