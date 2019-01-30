@@ -6,16 +6,21 @@
 V2.7.0, 30/1/2019
 :toc: left
 :icons: font
+:math:
+:stem: latexmath
 
 **FastScapeLib** is an interface or library (i.e. a set of subroutines) to model landscape evolution by river incision, sediment transport and deposition in continental environments.
 
-**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019a in <<References>>) and (b) hillslope diffusion, using a set of highly efficient algorithms that are all O(n) complexity and implicit in time. These routines can be called from a Fortran, C or Python main program and are ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
+**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019 in <<References>>) and (b) hillslope diffusion, using a set of highly efficient algorithms that are all latexmath:[\mathcal{O}(n)] complexity and implicit in time. These routines can be called from a Fortran, C or Python main program and are ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
 
 Basic partial differential equation solved by **FastScapeLib** is:
 
-`dh/dt = U - K~f~ A^m^ S^n^ + G/A &sect;~A~ (U - dh/dt) dA + d\dx (K~d~ dh/dx) + d/dy (K~d~ dh/dy)`
+[latexmath]
+++++
+\frac{\partial h}{\partial t} = U - K_f A^m S^n + \frac{G}{A} \int_A \left(U - \frac{\partial h}{\partial t}\right) dA + K_d \nabla^2 h
+++++
 
-where `h` is topography, `U` is uplift, `S` is slope, `A` is drainage area, and `K~f~`, `m`, `n`, `G` and `K~d~` are parameters (see further down for unit and meaning).
+where latexmath:[h] is topography, latexmath:[U] is uplift, latexmath:[S] is slope, latexmath:[A] is drainage area, and latexmath:[K_f], latexmath:[m], latexmath:[n], latexmath:[G] and latexmath:[K_d] are parameters (see further down for unit and meaning).
 
 include::install.adoc[]
 
