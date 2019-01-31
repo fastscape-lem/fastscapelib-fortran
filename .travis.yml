@@ -28,11 +28,12 @@ matrix:
     - language: c
       os: osx
       before_install:
-        - brew install gcc cmake
+        - brew install gcc
       install:
         - "./ci/build_examples.sh"
       script:
         - "./ci/run_examples.sh"
+      env: RUN_FORTRAN_EXAMPLES=yes
 
 deploy:
   provider: pages
