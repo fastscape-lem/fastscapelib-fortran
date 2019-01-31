@@ -13,13 +13,18 @@ image:
 stack: python 3
 
 environment:
-  MINGWDIR: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
+  matrix:
+    - MINGW_DIR: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
 
-init:
+before_build:
   - cmd: set PATH=%MINGW_DIR%;%PATH%
   - echo "%PATH%"
+  - cmake --version
+  - mingw32-make --version
+  - # CMake refuses to generate MinGW Makefiles if sh.exe is in the Path
+  - ps: Get-Command sh.exe -All | Remove-Item
 
-install:
+build_script:
   - mkdir build
   - cd build
   - cmake -G "MSYS Makefiles" -DBUILD_FASTSCAPELIB_SHARED=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
