@@ -22,7 +22,7 @@ environment:
 
 install:
   - cmd: set PATH=%MINGW_DIR%;%PATH%
-  - cmd: SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
   - echo "%PATH%"
   - cmake --version
   - mingw32-make --version
