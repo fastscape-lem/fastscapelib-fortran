@@ -28,6 +28,15 @@ set(FLEXURE_SRC_FILES
     ${FLEXURE_SRC_DIR}/sinft.f
     )
 
+# Pre-processor
+# =============
+
+if(WIN32)
+  add_compile_definitions(ON_WINDOWS)
+endif()
+
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+
 # Flags
 # =====
 
@@ -125,8 +134,15 @@ if(BUILD_PYTHON_MODULE)
       ${CMAKE_MODULE_PATH})
   endif()
 
-  find_package(PythonExtensions)
+  find_package(PythonExtensions REQUIRED)
   find_package(F2PY REQUIRED)
+
+  # TODO: see https://github.com/scikit-build/scikit-build/issues/383
+  set(_command "import distutils.sysconfig as ds; import sys; sys.stdout.write(ds.get_config_var('SO'))")
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "${_command}"
+    OUTPUT_VARIABLE PYTHON_EXTENSION_MODULE_SUFFIX
+    RESULT_VARIABLE _result)
+  message(STATUS ${PYTHON_EXTENSION_MODULE_SUFFIX})
 
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
   set(F2PY_MODULE_FILE
@@ -137,12 +153,18 @@ if(BUILD_PYTHON_MODULE)
     DEPENDS ${F2PY_MODULE_FILE}
     )
 
+  set(F2PY_COMPILER_OPTIONS "--f90flags=\"-cpp\"")
+  if(WIN32)
+    set(F2PY_COMPILER_OPTIONS "${F2PY_COMPILER_OPTIONS} -DON_WINDOWS --compiler=mingw32")
+  endif()
+
   add_custom_command(
     OUTPUT ${F2PY_MODULE_FILE}
     COMMAND ${F2PY_EXECUTABLE}
       -m ${F2PY_MODULE_NAME}
       -c
       ${FASTSCAPELIB_SRC_FILES}
+      ${F2PY_COMPILER_OPTIONS}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
