@@ -146,12 +146,17 @@ if(BUILD_PYTHON_MODULE)
     DEPENDS ${F2PY_MODULE_FILE}
     )
 
+  if(WIN32)
+    set(F2PY_COMPILER_OPTION "--compiler=mingw32")
+  endif()
+
   add_custom_command(
     OUTPUT ${F2PY_MODULE_FILE}
     COMMAND ${F2PY_EXECUTABLE}
       -m ${F2PY_MODULE_NAME}
       -c
       ${FASTSCAPELIB_SRC_FILES}
+      ${F2PY_COMPILER_OPTION}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
