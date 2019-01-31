@@ -1,10 +1,30 @@
-language: ruby
+notifications:
+  email: false
 
-before_install:
-  - gem install asciidoctor
-
-script:
-  - asciidoctor docs/index.adoc -o docs/index.html
+matrix:
+  include:
+    - language: ruby
+      before_install:
+        - gem install asciidoctor
+      script:
+        - asciidoctor docs/index.adoc -o docs/index.html
+      env: DOCS=yes
+    - language: fortran
+      os: linux
+      addons:
+        apt:
+          packages:
+            - gfortran
+            - cmake
+      install:
+        - mkdir build
+        - cd build
+        - cmake -DBUILD_FASTSCAPELIB_SHARED=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
+        - make
+      script:
+        - cd examples
+        - ./Fan
+      env: RUN_FORTRAN_EXAMPLES=yes
 
 deploy:
   provider: pages
@@ -13,3 +33,4 @@ deploy:
   local-dir: docs/
   on:
     branch: master
+    condition: "$DOCS = yes"
