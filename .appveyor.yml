@@ -38,6 +38,8 @@ build_script:
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cd build
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake -G "MinGW Makefiles" -DBUILD_FASTSCAPELIB_SHARED=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake --build .
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -c "import sysconfig; sysconfig.get_config_var('SO')"
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -c "import sysconfig; sysconfig.get_config_var('EXT_SUFFIX')"
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install . --no-build-isolation
 
 test_script:
