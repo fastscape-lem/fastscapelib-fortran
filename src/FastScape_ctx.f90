@@ -603,7 +603,7 @@ module FastScapeContext
     if (step.lt.1000000) cstep(1:1)='0'
 
 #ifdef ON_WINDOWS
-    call system ("if not exist \"VTK\" mkdir VTK")
+    call system ('if not exist "VTK" mkdir VTK')
 #else
     call system ("mkdir -p VTK")
 #endif
