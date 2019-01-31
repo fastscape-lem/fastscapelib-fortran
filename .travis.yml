@@ -13,7 +13,7 @@ matrix:
       script:
         - asciidoctor docs/index.adoc -o docs/index.html
       env: DOCS=yes
-    - language: fortran
+    - language: c
       os: linux
       addons:
         apt:
@@ -25,6 +25,14 @@ matrix:
       script:
         - "./ci/run_examples.sh"
       env: RUN_FORTRAN_EXAMPLES=yes
+    - language: c
+      os: osx
+      before_install:
+        - brew install gcc cmake
+      install:
+        - "./ci/build_examples.sh"
+      script:
+        - "./ci/run_examples.sh"
 
 deploy:
   provider: pages
