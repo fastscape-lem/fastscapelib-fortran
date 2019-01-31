@@ -17,12 +17,17 @@ environment:
   matrix:
     - RUN_FORTRAN_EXAMPLES: yes
     - TEST_IMPORT_PYTHON_MODULE: yes
+      PYTHON: "C:\\Python36-x64"
+      PYTHON_VERSION: "3.6.x"
+      PYTHON_ARCH: "64"
 
-before_build:
+install:
   - cmd: set PATH=%MINGW_DIR%;%PATH%
   - echo "%PATH%"
   - cmake --version
   - mingw32-make --version
+  - cmd: SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python --version
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m ensurepip
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install scikit-build ninja numpy
   - # CMake refuses to generate MinGW Makefiles if sh.exe is in the Path
@@ -33,7 +38,7 @@ build_script:
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cd build
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake -G "MinGW Makefiles" -DBUILD_FASTSCAPELIB_SHARED=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake --build .
-  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install . -v
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install . --no-build-isolation
 
 test_script:
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cd examples
