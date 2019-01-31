@@ -28,6 +28,15 @@ set(FLEXURE_SRC_FILES
     ${FLEXURE_SRC_DIR}/sinft.f
     )
 
+# Pre-processor
+# =============
+
+if(WIN32)
+  add_compile_definitions(ON_WINDOWS)
+endif()
+
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
+
 # Flags
 # =====
 
