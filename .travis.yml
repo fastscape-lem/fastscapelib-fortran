@@ -48,7 +48,7 @@ matrix:
       install:
         - pip install . -v
       script:
-        - python -c "import fastscapelib_fortran"
+        - python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"
       env: TEST_PYTHON_IMPORT=yes
 
 deploy:
