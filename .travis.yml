@@ -31,8 +31,6 @@ matrix:
         homebrew:
           packages:
             - gcc
-      before_install:
-        - brew install gcc
       install:
         - "./ci/build_examples.sh"
       script:
