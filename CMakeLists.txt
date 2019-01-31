@@ -134,7 +134,7 @@ if(BUILD_PYTHON_MODULE)
       ${CMAKE_MODULE_PATH})
   endif()
 
-  find_package(PythonExtensions)
+  find_package(PythonExtensions REQUIRED)
   find_package(F2PY REQUIRED)
 
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
@@ -148,8 +148,7 @@ if(BUILD_PYTHON_MODULE)
 
   set(F2PY_COMPILER_OPTIONS "--f90flags=\"-cpp\"")
   if(WIN32)
-    set(F2PY_COMPILER_OPTIONS "--compiler=mingw32 -DON_WINDOWS"
-      ${F2PY_COMPILER_OPTIONS})
+    set(F2PY_COMPILER_OPTIONS "${F2PY_COMPILER_OPTIONS} -DON_WINDOWS --compiler=mingw32")
   endif()
 
   add_custom_command(
