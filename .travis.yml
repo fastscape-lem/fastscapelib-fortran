@@ -1,10 +1,55 @@
-language: ruby
+notifications:
+  email: false
 
-before_install:
-  - gem install asciidoctor
+branches:
+  only:
+    - master
 
-script:
-  - asciidoctor docs/index.adoc -o docs/index.html
+matrix:
+  include:
+    - language: ruby
+      before_install:
+        - gem install asciidoctor
+      script:
+        - asciidoctor docs/index.adoc -o docs/index.html
+      env: BUILD_DOCS=yes
+    - language: c
+      os: linux
+      addons:
+        apt:
+          packages:
+            - gfortran
+            - cmake
+      install:
+        - "./ci/build_examples.sh"
+      script:
+        - "./ci/run_examples.sh"
+      env: RUN_FORTRAN_EXAMPLES=yes
+    - language: c
+      os: osx
+      addons:
+        homebrew:
+          packages:
+            - gcc
+      install:
+        - "./ci/build_examples.sh"
+      script:
+        - "./ci/run_examples.sh"
+      env: RUN_FORTRAN_EXAMPLES=yes
+    - language: python
+      python: 3.6
+      addons:
+        apt:
+          packages:
+            - gfortran
+            - cmake
+      before_install:
+        - pip install scikit-build
+      install:
+        - pip install . -v
+      script:
+        - python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"
+      env: TEST_PYTHON_IMPORT=yes
 
 deploy:
   provider: pages
@@ -13,3 +58,4 @@ deploy:
   local-dir: docs/
   on:
     branch: master
+    condition: "$BUILD_DOCS = yes"
