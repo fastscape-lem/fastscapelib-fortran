@@ -1,2 +1,2 @@
-cd examples
+cd build/examples
 ./Fan
