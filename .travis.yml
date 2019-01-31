@@ -27,6 +27,10 @@ matrix:
       env: RUN_FORTRAN_EXAMPLES=yes
     - language: c
       os: osx
+      addons:
+        homebrew:
+          packages:
+            - gcc
       before_install:
         - brew install gcc
       install:
