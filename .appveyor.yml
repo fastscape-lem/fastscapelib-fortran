@@ -24,7 +24,7 @@ before_build:
   - cmake --version
   - mingw32-make --version
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m ensurepip
-  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install scikit-build ninja
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install scikit-build ninja numpy
   - # CMake refuses to generate MinGW Makefiles if sh.exe is in the Path
   - ps: Get-Command sh.exe -All | Remove-Item
 
