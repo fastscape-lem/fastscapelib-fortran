@@ -13,23 +13,29 @@ image:
 stack: python 3
 
 environment:
+  MINGW_DIR: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
   matrix:
-    - MINGW_DIR: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
+    - RUN_FORTRAN_EXAMPLES: yes
+    - TEST_IMPORT_PYTHON_MODULE: yes
 
 before_build:
   - cmd: set PATH=%MINGW_DIR%;%PATH%
   - echo "%PATH%"
   - cmake --version
   - mingw32-make --version
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m ensurepip
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install scikit-build ninja
   - # CMake refuses to generate MinGW Makefiles if sh.exe is in the Path
   - ps: Get-Command sh.exe -All | Remove-Item
 
 build_script:
-  - mkdir build
-  - cd build
-  - cmake -G "MinGW Makefiles" -DBUILD_FASTSCAPELIB_SHARED=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
-  - cmake --build .
+  - if "%RUN_FORTRAN_EXAMPLES%"=="yes" mkdir build
+  - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cd build
+  - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake -G "MinGW Makefiles" -DBUILD_FASTSCAPELIB_SHARED=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
+  - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake --build .
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install . -v
 
 test_script:
-  - cd examples
-  - Fan
+  - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cd examples
+  - if "%RUN_FORTRAN_EXAMPLES%"=="yes" Fan
+  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"
