@@ -12,7 +12,7 @@ matrix:
         - gem install asciidoctor
       script:
         - asciidoctor docs/index.adoc -o docs/index.html
-      env: DOCS=yes
+      env: BUILD_DOCS=yes
     - language: c
       os: linux
       addons:
@@ -41,4 +41,4 @@ deploy:
   local-dir: docs/
   on:
     branch: master
-    condition: "$DOCS = yes"
+    condition: "$BUILD_DOCS = yes"
