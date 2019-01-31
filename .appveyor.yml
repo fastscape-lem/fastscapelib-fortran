@@ -38,9 +38,6 @@ build_script:
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cd build
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake -G "MinGW Makefiles" -DBUILD_FASTSCAPELIB_SHARED=ON -DBUILD_EXAMPLES=ON -DCMAKE_BUILD_TYPE=Debug ..
   - if "%RUN_FORTRAN_EXAMPLES%"=="yes" cmake --build .
-  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" f2py
-  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m numpy.f2py
-  - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m sysconfig
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install . --no-build-isolation
 
 test_script:

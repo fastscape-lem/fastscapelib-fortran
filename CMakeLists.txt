@@ -137,12 +137,17 @@ if(BUILD_PYTHON_MODULE)
   find_package(PythonExtensions REQUIRED)
   find_package(F2PY REQUIRED)
 
+  # TODO: see https://github.com/scikit-build/scikit-build/issues/383
+  set(_command "import distutils.sysconfig as ds; import sys; sys.stdout.write(ds.get_config_var('SO'))")
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "${_command}"
+    OUTPUT_VARIABLE PYTHON_EXTENSION_MODULE_SUFFIX
+    RESULT_VARIABLE _result)
+  message(STATUS ${PYTHON_EXTENSION_MODULE_SUFFIX})
+
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
   set(F2PY_MODULE_FILE
     ${CMAKE_CURRENT_BINARY_DIR}/${F2PY_MODULE_NAME}${PYTHON_EXTENSION_MODULE_SUFFIX}
     )
-
-  message(STATUS ${PYTHON_EXTENSION_MODULE_SUFFIX})
 
   add_custom_target(${F2PY_MODULE_NAME} ALL
     DEPENDS ${F2PY_MODULE_FILE}
