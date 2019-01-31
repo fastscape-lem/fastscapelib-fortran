@@ -10,23 +10,22 @@ platform:
 image:
   - Visual Studio 2017
 
-stack: python 3
-
 environment:
-  MINGW_DIR: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
   matrix:
     - RUN_FORTRAN_EXAMPLES: yes
+      MINGW_DIR: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
     - TEST_IMPORT_PYTHON_MODULE: yes
+      MINGW_DIR: C:\mingw-w64\x86_64-7.2.0-posix-seh-rt_v5-rev1\mingw64\bin
       PYTHON: "C:\\Python36-x64"
       PYTHON_VERSION: "3.6.x"
       PYTHON_ARCH: "64"
 
 install:
   - cmd: set PATH=%MINGW_DIR%;%PATH%
+  - cmd: SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
   - echo "%PATH%"
   - cmake --version
   - mingw32-make --version
-  - cmd: SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python --version
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m ensurepip
   - if "%TEST_IMPORT_PYTHON_MODULE%"=="yes" python -m pip install scikit-build ninja numpy
