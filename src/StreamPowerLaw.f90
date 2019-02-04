@@ -228,7 +228,8 @@ subroutine StreamPowerLaw ()
           else
             h(ijk)=elev(ijk)
             lake_sill(ijk)=lake_sill(ijr1)
-            lake_water_volume(lake_sill(ijk))=lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
+            if (lake_sill(ijk).ne.0) lake_water_volume(lake_sill(ijk)) = &
+            lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
           endif
           water(ijk)=max(w_rcv,h(ijk))
         endif
@@ -274,7 +275,8 @@ subroutine StreamPowerLaw ()
           else
             h(ijk)=elev(ijk)
             lake_sill(ijk)=lake_sill(ijr1)
-            lake_water_volume(lake_sill(ijk))=lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
+            if (lake_sill(ijk).ne.0) lake_water_volume(lake_sill(ijk)) = &
+            lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
           endif
           water(ijk)=max(w_rcv,h(ijk))
         endif
@@ -287,9 +289,11 @@ subroutine StreamPowerLaw ()
   enddo
 
   do ij=1,nn
+    if (lake_sill(ij).ne.0) then
     if (lake_water_volume(lake_sill(ij)).gt.0.d0) h(ij)=h(ij) &
     +max(0.d0,min(lake_sediment(lake_sill(ij)),lake_water_volume(lake_sill(ij))))/ &
     lake_water_volume(lake_sill(ij))*(water(ij)-h(ij))
+    endif
   enddo
 
   deallocate (mrec,mwrec,mlrec,mnrec,mstack,hwater)
