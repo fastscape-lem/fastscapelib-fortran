@@ -629,7 +629,11 @@ module FastScapeContext
     if (step.lt.100000) cstep(1:2)='00'
     if (step.lt.1000000) cstep(1:1)='0'
 
+#ifdef ON_WINDOWS
+    call system ('if not exist "VTK" mkdir VTK')
+#else
     call system ("mkdir -p VTK")
+#endif
 
     write (nxc,'(i6)') nx
     write (nyc,'(i6)') ny

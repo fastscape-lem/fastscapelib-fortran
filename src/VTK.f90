@@ -27,7 +27,11 @@ subroutine VTK (h,name,nf,f,fname,nx,ny,dx,dy,istep,vex)
     !  write (CI(i),'(i1)') i
     !  enddo
 
+#ifdef ON_WINDOWS
+    call system ('if not exist "VTK" mkdir VTK')
+#else
     call system ("mkdir -p VTK")
+#endif
 
     nn=nx*ny
     write (nxc,'(i6)') nx
@@ -49,7 +53,11 @@ subroutine VTK (h,name,nf,f,fname,nx,ny,dx,dy,istep,vex)
     part2=' float 1'//char(10)//'LOOKUP_TABLE default'//char(10)
     npart2=len_trim(part2)
 
+#ifdef ON_WINDOWS
+    call system ('del VTK/'//trim(name)//cstep//'.vtk')
+#else
     call system ('rm -f VTK/'//trim(name)//cstep//'.vtk')
+#endif
 
     open(unit=77,file='VTK/'//trim(name)//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
     recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &

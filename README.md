@@ -1,6 +1,7 @@
 # Fastscapelib-fortran
 
 [![Build Status](https://travis-ci.org/fastscape-lem/fastscapelib-fortran.svg?branch=master)](https://travis-ci.org/fastscape-lem/fastscapelib-fortran)
+[![Build status](https://ci.appveyor.com/api/projects/status/c0wfit5kj1gpo1a7/branch/master?svg=true)](https://ci.appveyor.com/project/benbovy/fastscapelib-fortran/branch/master)
 [![DOI](https://zenodo.org/badge/167184498.svg)](https://zenodo.org/badge/latestdoi/167184498)
 
 A Fortran (+ Python bindings) library of efficient algorithms for
