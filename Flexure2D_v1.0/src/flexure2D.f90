@@ -51,6 +51,7 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
   do while (nflex.lt.max(nx,ny))
     nflex=nflex*2
   enddo
+  nflex=nflex/2
 
   allocate (w(nflex,nflex))
 

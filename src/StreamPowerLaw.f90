@@ -285,6 +285,7 @@ subroutine StreamPowerLaw ()
     endif
 
     err=maxval(abs(h-hp))
+    if (maxval(g).lt.tiny(g)) err=0.d0
 
   enddo
 
