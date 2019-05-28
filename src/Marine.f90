@@ -91,6 +91,7 @@ subroutine Marine()
   where (flux.gt.0.d0.and.h.lt.sealevel) flux=-(h-shelfdepth)
   where (flux.le.0.d0.and.h.lt.sealevel) flux=flux-(h-shelfdepth)
   where (h.ge.sealevel) flux=0.d0
+  flux=max(flux,0.d0)
 
   ! silt fraction (after decompaction) in shelf
   Fs=0.d0
