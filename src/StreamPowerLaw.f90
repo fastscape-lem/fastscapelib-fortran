@@ -152,6 +152,7 @@ subroutine StreamPowerLaw ()
   nGSStreamPowerLaw=0
 
   lake_sediment=0.d0
+  lake_sill=0.d0
 
   do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
@@ -285,6 +286,8 @@ subroutine StreamPowerLaw ()
     err=maxval(abs(h-hp))
 
   enddo
+
+if (nGSStreamPowerLaw.eq.99) stop 'G-S algorithm did not converge in StreamPowerLaw'
 
   do ij=1,nn
     if (lake_sill(ij).ne.0) then

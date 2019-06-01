@@ -70,3 +70,7 @@ docs/*.html
 
 # Misc
 .DS_Store
+
+test/VTK
+test/*.f90
+fluxes.txt
