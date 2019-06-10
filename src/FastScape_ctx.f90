@@ -17,13 +17,20 @@ module FastScapeContext
   double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
   integer, dimension(:), allocatable :: stack, ndon, rec
   integer, dimension(:,:), allocatable :: don
-  logical :: runSPL, runAdvect, runDiffusion, runStrati
-  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati
+  double precision, dimension(:), allocatable :: hwater
+  double precision, dimension(:,:), allocatable :: mwrec, mlrec
+  integer, dimension(:), allocatable :: mnrec, mstack
+  integer, dimension(:,:), allocatable :: mrec
+  logical :: runSPL, runAdvect, runDiffusion, runStrati, runUplift
+  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati, timeUplift
   double precision, dimension(:,:), allocatable :: reflector
   double precision, dimension(:,:,:), allocatable :: fields
   integer nfield, nfreq, nreflector, nfreqref, ireflector
   double precision :: vexref
   double precision, dimension(:), allocatable :: lake_depth
+  logical, dimension(:), allocatable :: bc
+  logical :: xcyclic, ycyclic
+  logical :: distributed_flow
 
   contains
 
@@ -37,6 +44,7 @@ module FastScapeContext
     timeAdvect = 0.
     timeDiffusion = 0.
     timeStrati = 0.
+    timeUplift = 0.
 
   end subroutine Init
 
@@ -53,10 +61,10 @@ module FastScapeContext
 
     call Destroy()
 
-    allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
+    allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn),bc(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
     allocate (lake_depth(nn))
-
+    allocate (mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn),hwater(nn))
     h2(1:nx,1:ny) => h
     b2(1:nx,1:ny) => b
     vx2(1:nx,1:ny) => vx
@@ -84,6 +92,7 @@ module FastScapeContext
     runAdvect = .false.
     runDiffusion = .false.
     runStrati = .false.
+    runUplift = .false.
 
     nGSStreamPowerLaw = 0
 
@@ -120,7 +129,13 @@ module FastScapeContext
     if (allocated(reflector)) deallocate(reflector)
     if (allocated(fields)) deallocate(fields)
     if (allocated(lake_depth)) deallocate(lake_depth)
-
+    if (allocated (mrec)) deallocate (mrec)
+    if (allocated (mwrec)) deallocate (mwrec)
+    if (allocated (mlrec)) deallocate (mlrec)
+    if (allocated (mnrec)) deallocate (mnrec)
+    if (allocated (mstack)) deallocate (mstack)
+    if (allocated (hwater)) deallocate (hwater)
+    if (allocated (bc)) deallocate (bc)
     return
 
   end subroutine Destroy
@@ -213,7 +228,7 @@ module FastScapeContext
     a0=dx*dy*10.d0
     do ij=1,nn
       ijk=stack(ij)
-      if (a(ijk).gt.a0) chi(ijk)=chi(rec(ijk))+(a0/a(ijk))**(m/n)*length(ijk)
+      if (a(ijk).gt.a0.and.rec(ijk).ne.0) chi(ijk)=chi(rec(ijk))+(a0/a(ijk))**(m/n)*length(ijk)
     enddo
     chip(1:nn)=chi
     deallocate(chi)
@@ -366,6 +381,8 @@ module FastScapeContext
     g1 = gg1
     g2 = gg2
     p = pp
+    distributed_flow = .true.
+    if (abs(pp+2.d0).lt.tiny(pp)) distributed_flow = .false.
 
     if (maxval(kd).gt.tiny(kd).or.kdsed.gt.tiny(kdsed)) runDiffusion = .true.
 
@@ -463,6 +480,7 @@ module FastScapeContext
 
     write (*,*) 'Timing:'
     if (runSPL) write (*,*) 'SPL:',timeSPL
+    if (runUplift) write (*,*) 'Uplift:',timeUplift
     if (runDiffusion) write (*,*) 'Diffusion:',timeDiffusion
     if (runAdvect) write (*,*) 'Advection:',timeAdvect
     if (runStrati) write (*,*) 'Strati:',timeStrati
@@ -489,6 +507,8 @@ module FastScapeContext
 
     double precision, intent(in) :: up(*)
     integer i
+
+    runUplift = .true.
 
     do i=1,nn
       u(i) = up(i)
@@ -608,167 +628,154 @@ module FastScapeContext
     call system ("mkdir -p VTK")
 #endif
 
-    write (nxc,'(i6)') nx
-    write (nyc,'(i6)') ny
-    write (nnc,'(i12)') nn
+      write (nxc,'(i6)') nx
+      write (nyc,'(i6)') ny
+      write (nnc,'(i12)') nn
 
-    header(1:1024)=''
-    header='# vtk DataFile Version 3.0'//char(10)//'FastScape'//char(10) &
-    //'BINARY'//char(10)//'DATASET STRUCTURED_GRID'//char(10) &
-    //'DIMENSIONS '//nxc//' '//nyc//' 1'//char(10)//'POINTS' &
-    //nnc//' float'//char(10)
-    nheader=len_trim(header)
-    footer(1:1024)=''
-    footer='POINT_DATA'//nnc//char(10)
-    nfooter=len_trim(footer)
-    part1(1:1024)=''
-    part1='SCALARS '
-    npart1=len_trim(part1)+1
-    part2(1:1024)=''
-    part2=' float 1'//char(10)//'LOOKUP_TABLE default'//char(10)
-    npart2=len_trim(part2)
+      header(1:1024)=''
+      header='# vtk DataFile Version 3.0'//char(10)//'FastScape'//char(10) &
+      //'BINARY'//char(10)//'DATASET STRUCTURED_GRID'//char(10) &
+      //'DIMENSIONS '//nxc//' '//nyc//' 1'//char(10)//'POINTS' &
+      //nnc//' float'//char(10)
+      nheader=len_trim(header)
+      footer(1:1024)=''
+      footer='POINT_DATA'//nnc//char(10)
+      nfooter=len_trim(footer)
+      part1(1:1024)=''
+      part1='SCALARS '
+      npart1=len_trim(part1)+1
+      part2(1:1024)=''
+      part2=' float 1'//char(10)//'LOOKUP_TABLE default'//char(10)
+      npart2=len_trim(part2)
 
-    open(unit=77,file='VTK/Topography'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
-    recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
-    +(npart1+5+npart2+4*nn),convert='big_endian')
-    write (77,rec=1) &
-    header(1:nheader), &
-    ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(h(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
-    footer(1:nfooter), &
-    part1(1:npart1)//'H'//part2(1:npart2),sngl(h(1:nn)), &
-    part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
-    close(77)
-
-    if (vex.lt.0.d0) then
-      open(unit=77,file='VTK/Basement'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
+      open(unit=77,file='VTK/Topography'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
       recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
       +(npart1+5+npart2+4*nn),convert='big_endian')
       write (77,rec=1) &
       header(1:nheader), &
-      ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(b(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
+      ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(h(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
       footer(1:nfooter), &
-      part1(1:npart1)//'B'//part2(1:npart2),sngl(b(1:nn)), &
+      part1(1:npart1)//'H'//part2(1:npart2),sngl(h(1:nn)), &
       part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
       close(77)
-      open(unit=77,file='VTK/SeaLevel'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
-      recl=nheader+3*4*nn+nfooter+(npart1+2+npart2+4*nn),convert='big_endian')
-      write (77,rec=1) &
-      header(1:nheader), &
-      ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(sealevel*abs(vex)),i=1,nx),j=1,ny), &
-      footer(1:nfooter), &
-      part1(1:npart1)//'SL'//part2(1:npart2),(sngl(sealevel),i=1,nn)
-      close(77)
-    endif
 
-    return
-  end subroutine Make_VTK
+      if (vex.lt.0.d0) then
+        open(unit=77,file='VTK/Basement'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
+        recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
+        +(npart1+5+npart2+4*nn),convert='big_endian')
+        write (77,rec=1) &
+        header(1:nheader), &
+        ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(b(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
+        footer(1:nfooter), &
+        part1(1:npart1)//'B'//part2(1:npart2),sngl(b(1:nn)), &
+        part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
+        close(77)
+        open(unit=77,file='VTK/SeaLevel'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
+        recl=nheader+3*4*nn+nfooter+(npart1+2+npart2+4*nn),convert='big_endian')
+        write (77,rec=1) &
+        header(1:nheader), &
+        ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(sealevel*abs(vex)),i=1,nx),j=1,ny), &
+        footer(1:nfooter), &
+        part1(1:npart1)//'SL'//part2(1:npart2),(sngl(sealevel),i=1,nn)
+        close(77)
+      endif
 
-  !---------------------------------------------------------------
+      return
+    end subroutine Make_VTK
 
-  subroutine Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
+    !---------------------------------------------------------------
 
-    implicit none
+    subroutine Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
 
-    double precision, intent(in) :: vexp
-    integer, intent(in) :: nstepp, nreflectorp, nfreqp
+      implicit none
 
-    nfield = 10
+      double precision, intent(in) :: vexp
+      integer, intent(in) :: nstepp, nreflectorp, nfreqp
 
-    nfreqref = nstepp/nreflectorp
-    ireflector = 1
-    vexref = vexp
-    nreflector = nreflectorp
-    nfreq = nfreqp
+      nfield = 10
 
-    allocate (reflector(nn,nreflector),fields(nn,nfield,nreflector))
+      nfreqref = nstepp/nreflectorp
+      ireflector = 1
+      vexref = vexp
+      nreflector = nreflectorp
+      nfreq = nfreqp
 
-    fields=0.d0
+      allocate (reflector(nn,nreflector),fields(nn,nfield,nreflector))
 
-    !call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
-    !fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
+      fields=0.d0
 
-    runStrati = .true.
+      !call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
+      !fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
 
-  end subroutine Activate_Strati
+      runStrati = .true.
 
-  !---------------------------------------------------------------
+    end subroutine Activate_Strati
 
-  subroutine run_Strati ()
+    !---------------------------------------------------------------
 
-    implicit none
+    subroutine run_Strati ()
 
-    integer i
+      implicit none
 
-    ! uplift reflectors
-    do i = 1, nreflector
-      reflector(:,i) = reflector(:,i) + u*dt
-    enddo
+      integer i
 
-    ! updates erosion below each reflector
-    do i= 1, ireflector
-      fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
-    enddo
-
-    do i = 1, ireflector - 1
-      reflector(:,i) = min(reflector(:,i),h)
-    enddo
-
-    do i = ireflector, nreflector
-      reflector(:,i) = h
-    enddo
-
-    if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
-      if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
-      call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
-      fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
-    endif
-
-  end subroutine run_Strati
-
-  !---------------------------------------------------------------
-
-  subroutine compute_fluxes (tectonic_flux, erosion_flux, boundary_flux)
-
-    implicit none
-
-    double precision, intent(out) :: tectonic_flux, erosion_flux, boundary_flux
-    double precision :: surf
-    logical, dimension(:), allocatable :: bc
-    double precision, dimension(:), allocatable :: hwater,flux
-    double precision, dimension(:,:), allocatable :: mwrec,mlrec
-    integer, dimension(:), allocatable :: mnrec,mstack
-    integer, dimension(:,:), allocatable :: mrec
-    character*4 :: cbc
-    integer ij,ijk,k
-
-    surf = xl*yl/(nx - 1)/(ny - 1)
-
-    tectonic_flux = sum(u)*surf
-    erosion_flux = sum(erate)*surf
-
-    ! computes receiver and stack information for multi-direction flow
-    allocate (mrec(8,nn), mnrec(nn), mwrec(8,nn), mlrec(8,nn), mstack(nn), hwater(nn), flux(nn), bc(nn))
-    call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, ibc)
-    ! computes sediment flux
-    flux = erate
-    do ij = 1, nn
-      ijk = mstack(ij)
-      flux(ijk)=max(0.d0,flux(ijk))
-      do k = 1, mnrec(ijk)
-        flux(mrec(k,ijk)) = flux(mrec(k,ijk)) + flux(ijk)*mwrec(k,ijk)
+      ! uplift reflectors
+      do i = 1, nreflector
+        reflector(:,i) = reflector(:,i) + u*dt
       enddo
-    enddo
-    ! compute boundary flux
-    write (cbc,'(i4)') ibc
-    bc=.FALSE.
-    if (cbc(4:4).eq.'1') bc(1:nn:nx) = .TRUE.
-    if (cbc(2:2).eq.'1') bc(nx:nn:nx) = .TRUE.
-    if (cbc(1:1).eq.'1') bc(1:nx) = .TRUE.
-    if (cbc(3:3).eq.'1') bc(nx*(ny - 1) + 1:nn) = .TRUE.
-    boundary_flux = sum(flux,bc)*surf
 
-    deallocate (mrec, mnrec, mwrec, mlrec, mstack, hwater, flux, bc)
+      ! updates erosion below each reflector
+      do i= 1, ireflector
+        fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
+      enddo
 
-  end subroutine compute_fluxes
+      do i = 1, ireflector - 1
+        reflector(:,i) = min(reflector(:,i),h)
+      enddo
 
-end module FastScapeContext
+      do i = ireflector, nreflector
+        reflector(:,i) = h
+      enddo
+
+      if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
+        if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
+        call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
+        fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
+      endif
+
+    end subroutine run_Strati
+
+    !---------------------------------------------------------------
+
+    subroutine compute_fluxes (tectonic_flux, erosion_flux, boundary_flux)
+
+      implicit none
+
+      double precision, intent(out) :: tectonic_flux, erosion_flux, boundary_flux
+      double precision :: surf
+      double precision, dimension(:), allocatable :: flux
+      integer ij,ijk,k
+
+      surf = xl*yl/(nx - 1)/(ny - 1)
+
+      tectonic_flux = sum(u)*surf
+      erosion_flux = sum(erate)*surf
+
+      allocate (flux(nn))
+      ! computes sediment flux
+      flux = erate
+      do ij = 1, nn
+        ijk = mstack(ij)
+        flux(ijk)=max(0.d0,flux(ijk))
+        do k = 1, mnrec(ijk)
+          flux(mrec(k,ijk)) = flux(mrec(k,ijk)) + flux(ijk)*mwrec(k,ijk)
+        enddo
+      enddo
+      ! compute boundary flux
+      boundary_flux = sum(flux,bc)*surf
+
+      deallocate (flux)
+
+    end subroutine compute_fluxes
+
+  end module FastScapeContext

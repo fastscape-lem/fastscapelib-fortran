@@ -202,8 +202,16 @@ subroutine FastScape_Execute_Step()
     timeAdvect = timeAdvect + time_out-time_in
   endif
 
+  if (runUplift) then
+    call cpu_time (time_in)
+    call Uplift ()
+    call cpu_time (time_out)
+    timeUplift = timeUplift + time_out-time_in
+  endif
+
   if (runSPL) then
     call cpu_time (time_in)
+    call FlowRouting ()
     call StreamPowerLaw ()
     call cpu_time (time_out)
     timeSPL = timeSPL + time_out-time_in
@@ -393,15 +401,15 @@ end subroutine FastScape_Copy_F
 
 subroutine FastScape_Copy_Lake_Depth(Lp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: Lp
+  double precision, intent(inout), dimension(*) :: Lp
 
-call CopyLakeDepth(Lp)
+  call CopyLakeDepth(Lp)
 
-return
+  return
 
 end subroutine FastScape_Copy_Lake_Depth
 

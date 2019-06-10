@@ -71,9 +71,6 @@ program flexure_test
   nstep = 1000
   nfreq = 10
 
-  ! echo model setup
-  call FastScape_View()
-
   ! set uplift function (on half of the model)
   u = 3.d-4
   where (y.lt.yl/2.d0) u =0.d0
@@ -101,6 +98,9 @@ program flexure_test
 
   ! get step number (shold be zero as we have not yet called FastScape_Execute_Step)
   call FastScape_Get_Step (istep)
+
+  ! echo model setup
+  call FastScape_View()
 
   ! start of time loop
   do while (istep.lt.nstep)

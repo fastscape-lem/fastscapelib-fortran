@@ -16,7 +16,9 @@ set(FASTSCAPELIB_SRC_FILES
   ${FASTSCAPELIB_SRC_DIR}/LocalMinima.f90
   ${FASTSCAPELIB_SRC_DIR}/Strati.f90
   ${FASTSCAPELIB_SRC_DIR}/StreamPowerLaw.f90
+  ${FASTSCAPELIB_SRC_DIR}/Uplift.f90
   ${FASTSCAPELIB_SRC_DIR}/VTK.f90
+  ${FASTSCAPELIB_SRC_DIR}/FlowRouting.f90
   )
 
 set(FLEXURE_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Flexure2D_v1.0/src)
@@ -41,7 +43,7 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
 # =====
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    set(dialect "-ffree-form -std=f2008 -fimplicit-none")
+    set(dialect "-O -ffree-form -std=f2008 -fimplicit-none")
     set(bounds "-fbounds-check")
     set(warnings "-Wall -Wno-unused-dummy-argument")
 endif()
