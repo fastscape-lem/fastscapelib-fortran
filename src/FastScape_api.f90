@@ -195,6 +195,13 @@ subroutine FastScape_Execute_Step()
 
   real :: time_in, time_out
 
+  if (runUplift) then
+    call cpu_time (time_in)
+    call Uplift()
+    call cpu_time (time_out)
+    timeUplift = timeUplift + time_out-time_in
+  endif
+
   if (runAdvect) then
     call cpu_time (time_in)
     call Advect ()

@@ -17,8 +17,8 @@ module FastScapeContext
   double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
   integer, dimension(:), allocatable :: stack, ndon, rec
   integer, dimension(:,:), allocatable :: don
-  logical :: runSPL, runAdvect, runDiffusion, runStrati
-  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati
+  logical :: runSPL, runAdvect, runDiffusion, runStrati, runUplift
+  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati, timeUplift
   double precision, dimension(:,:), allocatable :: reflector
   double precision, dimension(:,:,:), allocatable :: fields
   integer nfield, nfreq, nreflector, nfreqref, ireflector
@@ -41,6 +41,7 @@ module FastScapeContext
     timeAdvect = 0.
     timeDiffusion = 0.
     timeStrati = 0.
+    timeUplift = 0.
 
   end subroutine Init
 
@@ -88,6 +89,7 @@ module FastScapeContext
     runAdvect = .false.
     runDiffusion = .false.
     runStrati = .false.
+    runUplift = .false.
 
     nGSStreamPowerLaw = 0
 
@@ -481,6 +483,7 @@ module FastScapeContext
     if (runSPL) write (*,*) 'SPL:',timeSPL
     if (runDiffusion) write (*,*) 'Diffusion:',timeDiffusion
     if (runAdvect) write (*,*) 'Advection:',timeAdvect
+    if (runUplift) write (*,*) 'Uplift:',timeUplift
     if (runStrati) write (*,*) 'Strati:',timeStrati
 
   end subroutine Debug
@@ -505,6 +508,8 @@ module FastScapeContext
 
     double precision, intent(in) :: up(*)
     integer i
+
+    runUplift = .true.
 
     do i=1,nn
       u(i) = up(i)

@@ -33,7 +33,7 @@ subroutine StreamPowerLaw ()
 
   ! uplift
 
-  h=h+u*dt
+  ! h=h+u*dt
 
   lake_depth = hwater - h
 
@@ -65,8 +65,8 @@ subroutine StreamPowerLaw ()
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
     ! guess/update the elevation at t+Δt (k)
     hp=h
-    ! update the base elevation
-    b=min(hp,bt+u*dt)
+    b=min(hp,bt)
+
     ! calculate erosion/deposition at each node
     dh=ht-hp
 
@@ -252,7 +252,7 @@ subroutine StreamPowerLaw ()
 
     ! uplift
 
-    h=h+u*dt
+!    h=h+u*dt
 
     ! computes receiver and stack information for mult-direction flow
 
@@ -283,8 +283,9 @@ subroutine StreamPowerLaw ()
       ! guess/update the elevation at t+Δt (k)
       hp=h
       ! update the base elevation
-      b=min(hp,bt+u*dt)
-      ! calculate erosion/deposition at each node
+!      b=min(hp,bt+u*dt)
+      b=min(hp,bt)
+       ! calculate erosion/deposition at each node
       dh=ht-hp
 
       ! sum the erosion in stack order

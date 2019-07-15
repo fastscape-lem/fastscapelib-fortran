@@ -12,8 +12,7 @@ program Mountain
 
   integer :: nx, ny, istep, nstep
   double precision :: xl, yl, dt, kfsed, m, n, kdsed, g
-  double precision, dimension(:), allocatable :: h, u, chi, kf, kd
-  double precision :: tectonic_flux, erosion_flux, boundary_flux
+  double precision, dimension(:), allocatable :: h, u, chi, kf, kd, b
 
   ! initialize FastScape
   call FastScape_Init ()
@@ -69,7 +68,7 @@ program Mountain
   call FastScape_Get_Step (istep)
 
   !allocate memory to extract chi
-  allocate (chi(nx*ny))
+  allocate (chi(nx*ny),b(nx*ny))
 
   ! loop on time stepping
   do while (istep<nstep)
@@ -80,14 +79,13 @@ program Mountain
     ! extract solution
     call FastScape_Copy_Chi (chi)
     ! create VTK file
-    call FastScape_VTK (chi, 2.d0)
+    call FastScape_VTK (chi, -2.d0)
     ! outputs h values
     call FastScape_Copy_h (h)
-    print*,'step',istep,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
-    ! outputs fluxes
-    call FastScape_Get_Fluxes (tectonic_flux, erosion_flux, boundary_flux)
-    print*, tectonic_flux, erosion_flux, boundary_flux
-
+    print*,'step',istep
+    print*,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
+    call FastScape_Copy_Basement (b)
+    print*,'b range:',minval(b),sum(b)/(nx*ny),maxval(b)
   enddo
 
   ! output timing
@@ -96,6 +94,6 @@ program Mountain
   ! end FastScape run
   call FastScape_Destroy ()
 
-  deallocate (h,u,kf,kd,chi)
+  deallocate (h,u,kf,kd,chi,b)
 
 end program Mountain
