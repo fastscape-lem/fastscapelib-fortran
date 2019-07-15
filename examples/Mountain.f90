@@ -13,6 +13,7 @@ program Mountain
   integer :: nx, ny, istep, nstep
   double precision :: xl, yl, dt, kfsed, m, n, kdsed, g
   double precision, dimension(:), allocatable :: h, u, chi, kf, kd
+  double precision :: tectonic_flux, erosion_flux, boundary_flux
 
   ! initialize FastScape
   call FastScape_Init ()
@@ -46,9 +47,10 @@ program Mountain
   m = 0.6d0
   n = 1.5d0
   kd = 1.d-1
+  kd = 0.d0
   kdsed = -1.d0
   g = 0.d0
-  call FastScape_Set_Erosional_Parameters (kf, kfsed, m, n, kd, kdsed, g, g, 10.d0)
+  call FastScape_Set_Erosional_Parameters (kf, kfsed, m, n, kd, kdsed, g, g, -2.d0)
 
   ! set uplift rate (uniform while keeping bounaries at base level)
   allocate (u(nx*ny))
@@ -82,6 +84,10 @@ program Mountain
     ! outputs h values
     call FastScape_Copy_h (h)
     print*,'step',istep,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
+    ! outputs fluxes
+    call FastScape_Get_Fluxes (tectonic_flux, erosion_flux, boundary_flux)
+    print*, tectonic_flux, erosion_flux, boundary_flux
+
   enddo
 
   ! output timing
