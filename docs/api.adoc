@@ -372,6 +372,30 @@ Arguments:
 
 array of dimension `(nx*ny)` containing the extracted erosion rate in meters per year (double precision)
 
+=== FastScape_Copy_Slope
+
+This routine is used to extract from the model the current slope (expressed in degrees)
+
+Arguments:
+
+`FastScape_Copy_Slope ( s)`
+
+`s` ::
+
+array of dimension `(nx*ny)` containing the extracted slope (double precision)
+
+=== FastScape_Copy_Curvature
+
+This routine is used to extract from the model the current curvature
+
+Arguments:
+
+`FastScape_Copy_Curvature ( c)`
+
+`c` ::
+
+array of dimension `(nx*ny)` containing the extracted curvature (double precision)
+
 === FastScape_Copy_Chi
 
 This routine is used to extract from the model the current chi parameter

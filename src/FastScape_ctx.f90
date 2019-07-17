@@ -224,6 +224,48 @@ module FastScapeContext
 
   !---------------------------------------------------------------
 
+  subroutine CopySlope (slopep)
+
+    double precision, intent(inout), dimension(*) :: slopep
+    double precision, dimension(:), allocatable :: s
+    double precision dx,dy
+
+    if (.not.setup_has_been_run) stop 'CopySlope - You need to run SetUp first'
+
+    allocate (s(nn))
+    dx=xl/(nx-1)
+    dy=yl/(ny-1)
+    call slope (h,s,nx,ny,dx,dy)
+    slopep(1:nn)=s
+    deallocate(s)
+
+    return
+
+  end subroutine CopySlope
+
+  !---------------------------------------------------------------
+
+  subroutine CopyCurvature (curvaturep)
+
+    double precision, intent(inout), dimension(*) :: curvaturep
+    double precision, dimension(:), allocatable :: c
+    double precision dx,dy
+
+    if (.not.setup_has_been_run) stop 'CopyCurvature - You need to run SetUp first'
+
+    allocate (c(nn))
+    dx=xl/(nx-1)
+    dy=yl/(ny-1)
+    call curvature (h,c,nx,ny,dx,dy)
+    curvaturep(1:nn)=c
+    deallocate(c)
+
+    return
+
+  end subroutine CopyCurvature
+
+  !---------------------------------------------------------------
+
   subroutine CopyCatchment (catchp)
 
     double precision, intent(inout), dimension(*) :: catchp
@@ -719,7 +761,7 @@ module FastScapeContext
 
     if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
       if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
-      call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
+      call Strati (b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
       fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
     endif
 
