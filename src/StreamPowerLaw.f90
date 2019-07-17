@@ -12,13 +12,13 @@ subroutine StreamPowerLaw ()
   integer :: ij,ijk,ijr,k,ijr1
   double precision :: dx,dy,fact,tol,err
   double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
-  double precision, dimension(:), allocatable :: rhs,ht,g,kfint,bt,dh,hp
+  double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
   double precision, dimension(:), allocatable :: elev
   logical, dimension(:), allocatable :: bc
   double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
   integer, dimension(:), allocatable :: lake_sill
 
-  allocate (rhs(nn),ht(nn),g(nn),kfint(nn),bc(nn),bt(nn),dh(nn),hp(nn))
+  allocate (ht(nn),g(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
   allocate (elev(nn))
   allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 
@@ -30,10 +30,6 @@ subroutine StreamPowerLaw ()
   kfint=kf
   if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
   if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
-
-  ! uplift
-
-  ! h=h+u*dt
 
   lake_depth = hwater - h
 
@@ -49,23 +45,21 @@ subroutine StreamPowerLaw ()
   enddo
 
   ! calculate the elevation / SPL, including sediment flux
-  tol=1.d-4*(maxval(abs(h))+1.d0)
+  tol=1.d-4*(maxval(abs(h)) + 1.d0)
   err=2.d0*tol
 
   ! store the elevation at t
   ht=h
-  bt=b
 
   ! Gauss-Seidel iteration
   nGSStreamPowerLaw=0
 
   lake_sediment=0.d0
 
-  do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
+  do while (err.gt.tol)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
     ! guess/update the elevation at t+Δt (k)
     hp=h
-    b=min(hp,bt)
 
     ! calculate erosion/deposition at each node
     dh=ht-hp
@@ -192,8 +186,11 @@ subroutine StreamPowerLaw ()
 
       err=maxval(abs(h-hp))
       if (maxval(g).lt.tiny(g)) err=0.d0
+      if (nGSStreamPowerLaw.eq.100) stop 'Gauss-Siedel scheme not convergent - change G'
 
     enddo
+
+    b=min(h,b)
 
     do ij=1,nn
       if (lake_sill(ij).ne.0) then
@@ -208,8 +205,6 @@ subroutine StreamPowerLaw ()
     erate=(ht-h)/dt
     Sedflux=ht-h
     !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
-
-    !deallocate (rhs,hn,bt,g,kf,h0)
 
     return
 
@@ -229,13 +224,13 @@ subroutine StreamPowerLaw ()
     integer :: ij,ijk,ijr
     double precision :: dx,dy,fact,tol,err
     double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
-    double precision, dimension(:), allocatable :: rhs,ht,g,kfint,bt,dh,hp
+    double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
     double precision, dimension(:), allocatable :: elev
     logical, dimension(:), allocatable :: bc
     double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
     integer, dimension(:), allocatable :: lake_sill
 
-    allocate (rhs(nn),ht(nn),g(nn),kfint(nn),bc(nn),bt(nn),dh(nn),hp(nn))
+    allocate (ht(nn),g(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
     allocate (elev(nn))
     allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 
@@ -271,20 +266,17 @@ subroutine StreamPowerLaw ()
 
     ! store the elevation at t
     ht=h
-    bt=b
 
     ! Gauss-Seidel iteration
     nGSStreamPowerLaw=0
 
     lake_sediment=0.d0
 
-    do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
+    do while (err.gt.tol)
       nGSStreamPowerLaw=nGSStreamPowerLaw+1
       ! guess/update the elevation at t+Δt (k)
       hp=h
-      ! update the base elevation
-!      b=min(hp,bt+u*dt)
-      b=min(hp,bt)
+
        ! calculate erosion/deposition at each node
       dh=ht-hp
 
@@ -331,13 +323,14 @@ subroutine StreamPowerLaw ()
                 !if (h(ijk).ge.sealevel.or..not.runMarine) then
                 f = elev(ijk)
                 df = 1.d0
-                if (ht(ijk).ge.ht(ijr)) then
+!                if (ht(ijk).ge.ht(ijr)) then
                   fact = kfint(ijk)*dt*a(ijk)**m/length(ijk)
                   f = f + fact*h(ijr)
                   df = df + fact
-                endif
+!                endif
                 h(ijk)=f/df
-                !endif
+!                h(ijk)=min(f/df,minval(h(don(1:ndon(ijk),ijk))))
+                  !endif
                 lake_sill(ijk)=ijk
                 lake_water_volume(ijk)=0.d0
                 if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
@@ -398,8 +391,10 @@ subroutine StreamPowerLaw ()
 
         err=maxval(abs(h-hp))
         if (maxval(g).lt.tiny(g)) err=0.d0
-
+        if (nGSStreamPowerLaw.eq.100) stop 'Gauss-Siedel scheme not convergent - change G'
       enddo
+
+      b=min(h,b)
 
       do ij=1,nn
         if (lake_sill(ij).ne.0) then
@@ -416,8 +411,6 @@ subroutine StreamPowerLaw ()
       erate=(ht-h)/dt
       Sedflux=ht-h
       !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
-
-      !deallocate (rhs,hn,bt,g,kf,h0)
 
       return
 

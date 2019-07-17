@@ -195,13 +195,6 @@ subroutine FastScape_Execute_Step()
 
   real :: time_in, time_out
 
-  if (runUplift) then
-    call cpu_time (time_in)
-    call Uplift()
-    call cpu_time (time_out)
-    timeUplift = timeUplift + time_out-time_in
-  endif
-
   if (runAdvect) then
     call cpu_time (time_in)
     call Advect ()
@@ -209,7 +202,17 @@ subroutine FastScape_Execute_Step()
     timeAdvect = timeAdvect + time_out-time_in
   endif
 
+  if (runUplift) then
+    print*,'u',sum(h)/(nx*ny),sum(b)/(nx*ny)
+    call cpu_time (time_in)
+    call Uplift()
+    call cpu_time (time_out)
+    timeUplift = timeUplift + time_out-time_in
+    print*,'u',sum(h)/(nx*ny),sum(b)/(nx*ny)
+  endif
+
   if (runSPL) then
+    print*,'s',sum(h)/(nx*ny),sum(b)/(nx*ny)
     call cpu_time (time_in)
     if (SingleFlowDirection) then
       call FlowRoutingSingleFlowDirection
@@ -220,6 +223,7 @@ subroutine FastScape_Execute_Step()
     endif
     call cpu_time (time_out)
     timeSPL = timeSPL + time_out-time_in
+    print*,'s',sum(h)/(nx*ny),sum(b)/(nx*ny)
   endif
 
   if (runDiffusion) then

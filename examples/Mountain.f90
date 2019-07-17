@@ -41,14 +41,14 @@ program Mountain
 
   ! set erosional parameters
   allocate (kf(nx*ny),kd(nx*ny))
-  kf = 2.d-6
+  kf = 1.d-5
   kfsed = -1.d0
-  m = 0.6d0
-  n = 1.5d0
+  m = 0.4d0
+  n = 1.d0
   kd = 1.d-1
   kd = 0.d0
   kdsed = -1.d0
-  g = 0.d0
+  g = 2.d0
   call FastScape_Set_Erosional_Parameters (kf, kfsed, m, n, kd, kdsed, g, g, -2.d0)
 
   ! set uplift rate (uniform while keeping bounaries at base level)
