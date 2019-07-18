@@ -425,15 +425,15 @@ end subroutine FastScape_Copy_F
 
 subroutine FastScape_Copy_Lake_Depth(Lp)
 
-use FastScapeContext
+  use FastScapeContext
 
-implicit none
+  implicit none
 
-double precision, intent(inout), dimension(*) :: Lp
+  double precision, intent(inout), dimension(*) :: Lp
 
-call CopyLakeDepth(Lp)
+  call CopyLakeDepth(Lp)
 
-return
+  return
 
 end subroutine FastScape_Copy_Lake_Depth
 
