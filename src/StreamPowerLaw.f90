@@ -187,66 +187,66 @@ subroutine StreamPowerLaw ()
 
     where (bc)
     elev=ht
-  elsewhere
-    elev=ht+(dh-(ht-hp))*g*dx*dy/a
-    endwhere
+    elsewhere
+      elev=ht+(dh-(ht-hp))*g*dx*dy/a
+      endwhere
 
-    ! apply modified stream power law using lake surface (hwater)
+      ! apply modified stream power law using lake surface (hwater)
 
-    if (abs(n-1.d0).lt.tiny(n)) then
+      if (abs(n-1.d0).lt.tiny(n)) then
 
-      do ij=nn,1,-1
-        ijk=mstack(ij)
-        ijr1=rec(ijk)
-        if (ijr1.eq.ijk) then
-          water(ijk)=ht(ijk)
-          lake_sill(ijk)=ijk
-          lake_water_volume(ijk)=0.d0
-        else
-          w_rcv=water(ijr1)
-          if (elev(ijk).gt.w_rcv) then
-            if (mnrec(ijk).gt.0) then
-              !if (h(ijk).ge.sealevel.or..not.runMarine) then
-              f = elev(ijk)
-              df = 1.d0
-              do k=1,mnrec(ijk)
-                !if (ht(ijk).ge.ht(mrec(k,ijk))) then
-                if (ht(ijk).ge.ht(mrec(k,ijk))) then
-                  fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
-                  f = f + fact*h(mrec(k,ijk))
-                  df = df + fact
-                endif
-              enddo
-              h(ijk)=f/df
-              !endif
-            endif
+        do ij=nn,1,-1
+          ijk=mstack(ij)
+          ijr1=rec(ijk)
+          if (ijr1.eq.ijk) then
+            water(ijk)=ht(ijk)
             lake_sill(ijk)=ijk
             lake_water_volume(ijk)=0.d0
-            if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
           else
-            h(ijk)=elev(ijk)
-            lake_sill(ijk)=lake_sill(ijr1)
-            if (lake_sill(ijk).ne.0) lake_water_volume(lake_sill(ijk)) = &
-            lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
+            w_rcv=water(ijr1)
+            if (elev(ijk).gt.w_rcv) then
+              if (mnrec(ijk).gt.0) then
+                !if (h(ijk).ge.sealevel.or..not.runMarine) then
+                f = elev(ijk)
+                df = 1.d0
+                do k=1,mnrec(ijk)
+                  !if (ht(ijk).ge.ht(mrec(k,ijk))) then
+                  if (ht(ijk).ge.ht(mrec(k,ijk))) then
+                    fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
+                    f = f + fact*h(mrec(k,ijk))
+                    df = df + fact
+                  endif
+                enddo
+                h(ijk)=f/df
+                !endif
+              endif
+              lake_sill(ijk)=ijk
+              lake_water_volume(ijk)=0.d0
+              if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
+            else
+              h(ijk)=elev(ijk)
+              lake_sill(ijk)=lake_sill(ijr1)
+              if (lake_sill(ijk).ne.0) lake_water_volume(lake_sill(ijk)) = &
+              lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
+            endif
+            water(ijk)=max(w_rcv,h(ijk))
           endif
-          water(ijk)=max(w_rcv,h(ijk))
-        endif
-      enddo
+        enddo
 
-    else
+      else
 
-      do ij=nn,1,-1
-        ijk=mstack(ij)
-        ijr1=rec(ijk)
-        if (ijr1.eq.ijk) then
-          water(ijk)=ht(ijk)
-          lake_sill(ijk)=ijk
-          lake_water_volume(ijk)=0.d0
-        else
-          w_rcv=water(ijr1)
-          if (elev(ijk).gt.w_rcv) then
-            if (mnrec(ijk).gt.0) then
-              !if (ht(ijk).ge.sealevel.or..not.runMarine) then
+        do ij=nn,1,-1
+          ijk=mstack(ij)
+          ijr1=rec(ijk)
+          if (ijr1.eq.ijk) then
+            water(ijk)=ht(ijk)
+            lake_sill(ijk)=ijk
+            lake_water_volume(ijk)=0.d0
+          else
+            w_rcv=water(ijr1)
+            if (elev(ijk).gt.w_rcv) then
+              if (mnrec(ijk).gt.0) then
+                !if (ht(ijk).ge.sealevel.or..not.runMarine) then
                 omega=0.875d0/n
                 tolp=1.d-3
                 errp=2.d0*tolp
@@ -265,70 +265,70 @@ subroutine StreamPowerLaw ()
                   errp=abs(hn-h(ijk))
                   h(ijk)=h(ijk)*(1.d0-omega)+hn*omega
                 enddo
-              !endif
+                !endif
+              endif
+              lake_sill(ijk)=ijk
+              lake_water_volume(ijk)=0.d0
+              if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
+            else
+              h(ijk)=elev(ijk)
+              lake_sill(ijk)=lake_sill(ijr1)
+              if (lake_sill(ijk).ne.0) lake_water_volume(lake_sill(ijk)) = &
+              lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
             endif
-            lake_sill(ijk)=ijk
-            lake_water_volume(ijk)=0.d0
-            if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
-          else
-            h(ijk)=elev(ijk)
-            lake_sill(ijk)=lake_sill(ijr1)
-            if (lake_sill(ijk).ne.0) lake_water_volume(lake_sill(ijk)) = &
-            lake_water_volume(lake_sill(ijk))+(w_rcv-h(ijk))
+            water(ijk)=max(w_rcv,h(ijk))
           endif
-          water(ijk)=max(w_rcv,h(ijk))
-        endif
-      enddo
+        enddo
 
-    endif
+      endif
 
-    err=maxval(abs(h-hp))
-    if (maxval(g).lt.tiny(g)) err=0.d0
+      err=maxval(abs(h-hp))
+      if (maxval(g).lt.tiny(g)) err=0.d0
 
+    enddo
+
+    do ij=1,nn
+      if (lake_sill(ij).ne.0) then
+        if (lake_water_volume(lake_sill(ij)).gt.0.d0) h(ij)=h(ij) &
+        +max(0.d0,min(lake_sediment(lake_sill(ij)),lake_water_volume(lake_sill(ij))))/ &
+        lake_water_volume(lake_sill(ij))*(water(ij)-h(ij))
+      endif
+    enddo
+
+    deallocate (mrec,mwrec,mlrec,mnrec,mstack,hwater)
+
+    ! stores total erosion, erosion rate and flux for output
+    etot=etot+ht-h
+    erate=(ht-h)/dt
+    Sedflux=ht-h
+    !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
+
+    !deallocate (rhs,hn,bt,g,kf,h0)
+
+    return
+
+  end subroutine StreamPowerLaw
+
+  !----------
+
+  recursive subroutine find_stack (ij,don,ndon,nn,stack,nstack,catch)
+
+  ! recursive routine to go through all nodes following donor information
+
+  implicit none
+  integer don(8,nn),ndon(nn),stack(nn)
+  double precision catch(nn)
+  integer k,ij,ijk,nn,nstack
+
+  do k=1,ndon(ij)
+    ijk=don(k,ij)
+    nstack=nstack+1
+    stack(nstack)=ijk
+    catch(ijk)=catch(ij)
+    call find_stack (ijk,don,ndon,nn,stack,nstack,catch)
   enddo
-
-  do ij=1,nn
-    if (lake_sill(ij).ne.0) then
-    if (lake_water_volume(lake_sill(ij)).gt.0.d0) h(ij)=h(ij) &
-    +max(0.d0,min(lake_sediment(lake_sill(ij)),lake_water_volume(lake_sill(ij))))/ &
-    lake_water_volume(lake_sill(ij))*(water(ij)-h(ij))
-    endif
-  enddo
-
-  deallocate (mrec,mwrec,mlrec,mnrec,mstack,hwater)
-
-  ! stores total erosion, erosion rate and flux for output
-  etot=etot+ht-h
-  erate=(ht-h)/dt
-  Sedflux=ht-h
-  !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
-
-  !deallocate (rhs,hn,bt,g,kf,h0)
 
   return
-
-end subroutine StreamPowerLaw
-
-!----------
-
-recursive subroutine find_stack (ij,don,ndon,nn,stack,nstack,catch)
-
-! recursive routine to go through all nodes following donor information
-
-implicit none
-integer don(8,nn),ndon(nn),stack(nn)
-double precision catch(nn)
-integer k,ij,ijk,nn,nstack
-
-do k=1,ndon(ij)
-  ijk=don(k,ij)
-  nstack=nstack+1
-  stack(nstack)=ijk
-  catch(ijk)=catch(ij)
-  call find_stack (ijk,don,ndon,nn,stack,nstack,catch)
-enddo
-
-return
 end subroutine find_stack
 
 !-----------------------------------------------------

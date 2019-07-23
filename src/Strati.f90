@@ -81,42 +81,6 @@ end subroutine Strati
 
 !-------------------------------------------------------------------
 
-subroutine slope (h,s,nx,ny,dx,dy)
-
-  implicit none
-
-  double precision h(nx*ny),s(nx*ny),dx,dy
-  integer nx,ny
-
-  integer i,j,ij,ia,ib,ic,id,ie,if,ig,ih,ii
-  double precision dzdx,dzdy,con
-
-  con=45.d0/atan(1.d0)
-
-  s=0.d0
-  do j=2,ny-1
-    do i=2,nx-1
-      ij=i+(j-1)*nx
-      ia=ij+nx-1
-      ib=ia+1
-      ic=ib+1
-      id=ij-1
-      ie=ij
-      if=ij+1
-      ig=ij-nx-1
-      ih=ig+1
-      ii=ih+1
-      dzdx=((h(ic)+2.d0*h(if)+h(ii))-(h(ia)+2.d0*h(id)+h(ig)))/8.d0/dx
-      dzdy=((h(ig)+2.d0*h(ih)+h(ii))-(h(ia)+2.d0*h(ib)+h(ic)))/8.d0/dy
-      s(ij)=dzdx**2+dzdy**2
-      if (s(ij).gt.tiny(s(ij))) s(ij)=atan(sqrt(s(ij)))*con
-    enddo
-  enddo
-
-end subroutine slope
-
-!-------------------------------------------------------------------
-
 subroutine distance_to_shore (h,d,nx,ny,stack,rec,length)
 
   implicit none
@@ -133,12 +97,12 @@ subroutine distance_to_shore (h,d,nx,ny,stack,rec,length)
     ij = stack(i)
     if (h(rec(ij)).gt.0.d0) then
       d(ij) = 1.d0
-    elseif (h(ij).gt.0.d0) then
-      d(ij) = length(ij)*(-h(rec(ij))/(h(ij)-h(rec(ij))))
-    endif
-    d(rec(ij)) = d(rec(ij)) + d(ij)
-  enddo
+      elseif (h(ij).gt.0.d0) then
+        d(ij) = length(ij)*(-h(rec(ij))/(h(ij)-h(rec(ij))))
+      endif
+      d(rec(ij)) = d(rec(ij)) + d(ij)
+    enddo
 
-  return
+    return
 
-end subroutine distance_to_shore
+  end subroutine distance_to_shore
