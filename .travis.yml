@@ -50,7 +50,7 @@ matrix:
         - pip install --upgrade pip wheel setuptools
         - pip install scikit-build
       install:
-        - pip install . -v
+        - pip install . -v --no-build-isolation
       script:
         - python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"
       env: TEST_PYTHON_IMPORT=yes
