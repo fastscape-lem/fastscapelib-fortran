@@ -47,6 +47,7 @@ matrix:
             - gfortran
             - cmake
       before_install:
+        - pip install --upgrade pip wheel setuptools
         - pip install scikit-build
       install:
         - pip install . -v
