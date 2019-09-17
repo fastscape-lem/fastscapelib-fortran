@@ -61,8 +61,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Jupyter Notebooks
+.ipynb_checkpoints
+
 # Examples
-examples/.ipynb_checkpoints/
 examples/VTK
 
 # Docs
