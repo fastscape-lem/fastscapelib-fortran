@@ -374,7 +374,7 @@ subroutine mst_kruskal(conn_weights, conn_basins, nbasins, nconn, mstree, mstree
     if (f0 .ne. f1) then
       mstree_size = mstree_size+1
       mstree(mstree_size) = eid
-      call Union (b0,b1,parent,rank,nbasins)
+      call DoUnion (b0,b1,parent,rank,nbasins)
     endif
 
   enddo
@@ -781,7 +781,7 @@ end subroutine UnionFindInit
 
 !----------------------
 
-subroutine Union (x,y,parent,rank,n)
+subroutine DoUnion (x,y,parent,rank,n)
 
   implicit none
 
@@ -809,7 +809,7 @@ subroutine Union (x,y,parent,rank,n)
   endif
 
   return
-end subroutine Union
+end subroutine DoUnion
 
 !----------------------
 
