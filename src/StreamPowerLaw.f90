@@ -55,6 +55,7 @@ subroutine StreamPowerLaw ()
   nGSStreamPowerLaw=0
 
   lake_sediment=0.d0
+  lake_sill=0.d0
 
   do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
@@ -88,10 +89,10 @@ subroutine StreamPowerLaw ()
     enddo
 
     where (bc)
-    elev=ht
+      elev=ht
     elsewhere
       elev=ht+(dh-(ht-hp))*g*dx*dy/a
-      endwhere
+    endwhere
 
       ! apply modified stream power law using lake surface (hwater)
 
@@ -108,19 +109,18 @@ subroutine StreamPowerLaw ()
             w_rcv=water(ijr1)
             if (elev(ijk).gt.w_rcv) then
               if (mnrec(ijk).gt.0) then
-                !if (h(ijk).ge.sealevel.or..not.runMarine) then
-                f = elev(ijk)
-                df = 1.d0
-                do k=1,mnrec(ijk)
-                  !if (ht(ijk).ge.ht(mrec(k,ijk))) then
-                  if (ht(ijk).ge.ht(mrec(k,ijk))) then
-                    fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
-                    f = f + fact*h(mrec(k,ijk))
-                    df = df + fact
-                  endif
-                enddo
-                h(ijk)=f/df
-                !endif
+                if (h(ijk).ge.sealevel.or..not.runMarine) then
+                  f = elev(ijk)
+                  df = 1.d0
+                  do k=1,mnrec(ijk)
+                    if (ht(ijk).ge.ht(mrec(k,ijk))) then
+                      fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)
+                      f = f + fact*h(mrec(k,ijk))
+                      df = df + fact
+                    endif
+                  enddo
+                  h(ijk)=f/df
+                endif
               endif
               lake_sill(ijk)=ijk
               lake_water_volume(ijk)=0.d0
@@ -148,26 +148,26 @@ subroutine StreamPowerLaw ()
             w_rcv=water(ijr1)
             if (elev(ijk).gt.w_rcv) then
               if (mnrec(ijk).gt.0) then
-                !if (ht(ijk).ge.sealevel.or..not.runMarine) then
-                omega=0.875d0/n
-                tolp=1.d-3
-                errp=2.d0*tolp
-                h0=elev(ijk)
-                do while (errp.gt.tolp)
-                  f=h(ijk)-h0
-                  df=1.d0
-                  do k=1,mnrec(ijk)
-                    if (ht(ijk).gt.ht(mrec(k,ijk))) then
-                      fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)**n
-                      f=f+fact*max(0.d0,h(ijk)-h(mrec(k,ijk)))**n
-                      df=df+fact*n*max(0.d0,h(ijk)-h(mrec(k,ijk)))**(n-1.d0)
-                    endif
+                if (ht(ijk).ge.sealevel.or..not.runMarine) then
+                  omega=0.875d0/n
+                  tolp=1.d-3
+                  errp=2.d0*tolp
+                  h0=elev(ijk)
+                  do while (errp.gt.tolp)
+                    f=h(ijk)-h0
+                    df=1.d0
+                    do k=1,mnrec(ijk)
+                      if (ht(ijk).gt.ht(mrec(k,ijk))) then
+                        fact = kfint(ijk)*dt*(a(ijk)*mwrec(k,ijk))**m/mlrec(k,ijk)**n
+                        f=f+fact*max(0.d0,h(ijk)-h(mrec(k,ijk)))**n
+                        df=df+fact*n*max(0.d0,h(ijk)-h(mrec(k,ijk)))**(n-1.d0)
+                      endif
+                    enddo
+                    hn=h(ijk)-f/df
+                    errp=abs(hn-h(ijk))
+                    h(ijk)=h(ijk)*(1.d0-omega)+hn*omega
                   enddo
-                  hn=h(ijk)-f/df
-                  errp=abs(hn-h(ijk))
-                  h(ijk)=h(ijk)*(1.d0-omega)+hn*omega
-                enddo
-                !endif
+                endif
               endif
               lake_sill(ijk)=ijk
               lake_water_volume(ijk)=0.d0

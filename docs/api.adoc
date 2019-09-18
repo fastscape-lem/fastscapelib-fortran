@@ -161,6 +161,55 @@ slope exponent for multi-direction flow; the distribution of flow among potentia
 `p = -1.d0` (or any negative value for `p`) corresponds to an exponent that varies with slope according to: `p = 0.5 + 0.6*slope`
 ====
 
+=== FastScape_Set_Marine_Parameters
+
+This routine is used to set the marine transport/compaction parameters
+
+Arguments:
+
+`FastScape_Set_Marine_Parameters ( SL, p1, p2, z1, z2, r, L, kds1, kds2)`
+
+`SL` ::
+
+sea level in meters (double precision)
+
+`p1`::
+
+reference/surface porosity for sand (double precision)
+
+`p2`::
+
+reference/surface porosity for shale (double precision)
+
+`z1`::
+
+e-folding depth for exponential porosity law for sand (double precision)
+
+`z2`::
+
+e-folding depth for exponential porosity law for shale (double precision)
+
+`r` ::
+
+sand-shale ratio for material leaving the continent (double precision)
+
+`L` ::
+
+averaging depth/thickness needed to solve the sand-shale equation in meters (double precision)
+
+`kds1` ::
+
+marine transport coefficient (diffusivity) for sand in meters squared per year (double precision)
+
+`kds2` ::
+
+marine transport coefficient (diffusivity) for shale in meters squared per year (double precision)
+
+[WARNING]
+====
+When `kds2` is not equal to `kds1`, it is possible that the algorithm fails to converge; the time step should be decreased until the maximum amount of sediment deposited in one time step is less than `L` the averaging depth; in theory, the convergence should not be affected when the increment in deposited sediment is higher than `L` and Xiaoping and Jean aere working on solving this problem
+====
+
 === FastScape_Set_BC
 
 This routine is used to set the boundary conditions
@@ -371,6 +420,30 @@ Arguments:
 `er` ::
 
 array of dimension `(nx*ny)` containing the extracted erosion rate in meters per year (double precision)
+
+=== FastScape_Copy_Slope
+
+This routine is used to extract from the model the current slope (expressed in degrees)
+
+Arguments:
+
+`FastScape_Copy_Slope ( s)`
+
+`s` ::
+
+array of dimension `(nx*ny)` containing the extracted slope (double precision)
+
+=== FastScape_Copy_Curvature
+
+This routine is used to extract from the model the current curvature
+
+Arguments:
+
+`FastScape_Copy_Curvature ( c)`
+
+`c` ::
+
+array of dimension `(nx*ny)` containing the extracted curvature (double precision)
 
 === FastScape_Copy_Chi
 

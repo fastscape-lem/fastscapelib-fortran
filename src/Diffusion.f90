@@ -57,7 +57,7 @@ subroutine Diffusion ()
     if (cbc(4:4).eq.'1') then
     diag(1)=1.
     sup(1)=0.
-    f(1)=zint(1,j)
+    f(1)=zintp(1,j)
     else
     factxp=(kdint(2,j)+kdint(1,j))/2.d0*(dt/2.)/dx**2
     factyp=(kdint(1,j+1)+kdint(1,j))/2.d0*(dt/2.)/dy**2
@@ -70,7 +70,7 @@ subroutine Diffusion ()
     if (cbc(2:2).eq.'1') then
     diag(nx)=1.
     inf(nx)=0.
-    f(nx)=zint(nx,j)
+    f(nx)=zintp(nx,j)
     else
     factxm=(kdint(nx-1,j)+kdint(nx,j))/2.d0*(dt/2.)/dx**2
     factyp=(kdint(nx,j+1)+kdint(nx,j))/2.d0*(dt/2.)/dy**2

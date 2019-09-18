@@ -8,7 +8,7 @@ module FastScapeContext
 
   integer :: nx, ny, nn, nstack
   integer :: step, ibc
-  integer :: nGSStreamPowerLaw
+  integer :: nGSStreamPowerLaw, nGSMarine
   logical :: setup_has_been_run
   double precision, target, dimension(:), allocatable :: h,u,vx,vy,length,a,erate,etot,catch,catch0,b,precip,kf,kd
   double precision, target, dimension(:), allocatable :: Sedflux, Fmix
@@ -17,8 +17,8 @@ module FastScapeContext
   double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
   integer, dimension(:), allocatable :: stack, ndon, rec
   integer, dimension(:,:), allocatable :: don
-  logical :: runSPL, runAdvect, runDiffusion, runStrati, runUplift
-  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati, timeUplift
+  logical :: runSPL, runAdvect, runDiffusion, runStrati, runUplift, runMarine
+  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati, timeUplift, timeMarine
   double precision, dimension(:,:), allocatable :: reflector
   double precision, dimension(:,:,:), allocatable :: fields
   integer nfield, nfreq, nreflector, nfreqref, ireflector
@@ -41,6 +41,7 @@ module FastScapeContext
     timeAdvect = 0.
     timeDiffusion = 0.
     timeStrati = 0.
+    timeMarine = 0.
     timeUplift = 0.
 
   end subroutine Init
@@ -89,9 +90,11 @@ module FastScapeContext
     runAdvect = .false.
     runDiffusion = .false.
     runStrati = .false.
+    runMarine = .false.
     runUplift = .false.
 
     nGSStreamPowerLaw = 0
+    nGSMarine = 0
 
     setup_has_been_run = .true.
 
@@ -234,6 +237,48 @@ module FastScapeContext
     return
 
   end subroutine CopyChi
+
+  !---------------------------------------------------------------
+
+  subroutine CopySlope (slopep)
+
+    double precision, intent(inout), dimension(*) :: slopep
+    double precision, dimension(:), allocatable :: s
+    double precision dx,dy
+
+    if (.not.setup_has_been_run) stop 'CopySlope - You need to run SetUp first'
+
+    allocate (s(nn))
+    dx=xl/(nx-1)
+    dy=yl/(ny-1)
+    call slope (h,s,nx,ny,dx,dy)
+    slopep(1:nn)=s
+    deallocate(s)
+
+    return
+
+  end subroutine CopySlope
+
+  !---------------------------------------------------------------
+
+  subroutine CopyCurvature (curvaturep)
+
+    double precision, intent(inout), dimension(*) :: curvaturep
+    double precision, dimension(:), allocatable :: c
+    double precision dx,dy
+
+    if (.not.setup_has_been_run) stop 'CopyCurvature - You need to run SetUp first'
+
+    allocate (c(nn))
+    dx=xl/(nx-1)
+    dy=yl/(ny-1)
+    call curvature (h,c,nx,ny,dx,dy)
+    curvaturep(1:nn)=c
+    deallocate(c)
+
+    return
+
+  end subroutine CopyCurvature
 
   !---------------------------------------------------------------
 
@@ -393,6 +438,28 @@ module FastScapeContext
 
   !---------------------------------------------------------------
 
+  subroutine SetMarineParam (sl, p1, p2, z1, z2, r, l, kds1, kds2)
+
+    double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
+
+    runMarine = .true.
+
+    sealevel = sl
+    poro1 = p1
+    poro2 = p2
+    zporo1 = z1
+    zporo2 = z2
+    ratio = r
+    layer = l
+    kdsea1 = kds1
+    kdsea2 = kds2
+
+    return
+
+  end subroutine SetMarineParam
+
+  !---------------------------------------------------------------
+
   subroutine SetDT (dtt)
 
     double precision, intent(in) :: dtt
@@ -478,10 +545,12 @@ module FastScapeContext
     write (*,*) 'Total number of local minima',counter
 
     write (*,*) 'Number of Gauss-Siedel iterations (SPL)',nGSStreamPowerLaw
+    write (*,*) 'Number of Crank-Nicholson iterations (Marine)',nGSMarine
 
     write (*,*) 'Timing:'
     if (runSPL) write (*,*) 'SPL:',timeSPL
     if (runDiffusion) write (*,*) 'Diffusion:',timeDiffusion
+    if (runMarine) write (*,*) 'Marine:',timeMarine
     if (runAdvect) write (*,*) 'Advection:',timeAdvect
     if (runUplift) write (*,*) 'Uplift:',timeUplift
     if (runStrati) write (*,*) 'Strati:',timeStrati

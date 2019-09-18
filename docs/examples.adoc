@@ -16,6 +16,14 @@ This is the basic square mountain problem where a landscape is formed by a unifo
 
 This model should run in approximately 90-100 seconds on a reasonably fast modern computer.
 
+=== Margin.f90
+
+Example showing the use of the Marine component of **FastScapeLib**.
+
+An area of 100x150 km is set to uplift on one half only. The other half is 1000 m below sea level and accumulate sediment eroded from the uplifting area. The erosion model is nonlinear (n = 2) and sediment transport affects erosion (g = 1). Multiple direction flow is selected. Marine transport is 10 x more efficient for silt than sand. No compaction. Resolution is 100x150. Boundary conditions are no flux boundaries except along the bottom boundary where base level is fixed at -1000 m.
+
+This model should run in approximately 90-95 seconds on a reasonably fast modern computer.
+
 === Fan.f90
 
 Example of the use of the continental transport/deposition component of **FastScapeLib**.

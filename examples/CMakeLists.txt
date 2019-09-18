@@ -3,7 +3,9 @@ cmake_minimum_required(VERSION 3.5)
 set(FASTSCAPELIB_EXAMPLES_SRC_FILES
   DippingDyke.f90
   Fan.f90
+  Margin.f90
   Mountain.f90
+  Strati_test.f90
   flexure_test.f90
   )
 
