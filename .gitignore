@@ -61,8 +61,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Jupyter Notebooks
+.ipynb_checkpoints
+
 # Examples
-examples/.ipynb_checkpoints/
 examples/VTK
 
 # Docs
@@ -70,3 +72,7 @@ docs/*.html
 
 # Misc
 .DS_Store
+
+test/VTK
+test/*.f90
+fluxes.txt

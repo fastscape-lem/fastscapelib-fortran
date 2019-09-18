@@ -8,9 +8,9 @@
 :math:
 :stem: latexmath
 
-**FastScapeLib** is an interface or library (i.e. a set of subroutines) to model landscape evolution by river incision, sediment transport and deposition in continental environments.
+**FastScapeLib** is an interface or library (i.e. a set of subroutines) to model landscape evolution by river incision, sediment transport and deposition in continental and marine environments.
 
-**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019 in <<References>>) and (b) hillslope diffusion, using a set of highly efficient algorithms that are all latexmath:[\mathcal{O}(n)] complexity and implicit in time. These routines can be called from a Fortran, C or Python main program and are ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
+**FastScapeLib** is a set of routines that solve (a) the stream power law (SPL) that has been enriched by a sediment transport/deposition term (see Yuan et al, 2019a in <<References>>) (b) hillslope diffusion and (c) marine transport and deposition (see Yuan et al, 2019b in <<References>>), using a set of highly efficient algorithms that are all latexmath:[\mathcal{O}(n)] complexity and implicit in time. These routines can be called from a Fortran, C or Python main program and are ideally suited to be coupled to a tectonic model, be it very simple, such as a flexural isostatic model, or very complex, such as a 3D thermo-mechanical model.
 
 Basic partial differential equation solved by **FastScapeLib** is:
 
