@@ -1,12 +1,33 @@
 [#release_notes]
 == Release notes
 
-=== Version 2.8.0 (Unreleased)
+=== Version 2.8.0 (18 September 2019)
+
+==== Changes
+
+- Refactor stream power law implementation (decouple from flow
+  routing) #23
+
+- Rename Union internal subroutine (could cause name conflicts when
+  building the library with f2py) #22
+
+==== New features
+
+- New routines for computing curvature and slope #15
+
+- New component for marine sediment transport and deposition #20
 
 ==== Bug fixes
 
-- Fix issue with lake_sill in very flat topography that caused
-  anomalous deposition of sediments (1ad452f).
+- Fixed VTK files export on Windows #7
+
+- Improved efficiency of stream power law erosion and flexure #8
+
+- Fixed bug in lake filling algorithm #12
+
+- Fixed bug in ADI implementation of diffusion #17
+
+- Fixed bug in Strati subroutine #18
 
 === Version 2.7.0 (30 January 2019)
 
