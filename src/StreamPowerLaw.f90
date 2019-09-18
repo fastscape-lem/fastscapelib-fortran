@@ -56,7 +56,7 @@ subroutine StreamPowerLaw ()
 
   lake_sediment=0.d0
 
-  do while (err.gt.tol)
+  do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
     ! guess/update the elevation at t+Δt (k)
     hp=h
@@ -184,9 +184,9 @@ subroutine StreamPowerLaw ()
 
       endif
 
-      err=maxval(abs(h-hp))
+      err=sqrt(sum((h-hp)**2)/nn)
       if (maxval(g).lt.tiny(g)) err=0.d0
-      if (nGSStreamPowerLaw.eq.100) stop 'Gauss-Siedel scheme not convergent - change G'
+      if (nGSStreamPowerLaw.eq.99) print*,'Beware Gauss-Siedel scheme not convergent'
 
     enddo
 
@@ -272,7 +272,7 @@ subroutine StreamPowerLaw ()
 
     lake_sediment=0.d0
 
-    do while (err.gt.tol)
+    do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
       nGSStreamPowerLaw=nGSStreamPowerLaw+1
       ! guess/update the elevation at t+Δt (k)
       hp=h
@@ -389,9 +389,9 @@ subroutine StreamPowerLaw ()
 
         endif
 
-        err=maxval(abs(h-hp))
+        err=sqrt(sum((h-hp)**2)/nn)
         if (maxval(g).lt.tiny(g)) err=0.d0
-        if (nGSStreamPowerLaw.eq.100) stop 'Gauss-Siedel scheme not convergent - change G'
+        if (nGSStreamPowerLaw.eq.99) print*,'Beware Gauss-Siedel scheme not convergent'
       enddo
 
       b=min(h,b)

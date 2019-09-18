@@ -7,7 +7,7 @@ subroutine Diffusion ()
   implicit none
 
   double precision, dimension(:), allocatable :: f,diag,sup,inf,res
-  double precision, dimension(:,:), allocatable :: zint,kdint
+  double precision, dimension(:,:), allocatable :: zint,kdint,zintp
   integer i,j,ij
   double precision factxp,factxm,factyp,factym,dx,dy
   character cbc*4
@@ -21,7 +21,7 @@ subroutine Diffusion ()
 
   ! creates 2D internal arrays to store topo and kd
 
-  allocate (zint(nx,ny),kdint(nx,ny))
+  allocate (zint(nx,ny),kdint(nx,ny),zintp(nx,ny))
 
   do j=1,ny
     do i=1,nx
@@ -31,6 +31,8 @@ subroutine Diffusion ()
       if (kdsed.gt.0.d0 .and. (h(ij)-b(ij)).gt.1.d-6) kdint(i,j)=kdsed
     enddo
   enddo
+
+  zintp = zint
 
   ! first pass along the x-axis
 
@@ -49,7 +51,7 @@ subroutine Diffusion ()
     diag(i)=1.d0+factxp+factxm
     sup(i)=-factxp
     inf(i)=-factxm
-    f(i)=zint(i,j)+factyp*zint(i,j+1)-(factyp+factym)*zint(i,j)+factym*zint(i,j-1)
+    f(i)=zintp(i,j)+factyp*zintp(i,j+1)-(factyp+factym)*zintp(i,j)+factym*zintp(i,j-1)
     enddo
 ! left bc
     if (cbc(4:4).eq.'1') then
@@ -62,7 +64,7 @@ subroutine Diffusion ()
     factym=(kdint(1,j-1)+kdint(1,j))/2.d0*(dt/2.)/dy**2
     diag(1)=1.d0+factxp
     sup(1)=-factxp
-    f(1)=zint(1,j)+factyp*zint(1,j+1)-(factyp+factym)*zint(1,j)+factym*zint(1,j-1)
+    f(1)=zintp(1,j)+factyp*zintp(1,j+1)-(factyp+factym)*zintp(1,j)+factym*zintp(1,j-1)
     endif
 ! right bc
     if (cbc(2:2).eq.'1') then
@@ -75,7 +77,7 @@ subroutine Diffusion ()
     factym=(kdint(nx,j-1)+kdint(nx,j))/2.d0*(dt/2.)/dy**2
     diag(nx)=1.d0+factxm
     inf(nx)=-factxm
-    f(nx)=zint(nx,j)+factyp*zint(nx,j+1)-(factyp+factym)*zint(nx,j)+factym*zint(nx,j-1)
+    f(nx)=zintp(nx,j)+factyp*zintp(nx,j+1)-(factyp+factym)*zintp(nx,j)+factym*zintp(nx,j-1)
     endif
   call tridag (inf,diag,sup,f,res,nx)
     do i=1,nx
@@ -131,7 +133,7 @@ subroutine Diffusion ()
     endif
   call tridag (inf,diag,sup,f,res,ny)
     do j=1,ny
-    zint(i,j)=res(j)
+    zintp(i,j)=res(j)
     enddo
   enddo
   deallocate (f,diag,sup,inf,res)
@@ -141,15 +143,15 @@ subroutine Diffusion ()
   do j=1,ny
     do i=1,nx
       ij=(j-1)*nx+i
-      etot(ij)=etot(ij)+h(ij)-zint(i,j)
-      erate(ij)=erate(ij)+(h(ij)-zint(i,j))/dt
-      h(ij)=zint(i,j)
+      etot(ij)=etot(ij)+h(ij)-zintp(i,j)
+      erate(ij)=erate(ij)+(h(ij)-zintp(i,j))/dt
+      h(ij)=zintp(i,j)
     enddo
   enddo
 
   b=min(h,b)
 
-  deallocate (zint,kdint)
+  deallocate (zint,kdint,zintp)
 
   return
 

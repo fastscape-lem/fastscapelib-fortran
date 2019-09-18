@@ -12,7 +12,7 @@ program Mountain
 
   integer :: nx, ny, istep, nstep
   double precision :: xl, yl, dt, kfsed, m, n, kdsed, g
-  double precision, dimension(:), allocatable :: h, u, chi, kf, kd, b
+  double precision, dimension(:), allocatable :: h, u, chi, kf, kd
 
   ! initialize FastScape
   call FastScape_Init ()
@@ -41,17 +41,16 @@ program Mountain
 
   ! set erosional parameters
   allocate (kf(nx*ny),kd(nx*ny))
-  kf = 1.d-5
+  kf = 2.d-6
   kfsed = -1.d0
-  m = 0.4d0
-  n = 1.d0
+  m = 0.6d0
+  n = 1.5d0
   kd = 1.d-1
-  kd = 0.d0
   kdsed = -1.d0
-  g = 2.d0
+  g = 0.d0
   call FastScape_Set_Erosional_Parameters (kf, kfsed, m, n, kd, kdsed, g, g, -2.d0)
 
-  ! set uplift rate (uniform while keeping bounaries at base level)
+  ! set uplift rate (uniform while keeping boundaries at base level)
   allocate (u(nx*ny))
   u = 1.d-3
   u(1:nx)=0.d0
@@ -68,7 +67,7 @@ program Mountain
   call FastScape_Get_Step (istep)
 
   !allocate memory to extract chi
-  allocate (chi(nx*ny),b(nx*ny))
+  allocate (chi(nx*ny))
 
   ! loop on time stepping
   do while (istep<nstep)
@@ -79,13 +78,11 @@ program Mountain
     ! extract solution
     call FastScape_Copy_Chi (chi)
     ! create VTK file
-    call FastScape_VTK (chi, -2.d0)
+    call FastScape_VTK (chi, 2.d0)
     ! outputs h values
     call FastScape_Copy_h (h)
     print*,'step',istep
     print*,'h range:',minval(h),sum(h)/(nx*ny),maxval(h)
-    call FastScape_Copy_Basement (b)
-    print*,'b range:',minval(b),sum(b)/(nx*ny),maxval(b)
   enddo
 
   ! output timing
@@ -94,6 +91,6 @@ program Mountain
   ! end FastScape run
   call FastScape_Destroy ()
 
-  deallocate (h,u,kf,kd,chi,b)
+  deallocate (h,u,kf,kd,chi)
 
 end program Mountain

@@ -203,16 +203,13 @@ subroutine FastScape_Execute_Step()
   endif
 
   if (runUplift) then
-    print*,'u',sum(h)/(nx*ny),sum(b)/(nx*ny)
     call cpu_time (time_in)
     call Uplift()
     call cpu_time (time_out)
     timeUplift = timeUplift + time_out-time_in
-    print*,'u',sum(h)/(nx*ny),sum(b)/(nx*ny)
   endif
 
   if (runSPL) then
-    print*,'s',sum(h)/(nx*ny),sum(b)/(nx*ny)
     call cpu_time (time_in)
     if (SingleFlowDirection) then
       call FlowRoutingSingleFlowDirection
@@ -223,7 +220,6 @@ subroutine FastScape_Execute_Step()
     endif
     call cpu_time (time_out)
     timeSPL = timeSPL + time_out-time_in
-    print*,'s',sum(h)/(nx*ny),sum(b)/(nx*ny)
   endif
 
   if (runDiffusion) then

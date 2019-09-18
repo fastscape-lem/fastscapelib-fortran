@@ -1,4 +1,4 @@
-subroutine Strati (h,b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,nfield,vex,dt, &
+subroutine Strati (b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,nfield,vex,dt, &
   stack,rec,length,sealevel)
 
   ! this routine tracks information (fields) on a set of reflectors (reflector)
@@ -7,7 +7,7 @@ subroutine Strati (h,b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,field
   implicit none
 
   integer :: nx, ny, nn, nreflector, ireflector, i, nfield, istep
-  double precision reflector(nx*ny,nreflector), h(nx*ny), b(nx*ny), F(nx*ny), dx, dy, vex, dt
+  double precision reflector(nx*ny,nreflector), b(nx*ny), F(nx*ny), dx, dy, vex, dt
   double precision fields(nx*ny,nfield,nreflector), xl, yl,sealevel
   double precision, dimension(nx*ny) :: length
   integer, dimension(nx*ny) :: stack,rec
