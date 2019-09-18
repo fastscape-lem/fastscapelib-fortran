@@ -320,9 +320,10 @@ subroutine StreamPowerLaw ()
             else
               w_rcv=water(ijr)
               if (elev(ijk).gt.w_rcv) then
-                !if (h(ijk).ge.sealevel.or..not.runMarine) then
+                if (h(ijk).ge.sealevel.or..not.runMarine) then
                 f = elev(ijk)
                 df = 1.d0
+                ! todo: check if we don't need those checks for single flow
 !                if (ht(ijk).ge.ht(ijr)) then
                   fact = kfint(ijk)*dt*a(ijk)**m/length(ijk)
                   f = f + fact*h(ijr)
@@ -330,7 +331,7 @@ subroutine StreamPowerLaw ()
 !                endif
                 h(ijk)=f/df
 !                h(ijk)=min(f/df,minval(h(don(1:ndon(ijk),ijk))))
-                  !endif
+                  endif
                 lake_sill(ijk)=ijk
                 lake_water_volume(ijk)=0.d0
                 if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
@@ -356,7 +357,7 @@ subroutine StreamPowerLaw ()
             else
               w_rcv=water(ijr)
               if (elev(ijk).gt.w_rcv) then
-                !if (ht(ijk).ge.sealevel.or..not.runMarine) then
+                if (ht(ijk).ge.sealevel.or..not.runMarine) then
                 omega=0.875d0/n
                 tolp=1.d-3
                 errp=2.d0*tolp
@@ -373,7 +374,7 @@ subroutine StreamPowerLaw ()
                   errp=abs(hn-h(ijk))
                   h(ijk)=h(ijk)*(1.d0-omega)+hn*omega
                 enddo
-                !endif
+                endif
                 lake_sill(ijk)=ijk
                 lake_water_volume(ijk)=0.d0
                 if (h(ijk).lt.w_rcv) h(ijk)=w_rcv
