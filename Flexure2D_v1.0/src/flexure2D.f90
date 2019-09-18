@@ -178,12 +178,12 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
 
   ! deallocate memory
 
-do j=1,ny
-  do i=1,nx
-    ij=(j-1)*nx+i
-    hh2(ij)=h(i,j)
+  do j=1,ny
+    do i=1,nx
+      ij=(j-1)*nx+i
+      hh2(ij)=h(i,j)
+    enddo
   enddo
-enddo
 
   deallocate (w,h,hp,rhos)
 

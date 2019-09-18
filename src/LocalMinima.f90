@@ -916,7 +916,7 @@ subroutine loc_min_3_find_stack (rec,ndon,donor,stack,nn)
     if (rec(ij).eq.ij) then
       nstack=nstack+1
       stack(nstack)=ij
-      call find_stack_recursively (ij,donor,ndon,nn,stack,nstack)
+      call find_stack_recursively_locmin (ij,donor,ndon,nn,stack,nstack)
     endif
   enddo
 
@@ -1049,7 +1049,7 @@ end subroutine loc_min_3_indexx
 
 !----------------------
 
-recursive subroutine find_stack_recursively (ij,donor,ndon,nn,stack,nstack)
+recursive subroutine find_stack_recursively_locmin (ij,donor,ndon,nn,stack,nstack)
 
 implicit none
 
@@ -1062,8 +1062,8 @@ do k=1,ndon(ij)
   ijk=donor(k,ij)
   nstack=nstack+1
   stack(nstack)=ijk
-  call find_stack_recursively (ijk,donor,ndon,nn,stack,nstack)
+  call find_stack_recursively_locmin (ijk,donor,ndon,nn,stack,nstack)
 enddo
 
 return
-end subroutine find_stack_recursively
+end subroutine find_stack_recursively_locmin

@@ -17,13 +17,17 @@ module FastScapeContext
   double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
   integer, dimension(:), allocatable :: stack, ndon, rec
   integer, dimension(:,:), allocatable :: don
-  logical :: runSPL, runAdvect, runDiffusion, runMarine, runStrati
-  real :: timeSPL, timeAdvect, timeDiffusion, timeMarine, timeStrati
+  logical :: runSPL, runAdvect, runDiffusion, runStrati, runUplift, runMarine
+  real :: timeSPL, timeAdvect, timeDiffusion, timeStrati, timeUplift, timeMarine
   double precision, dimension(:,:), allocatable :: reflector
   double precision, dimension(:,:,:), allocatable :: fields
   integer nfield, nfreq, nreflector, nfreqref, ireflector
   double precision :: vexref
-  double precision, dimension(:), allocatable :: lake_depth
+  logical :: SingleFlowDirection
+  double precision, dimension(:), allocatable :: lake_depth, hwater
+  integer, dimension(:), allocatable :: mnrec,mstack
+  integer, dimension(:,:), allocatable :: mrec
+  double precision, dimension(:,:), allocatable :: mwrec,mlrec
 
   contains
 
@@ -36,8 +40,9 @@ module FastScapeContext
     timeSPL = 0.
     timeAdvect = 0.
     timeDiffusion = 0.
-  timeMarine = 0.
-  timeStrati = 0.
+    timeStrati = 0.
+    timeMarine = 0.
+    timeUplift = 0.
 
   end subroutine Init
 
@@ -56,7 +61,7 @@ module FastScapeContext
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
-    allocate (lake_depth(nn))
+    allocate (lake_depth(nn),hwater(nn),mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn))
 
     h2(1:nx,1:ny) => h
     b2(1:nx,1:ny) => b
@@ -84,8 +89,9 @@ module FastScapeContext
     runSPL = .false.
     runAdvect = .false.
     runDiffusion = .false.
+    runStrati = .false.
     runMarine = .false.
-  runStrati = .false.
+    runUplift = .false.
 
     nGSStreamPowerLaw = 0
     nGSMarine = 0
@@ -123,6 +129,13 @@ module FastScapeContext
     if (allocated(reflector)) deallocate(reflector)
     if (allocated(fields)) deallocate(fields)
     if (allocated(lake_depth)) deallocate(lake_depth)
+    if (allocated(hwater)) deallocate(hwater)
+    if (allocated(mrec)) deallocate(mrec)
+    if (allocated(mnrec)) deallocate(mnrec)
+    if (allocated(mwrec)) deallocate(mwrec)
+    if (allocated(mlrec)) deallocate(mlrec)
+    if (allocated(mstack)) deallocate(mstack)
+
 
     return
 
@@ -411,6 +424,11 @@ module FastScapeContext
     g1 = gg1
     g2 = gg2
     p = pp
+    SingleFlowDirection = .false.
+    if (pp.lt.-1.5d0) then
+      SingleFlowDirection = .true.
+      p = 1.d0
+    endif
 
     if (maxval(kd).gt.tiny(kd).or.kdsed.gt.tiny(kdsed)) runDiffusion = .true.
 
@@ -534,6 +552,7 @@ module FastScapeContext
     if (runDiffusion) write (*,*) 'Diffusion:',timeDiffusion
     if (runMarine) write (*,*) 'Marine:',timeMarine
     if (runAdvect) write (*,*) 'Advection:',timeAdvect
+    if (runUplift) write (*,*) 'Uplift:',timeUplift
     if (runStrati) write (*,*) 'Strati:',timeStrati
 
   end subroutine Debug
@@ -558,6 +577,8 @@ module FastScapeContext
 
     double precision, intent(in) :: up(*)
     integer i
+
+    runUplift = .true.
 
     do i=1,nn
       u(i) = up(i)
@@ -674,7 +695,7 @@ module FastScapeContext
 #ifdef ON_WINDOWS
     call system ('if not exist "VTK" mkdir VTK')
 #else
-    call system ("mkdir -p VTK")
+      call system ("mkdir -p VTK")
 #endif
 
       write (nxc,'(i6)') nx
@@ -753,7 +774,7 @@ module FastScapeContext
 
       fields=0.d0
 
-      !call Strati (h, b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
+      !call Strati (b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, 0, &
       !fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
 
       runStrati = .true.
@@ -803,10 +824,7 @@ module FastScapeContext
       double precision, intent(out) :: tectonic_flux, erosion_flux, boundary_flux
       double precision :: surf
       logical, dimension(:), allocatable :: bc
-      double precision, dimension(:), allocatable :: hwater,flux
-      double precision, dimension(:,:), allocatable :: mwrec,mlrec
-      integer, dimension(:), allocatable :: mnrec,mstack
-      integer, dimension(:,:), allocatable :: mrec
+      double precision, dimension(:), allocatable :: flux
       character*4 :: cbc
       integer ij,ijk,k
 
@@ -816,17 +834,29 @@ module FastScapeContext
       erosion_flux = sum(erate)*surf
 
       ! computes receiver and stack information for multi-direction flow
-      allocate (mrec(8,nn), mnrec(nn), mwrec(8,nn), mlrec(8,nn), mstack(nn), hwater(nn), flux(nn), bc(nn))
-      call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, ibc)
+      !allocate (mrec(8,nn), mnrec(nn), mwrec(8,nn), mlrec(8,nn), mstack(nn), hwater(nn)
+      !call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, ibc)
       ! computes sediment flux
+      allocate (flux(nn), bc(nn))
+
       flux = erate
-      do ij = 1, nn
-        ijk = mstack(ij)
-        flux(ijk)=max(0.d0,flux(ijk))
-        do k = 1, mnrec(ijk)
-          flux(mrec(k,ijk)) = flux(mrec(k,ijk)) + flux(ijk)*mwrec(k,ijk)
+
+      if (SingleFlowDirection) then
+        do ij = nn ,1, -1
+          ijk = stack(ij)
+          flux(ijk)=max(0.d0,flux(ijk))
+          flux(rec(ijk)) = flux(rec(ijk)) + flux(ijk)
         enddo
-      enddo
+      else
+        do ij = 1, nn
+          ijk = mstack(ij)
+          flux(ijk)=max(0.d0,flux(ijk))
+          do k = 1, mnrec(ijk)
+            flux(mrec(k,ijk)) = flux(mrec(k,ijk)) + flux(ijk)*mwrec(k,ijk)
+          enddo
+        enddo
+      endif
+
       ! compute boundary flux
       write (cbc,'(i4)') ibc
       bc=.FALSE.
@@ -836,7 +866,7 @@ module FastScapeContext
       if (cbc(3:3).eq.'1') bc(nx*(ny - 1) + 1:nn) = .TRUE.
       boundary_flux = sum(flux,bc)*surf
 
-      deallocate (mrec, mnrec, mwrec, mlrec, mstack, hwater, flux, bc)
+      deallocate (flux, bc)
 
     end subroutine compute_fluxes
 
