@@ -10,9 +10,9 @@ subroutine Marine()
 
   double precision, dimension(:), allocatable :: flux,shelfdepth,ht,Fs,dh,dh1,dh2,Fmixt,mwater
   double precision, dimension(:), allocatable :: dhs, dhs1, F1, F2, zi, zo
-  integer, dimension(:), allocatable :: flag,mnrec,mstack
-  integer, dimension(:,:), allocatable :: mrec
-  double precision, dimension(:,:), allocatable :: mwrec,mlrec
+  integer, dimension(:), allocatable :: flag,mmnrec,mmstack
+  integer, dimension(:,:), allocatable :: mmrec
+  double precision, dimension(:,:), allocatable :: mmwrec,mmlrec
   double precision shelfslope,ratio1,ratio2,dx,dy
   integer ij,ijr,ijk,k
 
@@ -51,22 +51,22 @@ subroutine Marine()
   ! modifications made by Jean for multiple flow to distribute continental flux to ocean on the shelf
   ! Dec 2018
 
-  allocate (mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn),mwater(nn))
+  allocate (mmrec(8,nn),mmnrec(nn),mmwrec(8,nn),mmlrec(8,nn),mmstack(nn),mwater(nn))
 
-  call find_mult_rec (h,rec,stack,mwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,0.d0,ibc)
+  call find_mult_rec (h,rec,stack,mwater,mmrec,mmnrec,mmwrec,mmlrec,mmstack,nx,ny,dx,dy,0.d0,ibc)
 
-  !print*,count(flux>0.and.mnrec==0),count(flux>0),count(mstack==0)
+  !print*,count(flux>0.and.mmnrec==0),count(flux>0),count(mmstack==0)
 
   ! modifications made by Jean
   ! to compute shelf depth
   shelfdepth=sealevel
   shelfslope=-1.d-4
   do ij=1,nn
-    ijk=mstack(ij)
-    do k=1,mnrec(ijk)
-      ijr=mrec(k,ijk)
+    ijk=mmstack(ij)
+    do k=1,mmnrec(ijk)
+      ijr=mmrec(k,ijk)
       if (h(ijk).lt.sealevel) then
-        shelfdepth(ijr)=min(shelfdepth(ijr),shelfdepth(ijk)+mlrec(k,ijk)*shelfslope)
+        shelfdepth(ijr)=min(shelfdepth(ijr),shelfdepth(ijk)+mmlrec(k,ijk)*shelfslope)
         shelfdepth(ijr)=max(shelfdepth(ijr),h(ijr))
       endif
     enddo
@@ -78,15 +78,15 @@ subroutine Marine()
 
   where (h.lt.sealevel) flux=flux+(h-shelfdepth)
   do ij=1,nn
-    ijk=mstack(ij)
-    do k=1,mnrec(ijk)
-      ijr=mrec(k,ijk)
-      flux(ijr)=flux(ijr)+max(0.d0,flux(ijk)*mwrec(k,ijk))
+    ijk=mmstack(ij)
+    do k=1,mmnrec(ijk)
+      ijr=mmrec(k,ijk)
+      flux(ijr)=flux(ijr)+max(0.d0,flux(ijk)*mmwrec(k,ijk))
     enddo
   enddo
   ! modifications made by Jean
 
-  deallocate (mrec,mnrec,mwrec,mlrec,mstack,mwater)
+  deallocate (mmrec,mmnrec,mmwrec,mmlrec,mmstack,mwater)
 
   where (flux.gt.0.d0.and.h.lt.sealevel) flux=-(h-shelfdepth)
   where (flux.le.0.d0.and.h.lt.sealevel) flux=flux-(h-shelfdepth)
@@ -521,4 +521,3 @@ subroutine compaction (F1,F2,poro1,poro2,z1,z2,nn,dh,zi,zo)
   return
 
 end subroutine compaction
-
