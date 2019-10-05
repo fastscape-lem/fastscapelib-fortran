@@ -12,13 +12,13 @@ subroutine StreamPowerLaw ()
   integer :: ij,ijk,ijr,k,ijr1
   double precision :: dx,dy,fact,tol,err
   double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
-  double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
+  double precision, dimension(:), allocatable :: ht,kfint,dh,hp
   double precision, dimension(:), allocatable :: elev
   logical, dimension(:), allocatable :: bc
   double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
   integer, dimension(:), allocatable :: lake_sill
 
-  allocate (ht(nn),g(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
+  allocate (ht(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
   allocate (elev(nn))
   allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 
@@ -224,13 +224,13 @@ subroutine StreamPowerLaw ()
     integer :: ij,ijk,ijr
     double precision :: dx,dy,fact,tol,err
     double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
-    double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
+    double precision, dimension(:), allocatable :: ht,kfint,dh,hp
     double precision, dimension(:), allocatable :: elev
     logical, dimension(:), allocatable :: bc
     double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
     integer, dimension(:), allocatable :: lake_sill
 
-    allocate (ht(nn),g(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
+    allocate (ht(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
     allocate (elev(nn))
     allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 

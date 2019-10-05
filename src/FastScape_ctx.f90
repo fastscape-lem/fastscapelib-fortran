@@ -12,6 +12,7 @@ module FastScapeContext
   logical :: setup_has_been_run
   double precision, target, dimension(:), allocatable :: h,u,vx,vy,length,a,erate,etot,catch,catch0,b,precip,kf,kd
   double precision, target, dimension(:), allocatable :: Sedflux, Fmix
+  double precision, target, dimension(:), allocatable :: g
   double precision, dimension(:,:), pointer, contiguous :: h2, vx2, vy2, etot2, b2
   double precision :: xl, yl, dt, kfsed, m, n, kdsed, g1, g2, p
   double precision :: sealevel, poro1, poro2, zporo1, zporo2, ratio, layer, kdsea1, kdsea2
@@ -60,6 +61,7 @@ module FastScapeContext
     call Destroy()
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
+    allocate (g(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
     allocate (lake_depth(nn),hwater(nn),mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn))
 
@@ -135,6 +137,7 @@ module FastScapeContext
     if (allocated(mwrec)) deallocate(mwrec)
     if (allocated(mlrec)) deallocate(mlrec)
     if (allocated(mstack)) deallocate(mstack)
+    if (allocated(g)) deallocate(g)
 
 
     return
