@@ -25,10 +25,15 @@ subroutine StreamPowerLaw ()
   dx=xl/(nx-1)
   dy=yl/(ny-1)
 
-  ! defines g, dimensionless parameter for sediment transport and deposition
-  g=g1
+  ! set g, dimensionless parameter for sediment transport and deposition
+  ! if g1<0, skip and use g values directly from FastScapeContext (not in API!!!)
+  if (g1.ge.0.d0) then
+    g=g1
+    if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
+  endif
+
+  ! set kf / kfsed
   kfint=kf
-  if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
   if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
   lake_depth = hwater - h
@@ -239,17 +244,16 @@ subroutine StreamPowerLaw ()
     dx=xl/(nx-1)
     dy=yl/(ny-1)
 
-    ! defines g, dimensionless parameter for sediment transport and deposition
-    g=g1
+    ! set g, dimensionless parameter for sediment transport and deposition
+    ! if g1<0, skip and use g values directly from FastScapeContext (not in API!!!)
+    if (g1.ge.0.d0) then
+      g=g1
+      if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
+    endif
+
+    ! set kf / kfsed
     kfint=kf
-    if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
     if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
-
-    ! uplift
-
-!    h=h+u*dt
-
-    ! computes receiver and stack information for mult-direction flow
 
     lake_depth = hwater - h
 
