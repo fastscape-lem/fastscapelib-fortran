@@ -106,6 +106,56 @@ end subroutine FlowRoutingSingleFlowDirection
 
 !--------------------------------------------------------------------------------------------
 
+subroutine FlowAccumulation ()
+
+  use FastScapeContext
+
+  implicit none
+
+  integer :: ij, ijk, k
+  double precision :: dx,dy
+
+  dx=xl/(nx-1)
+  dy=yl/(ny-1)
+
+  a=dx*dy*precip
+  do ij=1,nn
+    ijk=mstack(ij)
+    do k =1,mnrec(ijk)
+      a(mrec(k,ijk))=a(mrec(k,ijk))+a(ijk)*mwrec(k,ijk)
+    enddo
+  enddo
+
+  return
+
+end subroutine FlowAccumulation
+
+!--------------------------------------------------------------------------------------------
+
+subroutine FlowAccumulationSingleFlowDirection ()
+
+  use FastScapeContext
+
+  implicit none
+
+  integer :: ij, ijk
+  double precision :: dx,dy
+
+  dx=xl/(nx-1)
+  dy=yl/(ny-1)
+
+  a=dx*dy*precip
+  do ij=nn,1,-1
+    ijk=stack(ij)
+    a(rec(ijk))=a(rec(ijk))+a(ijk)
+  enddo
+
+  return
+
+end subroutine FlowAccumulationSingleFlowDirection
+
+!--------------------------------------------------------------------------------------------
+
 subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,dy,p,ibc,p_mfd_exp)
 
   ! subroutine to find multiple receiver information

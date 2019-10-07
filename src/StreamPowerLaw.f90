@@ -40,15 +40,6 @@ subroutine StreamPowerLaw ()
 
   if (count(mstack==0).ne.0) print*,'incomplete stack',count(mstack==0),nn
 
-  ! computes drainage area
-  a=dx*dy*precip
-  do ij=1,nn
-    ijk=mstack(ij)
-    do k =1,mnrec(ijk)
-      a(mrec(k,ijk))=a(mrec(k,ijk))+a(ijk)*mwrec(k,ijk)
-    enddo
-  enddo
-
   ! calculate the elevation / SPL, including sediment flux
   tol=1.d-4*(maxval(abs(h)) + 1.d0)
   err=2.d0*tol
@@ -256,13 +247,6 @@ subroutine StreamPowerLaw ()
     if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
     lake_depth = hwater - h
-
-    ! computes drainage area
-    a=dx*dy*precip
-    do ij=nn,1,-1
-      ijk=stack(ij)
-      a(rec(ijk))=a(rec(ijk))+a(ijk)
-    enddo
 
     ! calculate the elevation / SPL, including sediment flux
     tol=1.d-4*(maxval(abs(h))+1.d0)

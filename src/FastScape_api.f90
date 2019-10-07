@@ -223,10 +223,12 @@ subroutine FastScape_Execute_Step()
   if (runSPL) then
     call cpu_time (time_in)
     if (SingleFlowDirection) then
-      call FlowRoutingSingleFlowDirection
+      call FlowRoutingSingleFlowDirection ()
+      call FlowAccumulationSingleFlowDirection ()
       call StreamPowerLawSingleFlowDirection ()
     else
       call FlowRouting ()
+      call FlowAccumulation ()
       call StreamPowerLaw ()
     endif
     call cpu_time (time_out)
