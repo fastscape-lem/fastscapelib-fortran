@@ -9,21 +9,28 @@ subroutine StreamPowerLaw ()
 
   implicit none
 
+  integer :: i1, i2, j1, j2
+  logical :: xcyclic, ycyclic
+  logical, dimension(:), allocatable :: bc
+
   integer :: ij,ijk,ijr,k,ijr1
   double precision :: dx,dy,fact,tol,err
   double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
   double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
   double precision, dimension(:), allocatable :: elev
-  logical, dimension(:), allocatable :: bc
   double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
   integer, dimension(:), allocatable :: lake_sill
 
-  allocate (ht(nn),g(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
+  allocate (ht(nn),g(nn),kfint(nn),dh(nn),hp(nn))
   allocate (elev(nn))
+  allocate (bc(nn))
   allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 
   dx=xl/(nx-1)
   dy=yl/(ny-1)
+
+  ! TODO: better to set boundary conditions once at the beginning of the model run
+  call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
 
   ! defines g, dimensionless parameter for sediment transport and deposition
   g=g1
@@ -221,23 +228,28 @@ subroutine StreamPowerLaw ()
 
     implicit none
 
+    integer :: i1, i2, j1, j2
+    logical :: xcyclic, ycyclic
+    logical, dimension(:), allocatable :: bc
+
     integer :: ij,ijk,ijr
     double precision :: dx,dy,fact,tol,err
     double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
     double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
     double precision, dimension(:), allocatable :: elev
-    logical, dimension(:), allocatable :: bc
     double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
     integer, dimension(:), allocatable :: lake_sill
 
-    allocate (ht(nn),g(nn),kfint(nn),bc(nn),dh(nn),hp(nn))
+    allocate (ht(nn),g(nn),kfint(nn),dh(nn),hp(nn))
     allocate (elev(nn))
+    allocate (bc(nn))
     allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
-
-    ! sets boundary conditions
 
     dx=xl/(nx-1)
     dy=yl/(ny-1)
+
+    ! TODO: better to set boundary conditions once at the beginning of the model run
+    call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
 
     ! defines g, dimensionless parameter for sediment transport and deposition
     g=g1
@@ -301,10 +313,10 @@ subroutine StreamPowerLaw ()
       enddo
 
       where (bc)
-      elev=ht
+        elev=ht
       elsewhere
         elev=ht+(dh-(ht-hp))*g*dx*dy/a
-        endwhere
+      endwhere
 
         ! apply modified stream power law using lake surface (hwater)
 
@@ -404,8 +416,6 @@ subroutine StreamPowerLaw ()
           lake_water_volume(lake_sill(ij))*(water(ij)-h(ij))
         endif
       enddo
-
-      deallocate (hwater)
 
       ! stores total erosion, erosion rate and flux for output
       etot=etot+ht-h
