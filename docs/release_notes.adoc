@@ -1,6 +1,12 @@
 [#release_notes]
 == Release notes
 
+=== Version 2.8.1 (13 October 2019)
+
+==== Bug fixes
+
+- Fixed regression with boundary conditions and StreamPowerLaw #29
+
 === Version 2.8.0 (18 September 2019)
 
 ==== Changes
