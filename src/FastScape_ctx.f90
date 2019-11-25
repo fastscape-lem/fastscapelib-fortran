@@ -4,9 +4,12 @@ module FastScapeContext
   ! should not be accessed or changed
   ! see API for name of routines and externally accessible variables
 
+  use FastScapeTypes
+
   implicit none
 
   integer :: nx, ny, nn, nstack
+  type(boundaries), target :: bounds
   integer :: step, ibc
   integer :: nGSStreamPowerLaw, nGSMarine
   logical :: setup_has_been_run
@@ -63,6 +66,7 @@ module FastScapeContext
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (g(nn))
+    allocate (bounds%bc(nn))
     allocate (p_mfd_exp(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
     allocate (lake_depth(nn),hwater(nn),mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn))
@@ -142,7 +146,7 @@ module FastScapeContext
     if (allocated(mstack)) deallocate(mstack)
     if (allocated(g)) deallocate(g)
     if (allocated(p_mfd_exp)) deallocate(p_mfd_exp)
-
+    if (allocated(bounds%bc)) deallocate(bounds%bc)
 
     return
 
@@ -573,6 +577,10 @@ module FastScapeContext
 
     ibc = jbc
 
+    bounds%ibc = jbc
+
+    call set_boundaries()
+
     return
 
   end subroutine SetBC
@@ -823,6 +831,37 @@ module FastScapeContext
 
     end subroutine run_Strati
 
+    !-------------------------------------------------------------------
+
+    subroutine set_boundaries ()
+
+      implicit none
+
+      character*4 :: cbc
+
+      write (cbc,'(i4)') ibc
+      bounds%bc=.FALSE.
+      bounds%i1=1
+      bounds%i2=nx
+      bounds%j1=1
+      bounds%j2=ny
+      if (cbc(4:4).eq.'1') bounds%i1=2
+      if (cbc(2:2).eq.'1') bounds%i2=nx-1
+      if (cbc(1:1).eq.'1') bounds%j1=2
+      if (cbc(3:3).eq.'1') bounds%j2=ny-1
+      if (cbc(4:4).eq.'1') bounds%bc(1:nn:nx)=.TRUE.
+      if (cbc(2:2).eq.'1') bounds%bc(nx:nn:nx)=.TRUE.
+      if (cbc(1:1).eq.'1') bounds%bc(1:nx)=.TRUE.
+      if (cbc(3:3).eq.'1') bounds%bc(nx*(ny-1)+1:nn)=.TRUE.
+      bounds%xcyclic=.FALSE.
+      bounds%ycyclic=.FALSE.
+      if (cbc(4:4).ne.'1'.and.cbc(2:2).ne.'1') bounds%xcyclic=.TRUE.
+      if (cbc(1:1).ne.'1'.and.cbc(3:3).ne.'1') bounds%ycyclic=.TRUE.
+
+      return
+
+    end subroutine set_boundaries
+
     !---------------------------------------------------------------
 
     subroutine compute_fluxes (tectonic_flux, erosion_flux, boundary_flux)
@@ -843,7 +882,7 @@ module FastScapeContext
 
       ! computes receiver and stack information for multi-direction flow
       !allocate (mrec(8,nn), mnrec(nn), mwrec(8,nn), mlrec(8,nn), mstack(nn), hwater(nn)
-      !call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, ibc, p_mfd_exp)
+      !call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, bounds, p_mfd_exp)
       ! computes sediment flux
       allocate (flux(nn), bc(nn))
 
