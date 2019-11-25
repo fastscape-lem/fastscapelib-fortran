@@ -1,6 +1,12 @@
 [#release_notes]
 == Release notes
 
+=== Version 2.8.2 (Unreleased)
+
+==== Bug fixes
+
+- Some internal changes for more flexibility downstream #25
+
 === Version 2.8.1 (13 October 2019)
 
 ==== Bug fixes

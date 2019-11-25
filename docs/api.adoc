@@ -138,7 +138,7 @@ bedrock dimensionless deposition/transport coefficient for the enriched SPL (dou
 
 [WARNING]
 ====
-When `g > 0`, the algorithm requires that Gauss-Seidel iterations be performed; depending on the value of `g`, the number of iterations can be significant (from 1 when `g` is near 0 to 20 when `g` is near 1)
+When `g > 0`, the algorithm requires that Gauss-Seidel iterations be performed; depending on the value of `g`, the number of iterations can be significant (from 1 when `g` is near 0 to 20 when `g` is near 1). `g` must be equal or greater than zero.
 ====
 
 `gsed` ::
