@@ -16,12 +16,12 @@ subroutine StreamPowerLaw ()
   integer :: ij,ijk,ijr,k,ijr1
   double precision :: dx,dy,fact,tol,err
   double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
-  double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
+  double precision, dimension(:), allocatable :: ht,kfint,dh,hp
   double precision, dimension(:), allocatable :: elev
   double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
   integer, dimension(:), allocatable :: lake_sill
 
-  allocate (ht(nn),g(nn),kfint(nn),dh(nn),hp(nn))
+  allocate (ht(nn),kfint(nn),dh(nn),hp(nn))
   allocate (elev(nn))
   allocate (bc(nn))
   allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
@@ -32,24 +32,20 @@ subroutine StreamPowerLaw ()
   ! TODO: better to set boundary conditions once at the beginning of the model run
   call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
 
-  ! defines g, dimensionless parameter for sediment transport and deposition
-  g=g1
+  ! set g, dimensionless parameter for sediment transport and deposition
+  ! if g1<0, skip and use g values directly from FastScapeContext (not in API!!!)
+  if (g1.ge.0.d0) then
+    g=g1
+    if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
+  endif
+
+  ! set kf / kfsed
   kfint=kf
-  if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
   if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
   lake_depth = hwater - h
 
   if (count(mstack==0).ne.0) print*,'incomplete stack',count(mstack==0),nn
-
-  ! computes drainage area
-  a=dx*dy*precip
-  do ij=1,nn
-    ijk=mstack(ij)
-    do k =1,mnrec(ijk)
-      a(mrec(k,ijk))=a(mrec(k,ijk))+a(ijk)*mwrec(k,ijk)
-    enddo
-  enddo
 
   ! calculate the elevation / SPL, including sediment flux
   tol=1.d-4*(maxval(abs(h)) + 1.d0)
@@ -235,12 +231,12 @@ subroutine StreamPowerLaw ()
     integer :: ij,ijk,ijr
     double precision :: dx,dy,fact,tol,err
     double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
-    double precision, dimension(:), allocatable :: ht,g,kfint,dh,hp
+    double precision, dimension(:), allocatable :: ht,kfint,dh,hp
     double precision, dimension(:), allocatable :: elev
     double precision, dimension(:), allocatable :: water,lake_water_volume,lake_sediment
     integer, dimension(:), allocatable :: lake_sill
 
-    allocate (ht(nn),g(nn),kfint(nn),dh(nn),hp(nn))
+    allocate (ht(nn),kfint(nn),dh(nn),hp(nn))
     allocate (elev(nn))
     allocate (bc(nn))
     allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
@@ -251,26 +247,18 @@ subroutine StreamPowerLaw ()
     ! TODO: better to set boundary conditions once at the beginning of the model run
     call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
 
-    ! defines g, dimensionless parameter for sediment transport and deposition
-    g=g1
+    ! set g, dimensionless parameter for sediment transport and deposition
+    ! if g1<0, skip and use g values directly from FastScapeContext (not in API!!!)
+    if (g1.ge.0.d0) then
+      g=g1
+      if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
+    endif
+
+    ! set kf / kfsed
     kfint=kf
-    if (g2.gt.0.d0) where ((h-b).gt.1.d0) g=g2
     if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
-    ! uplift
-
-!    h=h+u*dt
-
-    ! computes receiver and stack information for mult-direction flow
-
     lake_depth = hwater - h
-
-    ! computes drainage area
-    a=dx*dy*precip
-    do ij=nn,1,-1
-      ijk=stack(ij)
-      a(rec(ijk))=a(rec(ijk))+a(ijk)
-    enddo
 
     ! calculate the elevation / SPL, including sediment flux
     tol=1.d-4*(maxval(abs(h))+1.d0)

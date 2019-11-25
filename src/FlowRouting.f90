@@ -38,7 +38,7 @@ subroutine FlowRouting ()
   deallocate (bc)
 
   ! computes receiver and stack information for mult-direction flow
-  call find_mult_rec (h,rec,stack,hwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,p,ibc)
+  call find_mult_rec (h,rec,stack,hwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,p,ibc,p_mfd_exp)
 
   return
 
@@ -106,7 +106,57 @@ end subroutine FlowRoutingSingleFlowDirection
 
 !--------------------------------------------------------------------------------------------
 
-subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,dy,p,ibc)
+subroutine FlowAccumulation ()
+
+  use FastScapeContext
+
+  implicit none
+
+  integer :: ij, ijk, k
+  double precision :: dx,dy
+
+  dx=xl/(nx-1)
+  dy=yl/(ny-1)
+
+  a=dx*dy*precip
+  do ij=1,nn
+    ijk=mstack(ij)
+    do k =1,mnrec(ijk)
+      a(mrec(k,ijk))=a(mrec(k,ijk))+a(ijk)*mwrec(k,ijk)
+    enddo
+  enddo
+
+  return
+
+end subroutine FlowAccumulation
+
+!--------------------------------------------------------------------------------------------
+
+subroutine FlowAccumulationSingleFlowDirection ()
+
+  use FastScapeContext
+
+  implicit none
+
+  integer :: ij, ijk
+  double precision :: dx,dy
+
+  dx=xl/(nx-1)
+  dy=yl/(ny-1)
+
+  a=dx*dy*precip
+  do ij=nn,1,-1
+    ijk=stack(ij)
+    a(rec(ijk))=a(rec(ijk))+a(ijk)
+  enddo
+
+  return
+
+end subroutine FlowAccumulationSingleFlowDirection
+
+!--------------------------------------------------------------------------------------------
+
+subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,dy,p,ibc,p_mfd_exp)
 
   ! subroutine to find multiple receiver information
   ! in input:
@@ -126,11 +176,11 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
   ! stack: stoack order for multiple receivers (from top to bottom)
 
   integer nx,ny,ibc
-  double precision h(nx*ny),wrec(8,nx*ny),lrec(8,nx*ny),dx,dy,p,water(nx*ny)
+  double precision h(nx*ny),wrec(8,nx*ny),lrec(8,nx*ny),dx,dy,p,water(nx*ny),p_mfd_exp(nx*ny)
   integer rec(8,nx*ny),nrec(nx*ny),stack(nx*ny),rec0(nx*ny),stack0(nx*ny)
 
   integer :: nn,i,j,ii,jj,iii,jjj,ijk,k,ijr,nparse,nstack,ijn,i1,i2,j1,j2
-  double  precision :: slopemax,pp,sumweight,deltah
+  double  precision :: slopemax,sumweight,deltah
   integer, dimension(:), allocatable :: ndon,vis,parse
   integer, dimension(:,:), allocatable :: don
   double precision, dimension(:), allocatable :: h0
@@ -207,14 +257,13 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
   enddo
 
   do ij =1,nn
-    pp = p
-    if (pp<0.d0) then
+    if (p<0.d0) then
       slope = 0.d0
       if (nrec(ij).ne.0) slope = real(sum(wrec(1:nrec(ij),ij))/nrec(ij))
-      pp = 0.5 + 0.6*slope
+      p_mfd_exp(ij) = 0.5 + 0.6*slope
     endif
     do k=1,nrec(ij)
-      wrec(k,ij) = wrec(k,ij)**pp
+      wrec(k,ij) = wrec(k,ij)**p_mfd_exp(ij)
     enddo
     sumweight = sum(wrec(1:nrec(ij),ij))
     wrec(1:nrec(ij),ij) = wrec(1:nrec(ij),ij)/sumweight
