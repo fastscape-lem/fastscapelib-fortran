@@ -14,7 +14,7 @@ subroutine Diffusion ()
 
   !print*,'Diffusion'
 
-  write (cbc,'(i4)') ibc
+  write (cbc,'(i4)') bounds%ibc
 
   dx=xl/(nx-1)
   dy=yl/(ny-1)

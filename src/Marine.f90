@@ -109,7 +109,7 @@ subroutine Marine()
 
   ! silt and sand coupling diffusion in ocean
   call SiltSandCouplingDiffusion (h,Fmix,flux*Fs,flux*(1.d0-Fs), &
-  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,ibc)
+  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,bounds%ibc)
 
   ! pure silt and sand during deposition/erosion
   dh1=((h-ht)*Fmix+layer*(Fmix-Fmixt))*(1.d0-poro1)
