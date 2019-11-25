@@ -53,7 +53,7 @@ subroutine Marine()
 
   allocate (mmrec(8,nn),mmnrec(nn),mmwrec(8,nn),mmlrec(8,nn),mmstack(nn),mwater(nn))
 
-  call find_mult_rec (h,rec,stack,mwater,mmrec,mmnrec,mmwrec,mmlrec,mmstack,nx,ny,dx,dy,0.d0,ibc,p_mfd_exp)
+  call find_mult_rec (h,rec,stack,mwater,mmrec,mmnrec,mmwrec,mmlrec,mmstack,nx,ny,dx,dy,0.d0,bounds,p_mfd_exp)
 
   !print*,count(flux>0.and.mmnrec==0),count(flux>0),count(mmstack==0)
 

@@ -6,23 +6,14 @@ subroutine FlowRouting ()
 
   implicit none
 
-  integer :: i1, i2, j1, j2
-  logical, dimension(:), allocatable :: bc
-  logical :: xcyclic, ycyclic
   double precision :: dx, dy
 
   dx = xl/(nx - 1)
   dy = yl/(ny - 1)
 
-  allocate (bc(nn))
-
-  ! sets boundary conditions
-
-  call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
-
   ! finds receiver
 
-  call find_receiver (h, nx, ny, dx, dy, i1, i2, j1, j2, xcyclic, ycyclic, rec, length)
+  call find_receiver (h, nx, ny, dx, dy, bounds, rec, length)
 
   ! finds donors
 
@@ -33,12 +24,10 @@ subroutine FlowRouting ()
   call find_stack (rec, don, ndon, nn, catch0, stack, catch)
 
   ! removes local minima
-  call LocalMinima (stack,rec,bc,ndon,don,h,length,nx,ny,dx,dy)
-
-  deallocate (bc)
+  call LocalMinima (stack,rec,bounds%bc,ndon,don,h,length,nx,ny,dx,dy)
 
   ! computes receiver and stack information for mult-direction flow
-  call find_mult_rec (h,rec,stack,hwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,p,ibc,p_mfd_exp)
+  call find_mult_rec (h,rec,stack,hwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,p,bounds,p_mfd_exp)
 
   return
 
@@ -52,23 +41,15 @@ subroutine FlowRoutingSingleFlowDirection ()
 
   implicit none
 
-  integer :: i1, i2, j1, j2, i, ijk, ijr
-  logical, dimension(:), allocatable :: bc
-  logical :: xcyclic, ycyclic
+  integer :: i, ijk, ijr
   double precision :: dx, dy,deltah
 
   dx = xl/(nx - 1)
   dy = yl/(ny - 1)
 
-  allocate (bc(nn))
-
-  ! sets boundary conditions
-
-  call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
-
   ! finds receiver
 
-  call find_receiver (h, nx, ny, dx, dy, i1, i2, j1, j2, xcyclic, ycyclic, rec, length)
+  call find_receiver (h, nx, ny, dx, dy, bounds, rec, length)
 
   ! finds donors
 
@@ -79,9 +60,7 @@ subroutine FlowRoutingSingleFlowDirection ()
   call find_stack (rec, don, ndon, nn, catch0, stack, catch)
 
   ! removes local minima
-  call LocalMinima (stack,rec,bc,ndon,don,h,length,nx,ny,dx,dy)
-
-  deallocate (bc)
+  call LocalMinima (stack,rec,bounds%bc,ndon,don,h,length,nx,ny,dx,dy)
 
   ! find hwater
 
@@ -156,7 +135,7 @@ end subroutine FlowAccumulationSingleFlowDirection
 
 !--------------------------------------------------------------------------------------------
 
-subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,dy,p,ibc,p_mfd_exp)
+subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,dy,p,bounds,p_mfd_exp)
 
   ! subroutine to find multiple receiver information
   ! in input:
@@ -167,7 +146,7 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
   ! nx, ny resolution in x- and y-directions
   ! dx, dy grid spacing in x- and y-directions
   ! p is exponent to which the slope is put to share the water/sediment among receivers
-  ! ibc boundary conditions (1111 to 0000)
+  ! bounds: boundaries type (boundary conditions)
   ! in output:
   ! rec: multiple receiver information
   ! nrec: number of receivers for each node
@@ -175,35 +154,20 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
   ! lrec: distance to each receiver
   ! stack: stoack order for multiple receivers (from top to bottom)
 
-  integer nx,ny,ibc
+  use FastScapeTypes
+
+  integer nx,ny
+  type(boundaries) :: bounds
   double precision h(nx*ny),wrec(8,nx*ny),lrec(8,nx*ny),dx,dy,p,water(nx*ny),p_mfd_exp(nx*ny)
   integer rec(8,nx*ny),nrec(nx*ny),stack(nx*ny),rec0(nx*ny),stack0(nx*ny)
 
-  integer :: nn,i,j,ii,jj,iii,jjj,ijk,k,ijr,nparse,nstack,ijn,i1,i2,j1,j2
+  integer :: nn,i,j,ii,jj,iii,jjj,ijk,k,ijr,nparse,nstack,ijn
   double  precision :: slopemax,sumweight,deltah
   integer, dimension(:), allocatable :: ndon,vis,parse
   integer, dimension(:,:), allocatable :: don
   double precision, dimension(:), allocatable :: h0
-  character cbc*4
-  logical xcyclic,ycyclic
 
   nn=nx*ny
-
-  ! set bc
-
-  write (cbc,'(i4)') ibc
-  i1=1
-  i2=nx
-  j1=1
-  j2=ny
-  if (cbc(4:4).eq.'1') i1=2
-  if (cbc(2:2).eq.'1') i2=nx-1
-  if (cbc(1:1).eq.'1') j1=2
-  if (cbc(3:3).eq.'1') j2=ny-1
-  xcyclic=.FALSE.
-  ycyclic=.FALSE.
-  if (cbc(4:4).ne.'1'.and.cbc(2:2).ne.'1') xcyclic=.TRUE.
-  if (cbc(1:1).ne.'1'.and.cbc(3:3).ne.'1') ycyclic=.TRUE.
 
   allocate (h0(nn))
 
@@ -228,21 +192,21 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
   wrec=0.d0
 
   ! loop on all nodes
-  do j=j1,j2
-    do i=i1,i2
+  do j=bounds%j1,bounds%j2
+    do i=bounds%i1,bounds%i2
       ij = (j-1)*nx + i
       slopemax = 0.
       do jj=-1,1
         jjj= j + jj
-        if (jjj.lt.1.and.ycyclic) jjj=jjj+ny
+        if (jjj.lt.1.and.bounds%ycyclic) jjj=jjj+ny
         jjj=max(jjj,1)
-        if (jjj.gt.ny.and.ycyclic) jjj=jjj-ny
+        if (jjj.gt.ny.and.bounds%ycyclic) jjj=jjj-ny
         jjj=min(jjj,ny)
         do ii=-1,1
           iii = i + ii
-          if (iii.lt.1.and.xcyclic) iii=iii+nx
+          if (iii.lt.1.and.bounds%xcyclic) iii=iii+nx
           iii=max(iii,1)
-          if (iii.gt.nx.and.xcyclic) iii=iii-nx
+          if (iii.gt.nx.and.bounds%xcyclic) iii=iii-nx
           iii=min(iii,nx)
           ijk = (jjj-1)*nx + iii
           if (h0(ij).gt.h0(ijk)) then
@@ -326,54 +290,16 @@ end subroutine find_mult_rec
 
 !--------------------------------------------------------------------------------------------
 
-subroutine set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
+subroutine find_receiver (h, nx, ny, dx, dy, bounds, rec, length)
+
+  use FastScapeTypes
 
   implicit none
 
-  integer, intent(in) :: ibc, nx, ny
-  integer, intent(out) :: i1, i2, j1, j2
-  logical, intent(out) :: xcyclic, ycyclic
-  logical, dimension(nx*ny), intent(out) :: bc
-
-  character*4 :: cbc
-  integer nn
-
-  nn = nx*ny
-
-  write (cbc,'(i4)') ibc
-  bc=.FALSE.
-  i1=1
-  i2=nx
-  j1=1
-  j2=ny
-  if (cbc(4:4).eq.'1') i1=2
-  if (cbc(2:2).eq.'1') i2=nx-1
-  if (cbc(1:1).eq.'1') j1=2
-  if (cbc(3:3).eq.'1') j2=ny-1
-  if (cbc(4:4).eq.'1') bc(1:nn:nx)=.TRUE.
-  if (cbc(2:2).eq.'1') bc(nx:nn:nx)=.TRUE.
-  if (cbc(1:1).eq.'1') bc(1:nx)=.TRUE.
-  if (cbc(3:3).eq.'1') bc(nx*(ny-1)+1:nn)=.TRUE.
-  xcyclic=.FALSE.
-  ycyclic=.FALSE.
-  if (cbc(4:4).ne.'1'.and.cbc(2:2).ne.'1') xcyclic=.TRUE.
-  if (cbc(1:1).ne.'1'.and.cbc(3:3).ne.'1') ycyclic=.TRUE.
-
-  return
-
-end subroutine set_bc
-
-!--------------------------------------------------------------------------------------------
-
-
-subroutine find_receiver (h, nx, ny, dx, dy, i1, i2, j1, j2, xcyclic, ycyclic, rec, length)
-
-  implicit none
-
-  integer, intent(in) :: nx, ny, i1, i2, j1, j2
+  type(boundaries), intent(in) :: bounds
+  integer, intent(in) :: nx, ny
   double precision, dimension(nx*ny), intent(in) :: h
   double precision, intent(in) :: dx, dy
-  logical, intent(in) :: xcyclic, ycyclic
   integer, dimension(nx*ny), intent(out) :: rec
   double precision, dimension(nx*ny), intent(out) :: length
 
@@ -391,21 +317,21 @@ subroutine find_receiver (h, nx, ny, dx, dy, i1, i2, j1, j2, xcyclic, ycyclic, r
 
   ! finds receiver using steepest descent/neighbour method
 
-  do j=j1,j2
-    do i=i1,i2
+  do j=bounds%j1,bounds%j2
+    do i=bounds%i1,bounds%i2
       ij=i+(j-1)*nx
       smax=tiny(smax)
       do jj=-1,1
         do ii=-1,1
           iii=i+ii
-          if (iii.lt.1.and.xcyclic) iii=iii+nx
+          if (iii.lt.1.and.bounds%xcyclic) iii=iii+nx
           iii=max(iii,1)
-          if (iii.gt.nx.and.xcyclic) iii=iii-nx
+          if (iii.gt.nx.and.bounds%xcyclic) iii=iii-nx
           iii=min(iii,nx)
           jjj=j+jj
-          if (jjj.lt.1.and.ycyclic) jjj=jjj+ny
+          if (jjj.lt.1.and.bounds%ycyclic) jjj=jjj+ny
           jjj=max(jjj,1)
-          if (jjj.gt.ny.and.ycyclic) jjj=jjj-ny
+          if (jjj.gt.ny.and.bounds%ycyclic) jjj=jjj-ny
           jjj=min(jjj,ny)
           ijk=iii+(jjj-1)*nx
           if (ijk.ne.ij) then
