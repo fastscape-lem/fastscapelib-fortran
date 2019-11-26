@@ -81,7 +81,7 @@ subroutine StreamPowerLaw ()
       endif
     enddo
 
-    where (bounds%bc)
+    where (bounds_bc)
       elev=ht
     elsewhere
       elev=ht+(dh-(ht-hp))*g*dx*dy/a
@@ -282,7 +282,7 @@ subroutine StreamPowerLaw ()
         endif
       enddo
 
-      where (bounds%bc)
+      where (bounds_bc)
         elev=ht
       elsewhere
         elev=ht+(dh-(ht-hp))*g*dx*dy/a

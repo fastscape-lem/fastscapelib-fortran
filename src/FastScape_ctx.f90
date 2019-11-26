@@ -4,12 +4,13 @@ module FastScapeContext
   ! should not be accessed or changed
   ! see API for name of routines and externally accessible variables
 
-  use FastScapeTypes
-
   implicit none
 
   integer :: nx, ny, nn, nstack
-  type(boundaries), target :: bounds
+  integer :: bounds_ibc
+  integer :: bounds_i1, bounds_i2, bounds_j1, bounds_j2
+  logical :: bounds_xcyclic, bounds_ycyclic
+  logical, dimension(:), allocatable :: bounds_bc
   integer :: step
   integer :: nGSStreamPowerLaw, nGSMarine
   logical :: setup_has_been_run
@@ -66,7 +67,7 @@ module FastScapeContext
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (g(nn))
-    allocate (bounds%bc(nn))
+    allocate (bounds_bc(nn))
     allocate (p_mfd_exp(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
     allocate (lake_depth(nn),hwater(nn),mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn))
@@ -146,7 +147,7 @@ module FastScapeContext
     if (allocated(mstack)) deallocate(mstack)
     if (allocated(g)) deallocate(g)
     if (allocated(p_mfd_exp)) deallocate(p_mfd_exp)
-    if (allocated(bounds%bc)) deallocate(bounds%bc)
+    if (allocated(bounds_bc)) deallocate(bounds_bc)
 
     return
 
@@ -383,7 +384,7 @@ module FastScapeContext
     write (*,*) 'xl,yl',xl,yl
     write (*,*) 'dt',dt
     write (*,*) 'Kf,Kfsed,,m,n,Kd,Kdsed,G1,G2',sum(kf)/nn,kfsed,m,n,sum(kd)/nn,kdsed,g1,g2
-    write (*,*) 'ibc',bounds%ibc
+    write (*,*) 'ibc',bounds_ibc
     write (*,*) 'h',minval(h),sum(h)/nn,maxval(h)
     write (*,*) 'u',minval(u),sum(u)/nn,maxval(u)
 
@@ -538,8 +539,8 @@ module FastScapeContext
     write (*,*) 'Total number of self donors',counter
 
     counter=0
-    do j=bounds%j1,bounds%j2
-      do i=bounds%i1,bounds%i2
+    do j=bounds_j1,bounds_j2
+      do i=bounds_i1,bounds_i2
         ij=(j-1)*nx+i
         if (rec(ij)==ij) counter=counter+1
       enddo
@@ -569,26 +570,26 @@ module FastScapeContext
     integer, intent(in) :: jbc
     character*4 :: cbc
 
-    bounds%ibc = jbc
+    bounds_ibc = jbc
 
     write (cbc,'(i4)') jbc
-    bounds%bc=.FALSE.
-    bounds%i1=1
-    bounds%i2=nx
-    bounds%j1=1
-    bounds%j2=ny
-    if (cbc(4:4).eq.'1') bounds%i1=2
-    if (cbc(2:2).eq.'1') bounds%i2=nx-1
-    if (cbc(1:1).eq.'1') bounds%j1=2
-    if (cbc(3:3).eq.'1') bounds%j2=ny-1
-    if (cbc(4:4).eq.'1') bounds%bc(1:nn:nx)=.TRUE.
-    if (cbc(2:2).eq.'1') bounds%bc(nx:nn:nx)=.TRUE.
-    if (cbc(1:1).eq.'1') bounds%bc(1:nx)=.TRUE.
-    if (cbc(3:3).eq.'1') bounds%bc(nx*(ny-1)+1:nn)=.TRUE.
-    bounds%xcyclic=.FALSE.
-    bounds%ycyclic=.FALSE.
-    if (cbc(4:4).ne.'1'.and.cbc(2:2).ne.'1') bounds%xcyclic=.TRUE.
-    if (cbc(1:1).ne.'1'.and.cbc(3:3).ne.'1') bounds%ycyclic=.TRUE.
+    bounds_bc=.FALSE.
+    bounds_i1=1
+    bounds_i2=nx
+    bounds_j1=1
+    bounds_j2=ny
+    if (cbc(4:4).eq.'1') bounds_i1=2
+    if (cbc(2:2).eq.'1') bounds_i2=nx-1
+    if (cbc(1:1).eq.'1') bounds_j1=2
+    if (cbc(3:3).eq.'1') bounds_j2=ny-1
+    if (cbc(4:4).eq.'1') bounds_bc(1:nn:nx)=.TRUE.
+    if (cbc(2:2).eq.'1') bounds_bc(nx:nn:nx)=.TRUE.
+    if (cbc(1:1).eq.'1') bounds_bc(1:nx)=.TRUE.
+    if (cbc(3:3).eq.'1') bounds_bc(nx*(ny-1)+1:nn)=.TRUE.
+    bounds_xcyclic=.FALSE.
+    bounds_ycyclic=.FALSE.
+    if (cbc(4:4).ne.'1'.and.cbc(2:2).ne.'1') bounds_xcyclic=.TRUE.
+    if (cbc(1:1).ne.'1'.and.cbc(3:3).ne.'1') bounds_ycyclic=.TRUE.
 
   end subroutine SetBC
 
@@ -879,7 +880,7 @@ module FastScapeContext
       endif
 
       ! compute boundary flux
-      boundary_flux = sum(flux,bounds%bc)*surf
+      boundary_flux = sum(flux,bounds_bc)*surf
 
       deallocate (flux)
 
