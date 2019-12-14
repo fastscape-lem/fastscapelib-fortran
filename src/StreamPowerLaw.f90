@@ -209,6 +209,8 @@ subroutine StreamPowerLaw ()
     Sedflux=ht-h
     !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
 
+    deallocate (ht,kfint,dh,hp,elev,bc,water,lake_water_volume,lake_sediment,lake_sill)
+
     return
 
   end subroutine StreamPowerLaw
@@ -410,6 +412,8 @@ subroutine StreamPowerLaw ()
       erate=(ht-h)/dt
       Sedflux=ht-h
       !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
+
+      deallocate (ht,kfint,dh,hp,elev,bc,water,lake_water_volume,lake_sediment,lake_sill)
 
       return
 
