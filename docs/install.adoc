@@ -40,7 +40,6 @@ There are several build options, here shown with their default values:
 
 - `-DBUILD_FASTSCAPELIB_STATIC=ON`: build fastscapelib as a static library
 - `-DBUILD_FASTSCAPELIB_SHARED=OFF`: build fastscapelib as a shared library
-- `-DBUILD_PYTHON_MODULE=OFF`: build the fastscapelib library as a Python module
 - `-DUSE_FLEXURE=OFF`: include flexure routines in the library
 - `-DBUILD_EXAMPLES=OFF`: "build usage examples that are in the 'examples' directory
 
