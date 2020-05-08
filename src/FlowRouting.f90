@@ -40,6 +40,9 @@ subroutine FlowRouting ()
   ! computes receiver and stack information for mult-direction flow
   call find_mult_rec (h,rec,stack,hwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,p,ibc,p_mfd_exp)
 
+  ! compute lake depth
+  lake_depth = hwater - h
+
   return
 
 end subroutine FlowRouting
@@ -99,6 +102,9 @@ subroutine FlowRoutingSingleFlowDirection ()
       endif
     endif
   enddo
+
+  ! compute lake depth
+  lake_depth = hwater - h
 
   return
 

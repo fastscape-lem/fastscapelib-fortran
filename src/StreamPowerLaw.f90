@@ -43,8 +43,6 @@ subroutine StreamPowerLaw ()
   kfint=kf
   if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
-  lake_depth = hwater - h
-
   if (count(mstack==0).ne.0) print*,'incomplete stack',count(mstack==0),nn
 
   ! calculate the elevation / SPL, including sediment flux
@@ -259,8 +257,6 @@ subroutine StreamPowerLaw ()
     ! set kf / kfsed
     kfint=kf
     if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
-
-    lake_depth = hwater - h
 
     ! calculate the elevation / SPL, including sediment flux
     tol=1.d-4*(maxval(abs(h))+1.d0)
