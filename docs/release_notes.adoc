@@ -3,9 +3,14 @@
 
 === Version 2.8.2 (Unreleased)
 
+==== Changes
+
+- Improved the documentation on installing Python bindings #37
+
 ==== Bug fixes
 
 - Some internal changes for more flexibility downstream #25
+- Fixed some build issues with recent NumPy versions #37
 
 === Version 2.8.1 (13 October 2019)
 
