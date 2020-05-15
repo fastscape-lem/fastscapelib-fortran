@@ -135,27 +135,15 @@ if(SKBUILD)
   find_package(F2PY REQUIRED)
   find_package(PythonExtensions REQUIRED)
 
-  # TODO: remove this https://github.com/scikit-build/scikit-build/pull/491
-  include(UsePythonExtensions)
-
-  # needs a fix (cmake errors in function)
-  #add_python_extension(${F2PY_MODULE_NAME}
-  #  SOURCES ${FASTSCAPELIB_SRC_FILES}
-  #  INCLUDE_DIRECTORIES ${FASTSCAPELIB_SRC_DIR}
-  #)
-
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
 
-  add_python_library(${F2PY_MODULE_NAME} MODULE
+  add_python_extension(${F2PY_MODULE_NAME}
     SOURCES ${FASTSCAPELIB_SRC_FILES}
     INCLUDE_DIRECTORIES ${FASTSCAPELIB_SRC_DIR}
     )
 
-  python_extension_module(${F2PY_MODULE_NAME})
-
   install(
     TARGETS ${F2PY_MODULE_NAME}
     LIBRARY DESTINATION ${FASTSCAPELIB_NAME}
-    RUNTIME DESTINATION ${FASTSCAPELIB_NAME}
     )
 endif()
