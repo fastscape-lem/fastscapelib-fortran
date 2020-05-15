@@ -14,6 +14,9 @@ online for more details on how to build, install and use the library.
 
 GPLv3. See [License file](https://github.com/fastscape-lem/fastscapelib-fortran/blob/master/LICENSE).
 
+Some CMake modules included here have been copied from
+[scikit-build](https://github.com/scikit-build/scikit-build) (MIT license).
+
 ## Acknowledgment
 
 This project is supported by the
