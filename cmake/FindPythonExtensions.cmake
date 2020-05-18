@@ -104,9 +104,10 @@
 #                         [HEADER_OUTPUT_VAR <HeaderOutputVar>]
 #                         [INCLUDE_DIR_OUTPUT_VAR <IncludeDirOutputVar>])
 #
+# without the extension is used as the logical name.  If only ``<Name>`` is
+#
 # If only ``<Name>`` is provided, and it ends in the ".h" extension, then it
 # is assumed to be the ``<HeaderFilename>``.  The filename of the header file
-# without the extension is used as the logical name.  If only ``<Name>`` is
 # provided, and it does not end in the ".h" extension, then the
 # ``<HeaderFilename>`` is assumed to ``<Name>.h``.
 #
@@ -209,7 +210,7 @@
 #
 #    # module3 -- loaded at runtime
 #    add_cython_target(module3a.pyx)
-#    add_library(module1 MODULE ${module3a} module3b.cxx)
+#    add_library(module3 MODULE ${module3a} module3b.cxx)
 #    target_link_libraries(module3 ${Boost_LIBRARIES})
 #    python_extension_module(module3
 #                            LINKED_MODULES_VAR linked_module_list
@@ -243,9 +244,6 @@
 # limitations under the License.
 #=============================================================================
 
-# This file has been copied from the scikit-build library (ec6214a, MIT License)
-# https://github.com/scikit-build/scikit-build
-
 find_package(PythonInterp REQUIRED)
 find_package(PythonLibs)
 include(targetLinkLibrariesWithDynamicLookup)
@@ -257,7 +255,6 @@ import os
 import os.path
 import site
 import sys
-import sysconfig
 
 result = None
 rel_result = None
@@ -285,13 +282,17 @@ for candidate in candidates:
         rel_result = rel_candidate
         break
 
+ext_suffix_var = 'SO'
+if sys.version_info[:2] >= (3, 5):
+    ext_suffix_var = 'EXT_SUFFIX'
+
 sys.stdout.write(\";\".join((
     os.sep,
     os.pathsep,
     sys.prefix,
     result,
     rel_result,
-    sysconfig.get_config_var('SO')
+    distutils.sysconfig.get_config_var(ext_suffix_var)
 )))
 ")
 
@@ -332,18 +333,18 @@ function(_set_python_extension_symbol_visibility _target)
   endif()
   message("_modinit_prefix:${_modinit_prefix}")
   if("${CMAKE_C_COMPILER_ID}" STREQUAL "MSVC")
-    set_target_properties(${_target} PROPERTIES LINK_FLAGS
+    set_target_properties(${_target} PROPERTIES LINK_FLAGS 
         "/EXPORT:${_modinit_prefix}${_target}"
     )
-  elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+  elseif("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU" AND NOT ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(_script_path
       ${CMAKE_CURRENT_BINARY_DIR}/CMakeFiles/${_target}-version-script.map
     )
-    file(WRITE ${_script_path}
+    file(WRITE ${_script_path} 
                "{global: ${_modinit_prefix}${_target}; local: *; };"
     )
     set_property(TARGET ${_target} APPEND_STRING PROPERTY LINK_FLAGS
-        " -Wl,--version-script=${_script_path}"
+        " -Wl,--version-script=\"${_script_path}\""
     )
   endif()
 endfunction()
@@ -424,7 +425,7 @@ function(python_extension_module _target)
     endif()
 
     target_link_libraries_with_dynamic_lookup(${_target} ${PYTHON_LIBRARIES})
-
+    
     if(_is_module_lib)
       _set_python_extension_symbol_visibility(${_target})
     endif()
@@ -574,3 +575,5 @@ function(python_modules_header _name)
   endif()
   set(${_include_dirs_var} ${CMAKE_CURRENT_BINARY_DIR} PARENT_SCOPE)
 endfunction()
+
+include(UsePythonExtensions)

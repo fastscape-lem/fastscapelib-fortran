@@ -40,7 +40,6 @@ There are several build options, here shown with their default values:
 
 - `-DBUILD_FASTSCAPELIB_STATIC=ON`: build fastscapelib as a static library
 - `-DBUILD_FASTSCAPELIB_SHARED=OFF`: build fastscapelib as a shared library
-- `-DBUILD_PYTHON_MODULE=OFF`: build the fastscapelib library as a Python module
 - `-DUSE_FLEXURE=OFF`: include flexure routines in the library
 - `-DBUILD_EXAMPLES=OFF`: "build usage examples that are in the 'examples' directory
 
@@ -57,19 +56,25 @@ You should now be able to link your programs using **FastScapeLib**
 routines, e.g., with `-lfastscapelib_fortran`. See some Fortran programs
 in the 'examples' folder.
 
-=== Install the Python package
+=== Install the Python package (using conda)
 
-The recommended way of installing **FastScapeLib** as a Python package
-is to run the following command from the source directory (i.e., the
-top-level folder containing the file `setup.py`):
+[NOTE]
+====
+If you want to use this tool from within Python, you may consider using the
+**FastScape** package instead, which is built on top of FastScapeLib and which
+provides a high-level, user-friendly interface. See
+https://fastscape.readthedocs.io.
+====
+
+**FastScapeLib**'s Python bindings are available as a conda package
+(https://docs.conda.io/en/latest/). Conda can be installed from
+https://docs.conda.io/en/latest/miniconda.html.
+
+Then run the following command:
 
 ----
-pip install .
+conda install fastscapelib-f2py -c conda-forge
 ----
-
-This will also temporarily install all the tools needed to build the
-package (except a Fortran compiler and Python/NumPy, which must be
-both already installed). Note: you need pip >= 10.
 
 You should now be able to import the package from within Python, e.g.,
 
@@ -79,3 +84,27 @@ You should now be able to import the package from within Python, e.g.,
 
 There is a Jupyter notebook in the 'examples' folder showing simple
 usage of the library.
+
+=== Install the Python package (from source)
+
+You can also install **FastScapeLib**'s Python bindings from source, e.g, for
+development purpose. Run the following command from the source directory (i.e.,
+the top-level folder containing the file `setup.py`):
+
+----
+python -m pip install .
+----
+
+This will also temporarily install all the tools needed to build the package
+(except a Fortran compiler, which must be already installed). Note: you need pip
+>= 10.
+
+If you experience issues when installing or importing the package (NumPy
+compatibility issues), try running pip without build isolation:
+
+----
+python -m pip install . --no-build-isolation
+----
+
+Note that in this case you may first need to manually install all the tools
+required to build the package (i.e., CMake, NumPy, scikit-build).

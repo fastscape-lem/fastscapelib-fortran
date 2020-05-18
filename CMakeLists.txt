@@ -6,7 +6,7 @@ set(FASTSCAPELIB_NAME fastscapelib_fortran)
 # Sources
 # =======
 
-set(FASTSCAPELIB_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(FASTSCAPELIB_SRC_DIR src)
 
 set(FASTSCAPELIB_SRC_FILES
   ${FASTSCAPELIB_SRC_DIR}/Advect.f90
@@ -23,7 +23,7 @@ set(FASTSCAPELIB_SRC_FILES
   ${FASTSCAPELIB_SRC_DIR}/TerrainDerivatives.f90
   )
 
-set(FLEXURE_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Flexure2D_v1.0/src)
+set(FLEXURE_SRC_DIR Flexure2D_v1.0/src)
 
 set(FLEXURE_SRC_FILES
     ${FLEXURE_SRC_DIR}/flexure2D.f90
@@ -44,7 +44,7 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
 # Flags
 # =====
 
-if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+if(CMAKE_Fortran_COMPILER_ID MATCHES "Flang|GNU")
     set(dialect "-ffree-form -std=f2008 -fimplicit-none")
     set(bounds "-fbounds-check")
     set(warnings "-Wall -Wno-unused-dummy-argument")
@@ -71,7 +71,6 @@ set(CMAKE_Fortran_FLAGS_DEBUG
 
 OPTION(BUILD_FASTSCAPELIB_STATIC "build fastscapelib as a static library" ON)
 OPTION(BUILD_FASTSCAPELIB_SHARED "build fastscapelib as a shared library" OFF)
-OPTION(BUILD_PYTHON_MODULE "build fastscapelib library as a Python module" OFF)
 OPTION(USE_FLEXURE "include flexure routines in the library" OFF)
 OPTION(BUILD_EXAMPLES "build usage examples that are in the 'examples' directory" OFF)
 
@@ -131,48 +130,25 @@ endif()
 # Python module
 # =============
 
-if(BUILD_PYTHON_MODULE)
-  if(NOT SKBUILD)
-    set(CMAKE_MODULE_PATH
-      ${PROJECT_SOURCE_DIR}/cmake
-      ${CMAKE_MODULE_PATH})
-  endif()
+if(SKBUILD)
+  # TODO: remove when https://github.com/scikit-build/scikit-build/pull/495 is merged
+  set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 
-  find_package(PythonExtensions REQUIRED)
+  find_package(NumPy REQUIRED)
   find_package(F2PY REQUIRED)
-
-  # TODO: see https://github.com/scikit-build/scikit-build/issues/383
-  set(_command "import distutils.sysconfig as ds; import sys; sys.stdout.write(ds.get_config_var('SO'))")
-  execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c "${_command}"
-    OUTPUT_VARIABLE PYTHON_EXTENSION_MODULE_SUFFIX
-    RESULT_VARIABLE _result)
-  message(STATUS ${PYTHON_EXTENSION_MODULE_SUFFIX})
+  find_package(PythonExtensions REQUIRED)
 
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
-  set(F2PY_MODULE_FILE
-    ${CMAKE_CURRENT_BINARY_DIR}/${F2PY_MODULE_NAME}${PYTHON_EXTENSION_MODULE_SUFFIX}
+
+  add_python_library(${F2PY_MODULE_NAME} MODULE
+    SOURCES ${FASTSCAPELIB_SRC_FILES}
+    INCLUDE_DIRECTORIES ${FASTSCAPELIB_SRC_DIR}
     )
 
-  add_custom_target(${F2PY_MODULE_NAME} ALL
-    DEPENDS ${F2PY_MODULE_FILE}
+  python_extension_module(${F2PY_MODULE_NAME})
+
+  install(
+    TARGETS ${F2PY_MODULE_NAME}
+    LIBRARY DESTINATION "src_python/${FASTSCAPELIB_NAME}"
     )
-
-  set(F2PY_COMPILER_OPTIONS "--f90flags=\"-cpp\"")
-  if(WIN32)
-    set(F2PY_COMPILER_OPTIONS "${F2PY_COMPILER_OPTIONS} -DON_WINDOWS --compiler=mingw32")
-  endif()
-
-  add_custom_command(
-    OUTPUT ${F2PY_MODULE_FILE}
-    COMMAND ${F2PY_EXECUTABLE}
-      -m ${F2PY_MODULE_NAME}
-      -c
-      ${FASTSCAPELIB_SRC_FILES}
-      ${F2PY_COMPILER_OPTIONS}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-    )
-
-  if(SKBUILD)
-    install(FILES ${F2PY_MODULE_FILE} DESTINATION ${FASTSCAPELIB_NAME})
-  endif()
 endif()
