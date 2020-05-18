@@ -9,11 +9,10 @@
 
 ==== Bug fixes
 
-- Some internal changes for more flexibility downstream #25
+- Made internal changes for more flexibility downstream #25
+- Fixed boundary conditions performance/memory issues #33
 - Fixed some build issues with recent NumPy versions #37
-- Move lake depth computation in flow routing subroutines #38
-
-- Better handling o domainf boundary conditions (code readability and performance) #33
+- Moved lake depth computation in flow routing subroutines #38
 
 === Version 2.8.1 (13 October 2019)
 
