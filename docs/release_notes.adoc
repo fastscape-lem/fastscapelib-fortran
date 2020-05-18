@@ -11,6 +11,7 @@
 
 - Some internal changes for more flexibility downstream #25
 - Fixed some build issues with recent NumPy versions #37
+- Move lake depth computation in flow routing subroutines #38
 
 === Version 2.8.1 (13 October 2019)
 
