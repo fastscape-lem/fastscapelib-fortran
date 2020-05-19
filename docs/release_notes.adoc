@@ -1,6 +1,12 @@
 [#release_notes]
 == Release notes
 
+=== Version 2.9.0 (Unreleased)
+
+==== Changes
+
+==== Bug fixes
+
 === Version 2.8.2 (19 May 2020)
 
 ==== Changes
