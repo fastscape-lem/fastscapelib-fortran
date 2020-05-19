@@ -10,7 +10,8 @@
 ==== Bug fixes
 
 - Made internal changes for more flexibility downstream #25
-- Fixed boundary conditions performance/memory issues #33
+- Refactored boundary conditions #33
+- Explicit deallocation of arrays in StreamPowerLaw routines #35
 - Fixed some build issues with recent NumPy versions #37
 - Moved lake depth computation in flow routing subroutines #38
 
