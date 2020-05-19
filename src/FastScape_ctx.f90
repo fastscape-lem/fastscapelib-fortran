@@ -515,7 +515,6 @@ module FastScapeContext
     implicit none
 
     integer i,j,ij,counter
-    character*4 cbc
 
     write (*,*) '--------------------------------------------------------'
 
