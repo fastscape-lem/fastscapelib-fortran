@@ -3,6 +3,8 @@
 
 * link:https://www.sciencedirect.com/science/article/pii/S0169555X12004618[Braun, J. and Willett, S.D., 2013.] A very efficient, O(n), implicit and parallel method to solve the basic stream power law equation governing fluvial incision and landscape evolution. Geomorphology, 180-181, pp., 170-179.
 
-* Yuan, X., Braun, J., Guerit, L., Rouby, D. and Cordonnier, G., in revision. A new efficient, O(n), and implicit method to solve the Stream Power Law taking into account sediment transport and deposition. Journal of Geohysical Research - Surface.
+* link:https://doi.org/10.5194/esurf-7-549-2019[Cordonnier, G., Bovy, B. and Braun, J., 2019.] A versatile, linear complexity algorithm for flow routing in topographies with depressions. Earth Surf. Dynam., 7, pp. 549–562.
 
-* Yuan, X., Braun, J., Guerit, L., Simon, B., Bovy, B., Rouby, D. and Robin, C., submitted. Linking continental deposition to marine sediment transport and deposition: a new implicit and o(n) method. Earth and Planetary Science Letters.
+* link:https://doi.org/10.1029/2018JF004867[Yuan, X., Braun, J., Guerit, L., Rouby, D. and Cordonnier, G., 2019.] A New Efficient Method to Solve the Stream Power Law Model Taking Into Account Sediment Deposition. Journal of Geohysical Research - Surface, 124 (6), pp. 1346-1365.
+
+* link:https://doi.org/10.1016/j.epsl.2019.115728[Yuan, X., Braun, J., Guerit, L., Simon, B., Bovy, B., Rouby, D., Robin, C. and Jiao, R., 2019.] Linking continental deposition to marine sediment transport and deposition: a new implicit and o(n) method for inverse analysis. Earth and Planetary Science Letters, 524, 115728.
