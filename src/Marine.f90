@@ -53,7 +53,8 @@ subroutine Marine()
 
   allocate (mmrec(8,nn),mmnrec(nn),mmwrec(8,nn),mmlrec(8,nn),mmstack(nn),mwater(nn))
 
-  call find_mult_rec (h,rec,stack,mwater,mmrec,mmnrec,mmwrec,mmlrec,mmstack,nx,ny,dx,dy,0.d0,ibc,p_mfd_exp)
+  call find_mult_rec (h,rec,stack,mwater,mmrec,mmnrec,mmwrec,mmlrec,mmstack,nx,ny,dx,dy,0.d0,p_mfd_exp, &
+    bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic)
 
   !print*,count(flux>0.and.mmnrec==0),count(flux>0),count(mmstack==0)
 
@@ -109,7 +110,7 @@ subroutine Marine()
 
   ! silt and sand coupling diffusion in ocean
   call SiltSandCouplingDiffusion (h,Fmix,flux*Fs,flux*(1.d0-Fs), &
-  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,ibc)
+  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,bounds_ibc)
 
   ! pure silt and sand during deposition/erosion
   dh1=((h-ht)*Fmix+layer*(Fmix-Fmixt))*(1.d0-poro1)

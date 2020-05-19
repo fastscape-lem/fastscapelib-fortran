@@ -9,10 +9,6 @@ subroutine StreamPowerLaw ()
 
   implicit none
 
-  integer :: i1, i2, j1, j2
-  logical :: xcyclic, ycyclic
-  logical, dimension(:), allocatable :: bc
-
   integer :: ij,ijk,ijr,k,ijr1
   double precision :: dx,dy,fact,tol,err
   double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
@@ -23,14 +19,10 @@ subroutine StreamPowerLaw ()
 
   allocate (ht(nn),kfint(nn),dh(nn),hp(nn))
   allocate (elev(nn))
-  allocate (bc(nn))
   allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 
   dx=xl/(nx-1)
   dy=yl/(ny-1)
-
-  ! TODO: better to set boundary conditions once at the beginning of the model run
-  call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
 
   ! set g, dimensionless parameter for sediment transport and deposition
   ! if g1<0, skip and use g values directly from FastScapeContext (not in API!!!)
@@ -89,7 +81,7 @@ subroutine StreamPowerLaw ()
       endif
     enddo
 
-    where (bc)
+    where (bounds_bc)
       elev=ht
     elsewhere
       elev=ht+(dh-(ht-hp))*g*dx*dy/a
@@ -207,7 +199,7 @@ subroutine StreamPowerLaw ()
     Sedflux=ht-h
     !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
 
-    deallocate (ht,kfint,dh,hp,elev,bc,water,lake_water_volume,lake_sediment,lake_sill)
+    deallocate (ht,kfint,dh,hp,elev,water,lake_water_volume,lake_sediment,lake_sill)
 
     return
 
@@ -224,10 +216,6 @@ subroutine StreamPowerLaw ()
 
     implicit none
 
-    integer :: i1, i2, j1, j2
-    logical :: xcyclic, ycyclic
-    logical, dimension(:), allocatable :: bc
-
     integer :: ij,ijk,ijr
     double precision :: dx,dy,fact,tol,err
     double precision :: f,df,errp,h0,hn,omega,tolp,w_rcv
@@ -238,14 +226,10 @@ subroutine StreamPowerLaw ()
 
     allocate (ht(nn),kfint(nn),dh(nn),hp(nn))
     allocate (elev(nn))
-    allocate (bc(nn))
     allocate (water(nn),lake_water_volume(nn),lake_sediment(nn),lake_sill(nn))
 
     dx=xl/(nx-1)
     dy=yl/(ny-1)
-
-    ! TODO: better to set boundary conditions once at the beginning of the model run
-    call set_bc (ibc, nx, ny, i1, i2, j1, j2, bc, xcyclic, ycyclic)
 
     ! set g, dimensionless parameter for sediment transport and deposition
     ! if g1<0, skip and use g values directly from FastScapeContext (not in API!!!)
@@ -298,7 +282,7 @@ subroutine StreamPowerLaw ()
         endif
       enddo
 
-      where (bc)
+      where (bounds_bc)
         elev=ht
       elsewhere
         elev=ht+(dh-(ht-hp))*g*dx*dy/a
@@ -409,7 +393,7 @@ subroutine StreamPowerLaw ()
       Sedflux=ht-h
       !if (runMarine) where (h.lt.sealevel) Sedflux=0.d0
 
-      deallocate (ht,kfint,dh,hp,elev,bc,water,lake_water_volume,lake_sediment,lake_sill)
+      deallocate (ht,kfint,dh,hp,elev,water,lake_water_volume,lake_sediment,lake_sill)
 
       return
 

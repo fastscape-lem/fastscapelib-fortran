@@ -9,9 +9,11 @@
 
 ==== Bug fixes
 
-- Some internal changes for more flexibility downstream #25
+- Made internal changes for more flexibility downstream #25
+- Refactored boundary conditions #33
+- Explicit deallocation of arrays in StreamPowerLaw routines #35
 - Fixed some build issues with recent NumPy versions #37
-- Move lake depth computation in flow routing subroutines #38
+- Moved lake depth computation in flow routing subroutines #38
 
 === Version 2.8.1 (13 October 2019)
 

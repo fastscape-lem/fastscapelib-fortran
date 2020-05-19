@@ -7,7 +7,11 @@ module FastScapeContext
   implicit none
 
   integer :: nx, ny, nn, nstack
-  integer :: step, ibc
+  integer :: bounds_ibc
+  integer :: bounds_i1, bounds_i2, bounds_j1, bounds_j2
+  logical :: bounds_xcyclic, bounds_ycyclic
+  logical, dimension(:), allocatable :: bounds_bc
+  integer :: step
   integer :: nGSStreamPowerLaw, nGSMarine
   logical :: setup_has_been_run
   double precision, target, dimension(:), allocatable :: h,u,vx,vy,length,a,erate,etot,catch,catch0,b,precip,kf,kd
@@ -63,6 +67,7 @@ module FastScapeContext
 
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (g(nn))
+    allocate (bounds_bc(nn))
     allocate (p_mfd_exp(nn))
     allocate (length(nn),a(nn),erate(nn),etot(nn),b(nn),Sedflux(nn),Fmix(nn),kf(nn),kd(nn))
     allocate (lake_depth(nn),hwater(nn),mrec(8,nn),mnrec(nn),mwrec(8,nn),mlrec(8,nn),mstack(nn))
@@ -142,7 +147,7 @@ module FastScapeContext
     if (allocated(mstack)) deallocate(mstack)
     if (allocated(g)) deallocate(g)
     if (allocated(p_mfd_exp)) deallocate(p_mfd_exp)
-
+    if (allocated(bounds_bc)) deallocate(bounds_bc)
 
     return
 
@@ -379,7 +384,7 @@ module FastScapeContext
     write (*,*) 'xl,yl',xl,yl
     write (*,*) 'dt',dt
     write (*,*) 'Kf,Kfsed,,m,n,Kd,Kdsed,G1,G2',sum(kf)/nn,kfsed,m,n,sum(kd)/nn,kdsed,g1,g2
-    write (*,*) 'ibc',ibc
+    write (*,*) 'ibc',bounds_ibc
     write (*,*) 'h',minval(h),sum(h)/nn,maxval(h)
     write (*,*) 'u',minval(u),sum(u)/nn,maxval(u)
 
@@ -509,8 +514,7 @@ module FastScapeContext
 
     implicit none
 
-    integer i,j,counter,ij,i1,i2,j1,j2
-    character*4 cbc
+    integer i,j,ij,counter
 
     write (*,*) '--------------------------------------------------------'
 
@@ -534,17 +538,8 @@ module FastScapeContext
     write (*,*) 'Total number of self donors',counter
 
     counter=0
-    write (cbc,'(i4)') ibc
-    i1=1
-    i2=nx
-    j1=1
-    j2=ny
-    if (cbc(4:4).eq.'1') i1=2
-    if (cbc(2:2).eq.'1') i2=nx-1
-    if (cbc(1:1).eq.'1') j1=2
-    if (cbc(3:3).eq.'1') j2=ny-1
-    do j=j1,j2
-      do i=i1,i2
+    do j=bounds_j1,bounds_j2
+      do i=bounds_i1,bounds_i2
         ij=(j-1)*nx+i
         if (rec(ij)==ij) counter=counter+1
       enddo
@@ -569,11 +564,31 @@ module FastScapeContext
 
   subroutine SetBC (jbc)
 
+    implicit none
+
     integer, intent(in) :: jbc
+    character*4 :: cbc
 
-    ibc = jbc
+    bounds_ibc = jbc
 
-    return
+    write (cbc,'(i4)') jbc
+    bounds_bc=.FALSE.
+    bounds_i1=1
+    bounds_i2=nx
+    bounds_j1=1
+    bounds_j2=ny
+    if (cbc(4:4).eq.'1') bounds_i1=2
+    if (cbc(2:2).eq.'1') bounds_i2=nx-1
+    if (cbc(1:1).eq.'1') bounds_j1=2
+    if (cbc(3:3).eq.'1') bounds_j2=ny-1
+    if (cbc(4:4).eq.'1') bounds_bc(1:nn:nx)=.TRUE.
+    if (cbc(2:2).eq.'1') bounds_bc(nx:nn:nx)=.TRUE.
+    if (cbc(1:1).eq.'1') bounds_bc(1:nx)=.TRUE.
+    if (cbc(3:3).eq.'1') bounds_bc(nx*(ny-1)+1:nn)=.TRUE.
+    bounds_xcyclic=.FALSE.
+    bounds_ycyclic=.FALSE.
+    if (cbc(4:4).ne.'1'.and.cbc(2:2).ne.'1') bounds_xcyclic=.TRUE.
+    if (cbc(1:1).ne.'1'.and.cbc(3:3).ne.'1') bounds_ycyclic=.TRUE.
 
   end subroutine SetBC
 
@@ -831,9 +846,7 @@ module FastScapeContext
 
       double precision, intent(out) :: tectonic_flux, erosion_flux, boundary_flux
       double precision :: surf
-      logical, dimension(:), allocatable :: bc
       double precision, dimension(:), allocatable :: flux
-      character*4 :: cbc
       integer ij,ijk,k
 
       surf = xl*yl/(nx - 1)/(ny - 1)
@@ -843,9 +856,9 @@ module FastScapeContext
 
       ! computes receiver and stack information for multi-direction flow
       !allocate (mrec(8,nn), mnrec(nn), mwrec(8,nn), mlrec(8,nn), mstack(nn), hwater(nn)
-      !call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, ibc, p_mfd_exp)
+      !call find_mult_rec (h, rec, stack, hwater, mrec, mnrec, mwrec, mlrec, mstack, nx, ny, xl/(nx-1), yl/(ny-1), p, bounds, p_mfd_exp)
       ! computes sediment flux
-      allocate (flux(nn), bc(nn))
+      allocate (flux(nn))
 
       flux = erate
 
@@ -866,15 +879,9 @@ module FastScapeContext
       endif
 
       ! compute boundary flux
-      write (cbc,'(i4)') ibc
-      bc=.FALSE.
-      if (cbc(4:4).eq.'1') bc(1:nn:nx) = .TRUE.
-      if (cbc(2:2).eq.'1') bc(nx:nn:nx) = .TRUE.
-      if (cbc(1:1).eq.'1') bc(1:nx) = .TRUE.
-      if (cbc(3:3).eq.'1') bc(nx*(ny - 1) + 1:nn) = .TRUE.
-      boundary_flux = sum(flux,bc)*surf
+      boundary_flux = sum(flux,bounds_bc)*surf
 
-      deallocate (flux, bc)
+      deallocate (flux)
 
     end subroutine compute_fluxes
 
