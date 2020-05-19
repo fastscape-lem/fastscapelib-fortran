@@ -1,7 +1,7 @@
 [#release_notes]
 == Release notes
 
-=== Version 2.8.2 (Unreleased)
+=== Version 2.8.2 (19 May 2020)
 
 ==== Changes
 
@@ -11,8 +11,10 @@
 
 - Made internal changes for more flexibility downstream #25
 - Refactored boundary conditions #33
+- Fixed boundary conditions in flexure #34
 - Explicit deallocation of arrays in StreamPowerLaw routines #35
 - Fixed some build issues with recent NumPy versions #37
+- Simplified CMake script for building the Python extension #37
 - Moved lake depth computation in flow routing subroutines #38
 
 === Version 2.8.1 (13 October 2019)
