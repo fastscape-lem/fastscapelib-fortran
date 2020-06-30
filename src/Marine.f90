@@ -148,6 +148,9 @@ subroutine Marine()
   !h=ht+dh
   etot=etot+ht-h
   erate=erate+(ht-h)/dt
+  where (h.lt.sealevel) Sedflux=0.d0
+  where (h.lt.sealevel) etot=0.d0
+  where (h.lt.sealevel) erate=0.d0
 
   ! set the silt fraction in continent
   where (h.ge.sealevel+1.d-3) Fmix=0.d-1
