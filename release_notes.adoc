@@ -1,0 +1,62 @@
+[#release_notes]
+== Release notes
+
+=== Version 2.9.0 (Unreleased)
+
+==== Changes
+
+==== Bug fixes
+
+=== Version 2.8.2 (19 May 2020)
+
+==== Changes
+
+- Improved the documentation on installing Python bindings #37
+
+==== Bug fixes
+
+- Made internal changes for more flexibility downstream #25
+- Refactored boundary conditions #33
+- Fixed boundary conditions in flexure #34
+- Explicit deallocation of arrays in StreamPowerLaw routines #35
+- Fixed some build issues with recent NumPy versions #37
+- Simplified CMake script for building the Python extension #37
+- Moved lake depth computation in flow routing subroutines #38
+
+=== Version 2.8.1 (13 October 2019)
+
+==== Bug fixes
+
+- Fixed regression with boundary conditions and StreamPowerLaw #29
+
+=== Version 2.8.0 (18 September 2019)
+
+==== Changes
+
+- Refactor stream power law implementation (decouple from flow
+  routing) #23
+
+- Rename Union internal subroutine (could cause name conflicts when
+  building the library with f2py) #22
+
+==== New features
+
+- New routines for computing curvature and slope #15
+
+- New component for marine sediment transport and deposition #20
+
+==== Bug fixes
+
+- Fixed VTK files export on Windows #7
+
+- Improved efficiency of stream power law erosion and flexure #8
+
+- Fixed bug in lake filling algorithm #12
+
+- Fixed bug in ADI implementation of diffusion #17
+
+- Fixed bug in Strati subroutine #18
+
+=== Version 2.7.0 (30 January 2019)
+
+- First release in VCS.
