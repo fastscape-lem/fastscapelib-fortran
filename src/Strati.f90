@@ -37,7 +37,7 @@ subroutine Strati (b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
     fields(:,1,i) = reflector(:,i)
     call slope (reflector(:,i),s,nx,ny,dx,dy)
     fields(:,2,i) = s
-    if (rec(1).ne.0) call distance_to_shore (reflector(:,i),dist,nx,ny,stack,rec,length)
+    if (rec(1).ne.0) call distance_to_shore (reflector(:,i),dist,nx,ny,rec,xl,yl)
     if (i.gt.1) then
       fields(:,3,i) = reflector(:,i)-reflector(:,i-1)
     else
@@ -71,6 +71,9 @@ subroutine Strati (b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
     call VTK (reflector(:,i),'Horizon'//ref//'-',nfield,fields(:,1:nfield,i),names, nx,ny,dx,dy,istep,vex)
   enddo
 
+  call distance_to_shore (b,dist,nx,ny,rec,xl,yl)
+  call VTK_filled (b, nreflector, reflector, nfield, fields, names, nx, ny, dx, dy, istep, vex, dist)
+
   deallocate (s,dist)
 
   if (ireflector.eq.nreflector) call VTK_CUBE (fields, nx, ny, nfield, nreflector, xl, yl, names)
@@ -81,28 +84,45 @@ end subroutine Strati
 
 !-------------------------------------------------------------------
 
-subroutine distance_to_shore (h,d,nx,ny,stack,rec,length)
+subroutine distance_to_shore (h,d,nx,ny,rec,xl,yl)
 
   implicit none
 
   integer nx, ny
+  double precision xl, yl
   double precision, dimension(nx*ny) :: h, d
-  integer, dimension(nx*ny) :: stack, rec
-  double precision, dimension(nx*ny) :: length
+  integer, dimension(nx*ny) :: rec
 
-  integer :: i, ij
+  double precision, dimension(:), allocatable :: x,y
+  double precision rat, xshore, yshore, dist
+  integer :: i, j, ij, ijk
 
-  d = length
-  do i = nx*ny, 1, -1
-    ij = stack(i)
-    if (h(rec(ij)).gt.0.d0) then
-      d(ij) = 1.d0
-      elseif (h(ij).gt.0.d0) then
-        d(ij) = length(ij)*(-h(rec(ij))/(h(ij)-h(rec(ij))))
-      endif
-      d(rec(ij)) = d(rec(ij)) + d(ij)
+  d = 2.d0*(xl**2 + yl**2)
+
+  allocate (x(nx*ny), y(nx*ny))
+  x = (/((xl*float(i-1)/(nx-1), i=1,nx),j=1,ny)/)
+  y = (/((yl*float(j-1)/(ny-1), i=1,nx),j=1,ny)/)
+
+  do ij = 1, nx*ny
+
+    if (h(ij)*h(rec(ij)).lt.0.d0) then
+
+    rat = 0.5d0
+    if (h(rec(ij))-h(ij).ne.0.d0) rat = h(ij)/(h(rec(ij))-h(ij))
+    xshore = x(ij) + rat*(x(rec(ij))-x(ij))
+    yshore = y(ij) + rat*(y(rec(ij))-y(ij))
+
+    do ijk = 1, nx*ny
+      dist = (x(ijk) - xshore)**2 + (y(ijk) - yshore)**2
+      d(ijk) = min (d(ijk),dist)
     enddo
 
-    return
+    endif
 
-  end subroutine distance_to_shore
+  enddo
+
+  where (d>0.d0) d = sqrt(d)
+
+  return
+
+end subroutine distance_to_shore

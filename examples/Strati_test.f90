@@ -87,7 +87,7 @@ program Strati_test
   call FastScape_Get_Step (istep)
 
   nreflector = 5
-  nfreq = 50
+  nfreq = 500
   vex = 100.d0
   call FastScape_Strati (nstep, nreflector, nfreq, vex)
 

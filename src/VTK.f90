@@ -126,3 +126,131 @@ subroutine VTK_CUBE (fields, nx, ny, nf, nreflector, xl, yl, fname)
     close(77)
 
 end subroutine VTK_CUBE
+
+!------------------------------------------------
+
+subroutine VTK_filled (basement, nreflector, reflector, nfield, fields, names, nx, ny, dx, dy, istep, vex, distb)
+
+  ! This routine produces a 3D volume containing all the information produced by Strati in vtk format
+  ! The resulting file(s) called Strati-number (where number is the step number) can be loaded in
+  ! Paraview for viewing and data extraction (along synthetic wells)
+  ! Note however that the data is only stored at the location of the reflectors and that the information
+  ! in between reflectors is the result of interpolation made in Paraview
+  ! The larger the number of reflectors, the less the interpolation
+
+  ! Note that contrary to all other VTK producing routines, this one outputs the geometric information
+  ! in ASCII format (not binary); this means that the files it generates are larger and take more time
+  ! to load into Paraview
+
+  integer :: nx, ny, nreflector, nfield, istep
+  double precision basement(nx*ny), reflector(nx*ny,nreflector), dx, dy, vex, distb(nx*ny)
+  double precision fields(nx*ny,nfield,nreflector)
+  character*30 names(nfield)
+
+  character cstep*7, name*128
+  integer iunit, nnode, nelem
+
+  write (cstep,'(i7)') istep
+  if (istep.lt.10) cstep(1:6)='000000'
+  if (istep.lt.100) cstep(1:5)='00000'
+  if (istep.lt.1000) cstep(1:4)='0000'
+  if (istep.lt.10000) cstep(1:3)='000'
+  if (istep.lt.100000) cstep(1:2)='00'
+  if (istep.lt.1000000) cstep(1:1)='0'
+
+  iunit=30
+
+#ifdef ON_WINDOWS
+  call system ('if not exist "VTK" mkdir VTK')
+#else
+  call system ("mkdir -p VTK")
+#endif
+
+name='Strati-'
+
+#ifdef ON_WINDOWS
+  call system ('del VTK/'//trim(name)//cstep//'.vtk')
+#else
+  call system ('rm -f VTK/'//trim(name)//cstep//'.vtk')
+#endif
+
+  nnode = nx*ny*(nreflector+1)
+  nelem = (nx-1)*(ny-1)*nreflector
+
+  open(unit=iunit,file='VTK/'//trim(name)//cstep//'.vtk')
+  write(iunit,'(a)')'# vtk DataFile Version 3.0'
+  write(iunit,'(a)')'FilledStratigraphy'
+  write(iunit,'(a)')'ASCII'
+  write(iunit,'(a)')'DATASET UNSTRUCTURED_GRID'
+  write(iunit,'(a7,i10,a6)')'POINTS ',nnode,' float'
+
+  do k = 0, nreflector
+    do j = 1, ny
+      do i = 1, nx
+        ij = (j - 1)*nx + i
+        if (k.eq.0) then
+          write(iunit,'(3f16.4)') dx*(i - 1), dy*(j - 1), basement(ij)*vex
+        else
+          write(iunit,'(3f16.4)') dx*(i - 1), dy*(j - 1), reflector(ij, k)*vex
+        endif
+      enddo
+    enddo
+  enddo
+
+  write(iunit,'(A6, 2I10)') 'CELLS ',nelem,9*nelem
+  do k=1,nreflector
+    do j=1,ny-1
+      do i=1,nx-1
+        ij = (k-1)*nx*ny+(j-1)*nx+i-1
+        write(iunit,'(9I10)') 8 , ij, ij+1, ij+1+nx, ij+nx, &
+                                  ij+nx*ny, ij+1+nx*ny, ij+1+nx+nx*ny, ij+nx+nx*ny
+      enddo
+    enddo
+  enddo
+
+  write(iunit,'(A11, I10)') 'CELL_TYPES ',nelem
+  do k=1,nelem
+  write(iunit,'(I2)') 12 ! octree  (8 nodes)
+  enddo
+
+  write(iunit,'(a11,i10)')'POINT_DATA ',nnode
+
+  write(iunit,'(a)')'SCALARS 0.Reflector float 1'
+  write(iunit,'(a)')'LOOKUP_TABLE default'
+  do k = 0, nreflector
+    do j = 1, ny
+      do i = 1, nx
+        ij = (j - 1)*nx + i
+        write(iunit,'(e10.4)') float(k)
+      enddo
+    enddo
+  enddo
+
+  do l = 1, nfield
+    write(iunit,'(a)')'SCALARS '//names(l)//' float 1'
+    write(iunit,'(a)')'LOOKUP_TABLE default'
+    do k = 0, nreflector
+      do j = 1, ny
+        do i = 1, nx
+          ij = (j - 1)*nx + i
+          if (k.eq.0) then
+            if (l.eq.1.or.l.eq.2) then
+              write(iunit,'(e10.4)') fields(ij,l,k+1)
+            elseif (l.eq.7) then
+              write(iunit,'(e10.4)') distb(ij)
+            elseif (l.eq.9) then
+              write(iunit,'(e10.4)') 2*fields(ij,l,k+1)-fields(ij,l,k+2)
+            else
+              write(iunit,'(e10.4)') 0.
+            endif
+          else
+            write(iunit,'(e10.4)') fields(ij,l,k)
+          endif
+        enddo
+      enddo
+    enddo
+  enddo
+
+  close (iunit)
+
+end subroutine VTK_filled
