@@ -142,7 +142,7 @@ subroutine VTK_filled (basement, nreflector, reflector, nfield, fields, names, n
   ! in ASCII format (not binary); this means that the files it generates are larger and take more time
   ! to load into Paraview
 
-  integer :: nx, ny, nreflector, nfield, istep
+  integer :: nx, ny, nreflector, nfield, istep, i, j, k, l, ij 
   double precision basement(nx*ny), reflector(nx*ny,nreflector), dx, dy, vex, distb(nx*ny)
   double precision fields(nx*ny,nfield,nreflector)
   character*30 names(nfield)
