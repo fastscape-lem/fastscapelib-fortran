@@ -772,3 +772,19 @@ subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
   return
 
 end subroutine FastScape_Get_Fluxes
+
+!--------------------------------------------------------------------------
+
+subroutine FastScape_Set_Tolerance_SPL (atol_SPLp)
+
+  use FastScapeContext
+
+  implicit none
+
+  double precision, intent(in) :: atol_SPLp
+
+  call SetAtolSPL (atol_SPLp)
+
+  return
+
+end subroutine FastScape_Set_Tolerance_SPL

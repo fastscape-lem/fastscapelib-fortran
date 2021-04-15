@@ -34,6 +34,7 @@ module FastScapeContext
   integer, dimension(:), allocatable :: mnrec,mstack
   integer, dimension(:,:), allocatable :: mrec
   double precision, dimension(:,:), allocatable :: mwrec,mlrec
+  double precision :: atol_SPL
 
   contains
 
@@ -107,6 +108,8 @@ module FastScapeContext
     nGSMarine = 0
 
     setup_has_been_run = .true.
+
+    atol_SPL = -1.d0
 
     return
 
@@ -884,5 +887,18 @@ module FastScapeContext
       deallocate (flux)
 
     end subroutine compute_fluxes
+
+
+    !---------------------------------------------------------------
+
+    subroutine SetAtolSPL (atol_SPLp)
+
+      double precision, intent(in) ::atol_SPLp
+
+      atol_SPL = atol_SPLp
+
+      return
+
+    end subroutine SetAtolSPL
 
   end module FastScapeContext

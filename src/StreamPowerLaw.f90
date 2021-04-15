@@ -39,6 +39,7 @@ subroutine StreamPowerLaw ()
 
   ! calculate the elevation / SPL, including sediment flux
   tol=1.d-4*(maxval(abs(h)) + 1.d0)
+  if (atol_SPL > 0.d0) tol = atol_SPL
   err=2.d0*tol
 
   ! store the elevation at t
@@ -244,6 +245,7 @@ subroutine StreamPowerLaw ()
 
     ! calculate the elevation / SPL, including sediment flux
     tol=1.d-4*(maxval(abs(h))+1.d0)
+    if (atol_SPL > 0.d0) tol = atol_SPL
     err=2.d0*tol
 
     ! store the elevation at t
