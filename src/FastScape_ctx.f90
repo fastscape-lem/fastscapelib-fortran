@@ -5,6 +5,10 @@ module errors
                         ERR_Default = 1, &
                         ERR_FileNotFound = 2, &
                         ERR_nx_ny_not_set = 3
+
+  character(len=25), dimension(4) :: err_names = [character(len=25) :: "none", &
+                  "default", "file not found", "nx, ny not set"]
+
   type :: ErrorType
     integer :: Code
     character(len=256) :: Message
