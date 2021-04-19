@@ -1,29 +1,12 @@
 
 #include "Error.fpp"
 
-module errors
-  implicit none
-  integer, parameter :: ERR_None                = 0,  &
-                        ERR_Default             = 1,  &
-                        ERR_FileNotFound        = 2,  &
-                        ERR_FileOpenFailed      = 3,  &
-                        ERR_ParameterInvalid    = 4,  &
-                        ERR_ParameterOutOfRange = 5
-
-  character(len=50), dimension(5) :: err_names = [character(len=50) :: "Default run time error", &
-      "File error: File not found",        &
-      "File error: File open failed",      &
-      "Parameter error: Input invalid",    &
-      "Parameter error: Out of range"      ]
-
-end module errors
-
 module FastScapeContext
 
   ! Context module for FastScape api
   ! should not be accessed or changed
   ! see API for name of routines and externally accessible variables
-  use errors
+  use FastScapeErrorCodes
 
   implicit none
 

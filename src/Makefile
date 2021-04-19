@@ -11,7 +11,7 @@ endif
 
 ON_WINDOWS = f
 
-FASTSCAPE_OBJ = FastScape_ctx.o FastScape_api.o StreamPowerLaw.o Diffusion.o LocalMinima.o Advect.o Marine.o VTK.o FlowRouting.o Strati.o Uplift.o TerrainDerivatives.o
+FASTSCAPE_OBJ = FastScapeErrorCodes.o FastScape_ctx.o FastScape_api.o StreamPowerLaw.o Diffusion.o LocalMinima.o Advect.o Marine.o VTK.o FlowRouting.o Strati.o Uplift.o TerrainDerivatives.o
 
 .f90.o:
 	$(F90) -c $(F90_OPTIONS) $*.f90
