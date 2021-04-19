@@ -142,15 +142,17 @@
 ! writes debugging information to the default output
 
 ! -----------------------------------------------------------------------------------------
+#include "Error.fpp"
 
-subroutine FastScape_Init()
+subroutine FastScape_Init(ierr)
 
   use FastScapeContext
-
   implicit none
+  integer, intent(out):: ierr
 
   call Init()
-
+  ierr = error%Code
+  !HANDLE_ERROR(error)
   return
 
 end subroutine FastScape_Init

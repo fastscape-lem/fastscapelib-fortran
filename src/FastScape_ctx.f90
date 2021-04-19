@@ -1,8 +1,23 @@
+#include "Error.fpp"
+module errors
+  implicit none
+  integer, parameter :: ERR_None = 0, &
+                        ERR_Default = 1, &
+                        ERR_FileNotFound = 2, &
+                        ERR_nx_ny_not_set = 3
+  type :: ErrorType
+    integer :: Code
+    character(len=256) :: Message
+  end type ErrorType
+
+end module errors
+
 module FastScapeContext
 
   ! Context module for FastScape api
   ! should not be accessed or changed
   ! see API for name of routines and externally accessible variables
+  use errors
 
   implicit none
 
@@ -35,10 +50,15 @@ module FastScapeContext
   integer, dimension(:,:), allocatable :: mrec
   double precision, dimension(:,:), allocatable :: mwrec,mlrec
 
+  type(ErrorType) :: error
+
+
   contains
 
   subroutine Init()
-
+    implicit none
+    error%Code = ERR_None
+    write(*,*) 'error%Code',error%Code
     nx=0
     ny=0
     step=0
@@ -49,6 +69,9 @@ module FastScapeContext
     timeStrati = 0.
     timeMarine = 0.
     timeUplift = 0.
+    !if (nx == 0) then
+    !  RAISE_ERROR('Error not in init',error,ERR_Default)
+    !end if
 
   end subroutine Init
 
@@ -58,13 +81,18 @@ module FastScapeContext
 
     implicit none
 
-    if (nx.eq.0) stop 'FastScapeSetup - You need to set nx first'
-    if (ny.eq.0) stop 'FastScapeSetup - You need to set ny first'
+    if (nx.eq.0) then
+      RAISE_ERROR('FastScapeSetup - You need to set nx first',error,ERR_nx_ny_not_set)
+      HANDLE_ERROR(error)
+    end if
+    if (ny.eq.0) then
+      RAISE_ERROR('FastScapeSetup - You need to set ny first',error,ERR_nx_ny_not_set)
+      HANDLE_ERROR(error)
+    end if
 
     nn=nx*ny
 
     call Destroy()
-
     allocate (h(nn),u(nn),vx(nn),vy(nn),stack(nn),ndon(nn),rec(nn),don(8,nn),catch0(nn),catch(nn),precip(nn))
     allocate (g(nn))
     allocate (bounds_bc(nn))
