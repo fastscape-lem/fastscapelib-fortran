@@ -1,4 +1,6 @@
+
 #include "Error.fpp"
+
 module errors
   implicit none
   integer, parameter :: ERR_None = 0, &
@@ -9,12 +11,6 @@ module errors
   character(len=25), dimension(3) :: err_names = [character(len=25) :: "default", &
       "file not found", &
       "nx, ny not set"       ]
-
-  type :: ErrorType
-    integer :: Code
-    character(len=256) :: Message
-  end type ErrorType
-
 end module errors
 
 module FastScapeContext
@@ -55,7 +51,6 @@ module FastScapeContext
   integer, dimension(:,:), allocatable :: mrec
   double precision, dimension(:,:), allocatable :: mwrec,mlrec
 
-  type(ErrorType) :: error
 
 
   contains
@@ -65,7 +60,7 @@ module FastScapeContext
 
     integer, intent(inout) :: ierr
 
-    ierr = 0
+    ierr = 0  ! Initialize to zero
     nx=0
     ny=0
     step=0
@@ -84,15 +79,6 @@ module FastScapeContext
 
   subroutine SetUp(ierr)
     implicit none
-
-    !if (nx.eq.0) then
-    !  RAISE_ERROR('FastScapeSetup - You need to set nx first',error,ERR_nx_ny_not_set)
-    !  HANDLE_ERROR(error)
-    !end if
-    !if (ny.eq.0) then
-    !  RAISE_ERROR('FastScapeSetup - You need to set ny first',error,ERR_nx_ny_not_set)
-    !  HANDLE_ERROR(error)
-    !end if
 
     integer, intent(inout) :: ierr
 
