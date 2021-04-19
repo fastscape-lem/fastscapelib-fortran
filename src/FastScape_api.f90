@@ -148,25 +148,37 @@ subroutine FastScape_Init(ierr)
 
   use FastScapeContext
   implicit none
-  integer, intent(out):: ierr
+  integer, intent(inout):: ierr
 
-  call Init()
-  ierr = error%Code
-  !HANDLE_ERROR(error)
+  ierr = 0
+  call Init(ierr)
+
+  FSCAPE_CHKERR(ierr)
   return
 
 end subroutine FastScape_Init
 
 !--------------------------------------------------------------------------
 
-subroutine FastScape_Setup()
+subroutine FastScape_Setup(ierr)
 
   use FastScapeContext
-
+  use errors
   implicit none
+  integer, intent(inout):: ierr
 
-  call SetUp()
+  ierr = 0
 
+  if (nx.eq.0) then
+    FSCAPE_RAISE1('[FastScape_Setup] You need to set nx first',ERR_nx_ny_not_set,ierr)
+  end if
+  if (ny.eq.0) then
+    FSCAPE_RAISE1('[FastScape_Setup] You need to set ny first',ERR_nx_ny_not_set,ierr)
+  end if
+  FSCAPE_CHKERR(ierr)
+
+  call SetUp(ierr)
+  FSCAPE_CHKERR(ierr)
   return
 
 end subroutine FastScape_Setup

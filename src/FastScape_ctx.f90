@@ -1,4 +1,6 @@
+
 #include "Error.fpp"
+
 module errors
   implicit none
   integer, parameter :: ERR_None = 0, &
@@ -6,14 +8,9 @@ module errors
                         ERR_FileNotFound = 2, &
                         ERR_nx_ny_not_set = 3
 
-  character(len=25), dimension(3) :: err_names = [character(len=25) ::"default", &
-                  "file not found", "nx, ny not set"]
-
-  type :: ErrorType
-    integer :: Code
-    character(len=256) :: Message
-  end type ErrorType
-
+  character(len=25), dimension(3) :: err_names = [character(len=25) :: "default", &
+      "file not found", &
+      "nx, ny not set"       ]
 end module errors
 
 module FastScapeContext
@@ -54,15 +51,16 @@ module FastScapeContext
   integer, dimension(:,:), allocatable :: mrec
   double precision, dimension(:,:), allocatable :: mwrec,mlrec
 
-  type(ErrorType) :: error
 
 
   contains
 
-  subroutine Init()
+  subroutine Init(ierr)
     implicit none
-    error%Code = ERR_None
-    write(*,*) 'error%Code',error%Code
+
+    integer, intent(inout) :: ierr
+
+    ierr = 0  ! Initialize to zero
     nx=0
     ny=0
     step=0
@@ -73,26 +71,27 @@ module FastScapeContext
     timeStrati = 0.
     timeMarine = 0.
     timeUplift = 0.
-    !if (nx == 0) then
-    !  RAISE_ERROR('Error not in init',error,ERR_Default)
-    !end if
 
+    FSCAPE_CHKERR(ierr)
   end subroutine Init
 
   !---------------------------------------------------------------
 
-  subroutine SetUp()
-
+  subroutine SetUp(ierr)
     implicit none
 
+    integer, intent(inout) :: ierr
+
+    ierr = 0 ! Initialize to zero
+
     if (nx.eq.0) then
-      RAISE_ERROR('FastScapeSetup - You need to set nx first',error,ERR_nx_ny_not_set)
-      HANDLE_ERROR(error)
+      FSCAPE_RAISE(ERR_nx_ny_not_set, ierr)
     end if
     if (ny.eq.0) then
-      RAISE_ERROR('FastScapeSetup - You need to set ny first',error,ERR_nx_ny_not_set)
-      HANDLE_ERROR(error)
+      FSCAPE_RAISE1('[FastScapeSetup] You need to set ny first',ERR_nx_ny_not_set,ierr)
     end if
+    FSCAPE_CHKERR(ierr)
+
 
     nn=nx*ny
 
