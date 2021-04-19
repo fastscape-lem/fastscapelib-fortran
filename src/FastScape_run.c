@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-void fastscape_init_(int* ierr);
+void fastscape_init_(int *ierr);
 void fastscape_set_nx_ny_(int* nx,int* ny);
 void fastscape_set_xl_yl_(double* xl,double* yl);
 void fastscape_set_dt_(double* dt);
@@ -10,7 +10,7 @@ void fastscape_set_erosional_parameters_(double* kf1_arr,double* kf2,double* m,d
 void fastscape_set_marine_parameters_(double* sealevel,double* poro1,double* poro2,double* z1,double* z2, double* ratio,double* L,double* kds1,double* kds2);
 void fastscape_set_bc_(int* bc);
 void fastscape_init_h_(double *h);
-void fastscape_setup_();
+void fastscape_setup_(int *ierr);
 void fastscape_copy_h_(double *h);
 void fastscape_set_u_(double *u);
 void fastscape_execute_step_();
@@ -96,7 +96,13 @@ int main(void){
      // printf("%d\n",field[0] );
      // printf("%d\n",field[1] );
      fastscape_init_(&ierr);
-     fastscape_setup_();
+     fastscape_setup_(&ierr);
+     if (ierr != 0) {
+       printf("Internal FastScape error occurred: error code = %d\n",ierr);
+       printf("C driver taking action - returning with exit code 1\n");
+       return(1);
+     }
+  
      fastscape_set_nx_ny_(&nx,&ny);
      fastscape_set_xl_yl_(&xl,&yl);
      fastscape_set_dt_(&dt);
