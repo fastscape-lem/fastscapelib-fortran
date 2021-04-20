@@ -43,12 +43,9 @@ module FastScapeContext
 
   contains
 
-  subroutine Init(ierr)
+  subroutine Init()
     implicit none
 
-    integer, intent(inout) :: ierr
-
-    ierr = 0  ! Initialize to zero
     nx=0
     ny=0
     step=0
@@ -60,7 +57,6 @@ module FastScapeContext
     timeMarine = 0.
     timeUplift = 0.
 
-    FSCAPE_CHKERR(ierr)
   end subroutine Init
 
   !---------------------------------------------------------------

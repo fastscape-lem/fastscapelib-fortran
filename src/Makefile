@@ -25,7 +25,7 @@ LIB: $(FASTSCAPE_OBJ)
 	ar rc libFastScape.a $(FASTSCAPE_OBJ)
 
 RUNF90: LIB
-	$(F90) -O FastScape_run.f90 -o FastScape_run_f90 -L. -lFastScape
+	$(F90) -O $(F90_OPTIONS) FastScape_run.f90 -o FastScape_run_f90 -L. -lFastScape
 
 RUNC: LIB
 	$(CC) -O FastScape_run.c -o FastScape_run_c -L. -lFastScape -lgfortran

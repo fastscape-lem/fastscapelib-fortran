@@ -2,25 +2,27 @@
 #include <stdlib.h>
 #include <time.h>
 void fastscape_init_(int *ierr);
-void fastscape_set_nx_ny_(int* nx,int* ny);
-void fastscape_set_xl_yl_(double* xl,double* yl);
-void fastscape_set_dt_(double* dt);
-void fastscape_set_erosional_parameters_(double* kf1_arr,double* kf2,double* m,double* n,double* kd1_arr,double* kd2,double* g1,double* g2, double* p_flow_dir_exp);
+void fastscape_set_nx_ny_(int* nx,int* ny,int *ierr);
+void fastscape_set_xl_yl_(double* xl,double* yl,int *ierr);
+void fastscape_set_dt_(double* dt,int *ierr);
+void fastscape_set_erosional_parameters_(double* kf1_arr,double* kf2,double* m,double* n,double* kd1_arr,double* kd2,double* g1,double* g2, double* p_flow_dir_exp,int *ierr);
 //void fastscape_set_precipitation_rate_(double* preci_rate);
-void fastscape_set_marine_parameters_(double* sealevel,double* poro1,double* poro2,double* z1,double* z2, double* ratio,double* L,double* kds1,double* kds2);
-void fastscape_set_bc_(int* bc);
-void fastscape_init_h_(double *h);
+void fastscape_set_marine_parameters_(double* sealevel,double* poro1,double* poro2,double* z1,double* z2, double* ratio,double* L,double* kds1,double* kds2,int *ierr);
+void fastscape_set_bc_(int* bc,int *ierr);
+void fastscape_init_h_(double *h,int *ierr);
 void fastscape_setup_(int *ierr);
-void fastscape_copy_h_(double *h);
-void fastscape_set_u_(double *u);
-void fastscape_execute_step_();
-void fastscape_get_step_(int* istep);
-void fastscape_debug_();
-void fastscape_copy_total_erosion_(double* etot);
-void fastscape_copy_erosion_rate_(double* erate);
-void fastscape_copy_basement_(double* b);
-void fastscape_vtk_(double* etot, double* vexp);
-void fastscape_view_();
+void fastscape_copy_h_(double *h,int *ierr);
+void fastscape_set_u_(double *u,int *ierr);
+void fastscape_execute_step_(int *ierr);
+void fastscape_get_step_(int* istep,int *ierr);
+void fastscape_debug_(int *ierr);
+void fastscape_copy_total_erosion_(double* etot,int *ierr);
+void fastscape_copy_erosion_rate_(double* erate,int *ierr);
+void fastscape_copy_basement_(double* b,int *ierr);
+void fastscape_vtk_(double* etot, double* vexp,int *ierr);
+void fastscape_view_(int *ierr);
+
+int chkerr(int ierr);
 
 int main(void){
     srand(time(NULL));
@@ -95,19 +97,19 @@ int main(void){
     //  }
      // printf("%d\n",field[0] );
      // printf("%d\n",field[1] );
-     fastscape_init_(&ierr);
-     fastscape_setup_(&ierr);
-     if (ierr != 0) {
-       printf("Internal FastScape error occurred: error code = %d\n",ierr);
-       printf("C driver taking action - returning with exit code 1\n");
-       return(1);
-     }
-  
-     fastscape_set_nx_ny_(&nx,&ny);
-     fastscape_set_xl_yl_(&xl,&yl);
-     fastscape_set_dt_(&dt);
-     fastscape_set_marine_parameters_(&sealevel, &poro1, &poro2, &z1, &z2, &ratio, &L, &kds1, &kds2);
-     fastscape_set_bc_(&bc);
+     fastscape_init_(&ierr);chkerr(ierr);
+     fastscape_set_nx_ny_(&nx,&ny,&ierr);chkerr(ierr);
+     fastscape_setup_(&ierr);chkerr(ierr);
+     // if (ierr != 0) {
+     //   printf("Internal FastScape error occurred: error code = %d\n",ierr);
+     //   printf("C driver taking action - returning with exit code 1\n");
+     //   return(1);
+     // }
+
+     fastscape_set_xl_yl_(&xl,&yl,&ierr);chkerr(ierr);
+     fastscape_set_dt_(&dt,&ierr);chkerr(ierr);
+     fastscape_set_marine_parameters_(&sealevel, &poro1, &poro2, &z1, &z2, &ratio, &L, &kds1, &kds2, &ierr);chkerr(ierr);
+     fastscape_set_bc_(&bc,&ierr);chkerr(ierr);
     for (i=0;i <nn; i++){
         h[i] = rand() % 10 + 0;
         u[i] = 0.0;
@@ -125,7 +127,7 @@ int main(void){
             }
         }
     }
-    fastscape_set_erosional_parameters_(kf1_arr,&kf2,&m,&n,kd1_arr,&kd2,&g1,&g2,&p_flow_dir_exp);
+    fastscape_set_erosional_parameters_(kf1_arr,&kf2,&m,&n,kd1_arr,&kd2,&g1,&g2,&p_flow_dir_exp,&ierr);chkerr(ierr);
     // for (i=0;i <nn; i++){
     //     printf("Element #%d: %f\n",i,h[i]);
     // }
@@ -137,34 +139,34 @@ int main(void){
         }
     }
 
-    fastscape_init_h_(h);
-    fastscape_set_u_(u);
-    fastscape_copy_h_(h);
+    fastscape_init_h_(h,&ierr);chkerr(ierr);
+    fastscape_set_u_(u,&ierr);chkerr(ierr);
+    fastscape_copy_h_(h,&ierr);chkerr(ierr);
     // for (i=0;i <nn; i++){
     //     printf("Element #%d: %f\n",i,h[i]);
     // }
     nstep=500;
     nfreq=100;
     istep=nstep;
-    fastscape_view_();
+    fastscape_view_(&ierr);chkerr(ierr);
 
     while (istep<=nstep){
-        fastscape_execute_step_();
-        fastscape_get_step_(&istep);
-        fastscape_debug_();
+        fastscape_execute_step_(&ierr);chkerr(ierr);
+        fastscape_get_step_(&istep,&ierr);chkerr(ierr);
+        fastscape_debug_(&ierr);chkerr(ierr);
         if (istep%nfreq==0){
             printf("%d\n",istep );
-            fastscape_copy_total_erosion_(etot);
-            fastscape_copy_erosion_rate_(erate);
-            fastscape_copy_h_(h);
-            fastscape_copy_basement_(b);
+            fastscape_copy_total_erosion_(etot,&ierr);chkerr(ierr);
+            fastscape_copy_erosion_rate_(erate,&ierr);chkerr(ierr);
+            fastscape_copy_h_(h,&ierr);chkerr(ierr);
+            fastscape_copy_basement_(b,&ierr);chkerr(ierr);
             // for (i=0;i <nn; i++){
             //     printf("Element #%d: %f\n",i,h[i]);
             // }
             vexp = 2.0;
-            fastscape_vtk_(etot,&vexp);
+            fastscape_vtk_(etot,&vexp,&ierr);chkerr(ierr);
             vexp = -2.0;
-            fastscape_vtk_(erate,&vexp);
+            fastscape_vtk_(erate,&vexp,&ierr);chkerr(ierr);
         }
     }
     // fastscape_copy_h_(h);
@@ -187,4 +189,12 @@ int main(void){
     free(kf1_arr);
     free(kd1_arr);
 
+}
+
+int chkerr(int ierr){
+  if (ierr != 0) {
+    printf("Internal FastScape error occurred: error code = %d\n",ierr);
+    printf("C driver taking action - returning with exit code 1\n");
+    exit(1);
+  }
 }
