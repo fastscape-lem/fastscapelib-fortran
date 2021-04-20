@@ -1,24 +1,12 @@
 
 #include "Error.fpp"
 
-module errors
-  implicit none
-  integer, parameter :: ERR_None = 0, &
-                        ERR_Default = 1, &
-                        ERR_FileNotFound = 2, &
-                        ERR_nx_ny_not_set = 3
-
-  character(len=25), dimension(3) :: err_names = [character(len=25) :: "default", &
-      "file not found", &
-      "nx, ny not set"       ]
-end module errors
-
 module FastScapeContext
 
   ! Context module for FastScape api
   ! should not be accessed or changed
   ! see API for name of routines and externally accessible variables
-  use errors
+  use FastScapeErrorCodes
 
   implicit none
 
@@ -85,10 +73,10 @@ module FastScapeContext
     ierr = 0 ! Initialize to zero
 
     if (nx.eq.0) then
-      FSCAPE_RAISE(ERR_nx_ny_not_set, ierr)
+      FSCAPE_RAISE(ERR_ParameterInvalid, ierr)
     end if
     if (ny.eq.0) then
-      FSCAPE_RAISE1('[FastScapeSetup] You need to set ny first',ERR_nx_ny_not_set,ierr)
+      FSCAPE_RAISE_MESSAGE('FastScapeSetup(): You need to set ny first',ERR_ParameterInvalid,ierr)
     end if
     FSCAPE_CHKERR(ierr)
 
