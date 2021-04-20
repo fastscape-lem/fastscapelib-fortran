@@ -1,12 +1,13 @@
+#include "Error.fpp"
 !--------------------------------------------------------------------------------------------
-
-subroutine FlowRouting ()
+subroutine FlowRouting (ierr)
 
   use FastScapeContext
 
   implicit none
 
   double precision :: dx, dy
+  integer, intent(inout):: ierr
 
   dx = xl/(nx - 1)
   dy = yl/(ny - 1)
@@ -25,11 +26,11 @@ subroutine FlowRouting ()
   call find_stack (rec, don, ndon, nn, catch0, stack, catch)
 
   ! removes local minima
-  call LocalMinima (stack,rec,bounds_bc,ndon,don,h,length,nx,ny,dx,dy)
+  call LocalMinima (stack,rec,bounds_bc,ndon,don,h,length,nx,ny,dx,dy,ierr);FSCAPE_CHKERR(ierr)
 
   ! computes receiver and stack information for mult-direction flow
   call find_mult_rec (h,rec,stack,hwater,mrec,mnrec,mwrec,mlrec,mstack,nx,ny,dx,dy,p,p_mfd_exp, &
-    bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic)
+    bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic,ierr);FSCAPE_CHKERR(ierr)
 
   ! compute lake depth
   lake_depth = hwater - h
@@ -40,7 +41,7 @@ end subroutine FlowRouting
 
 !--------------------------------------------------------------------------------------------
 
-subroutine FlowRoutingSingleFlowDirection ()
+subroutine FlowRoutingSingleFlowDirection (ierr)
 
   use FastScapeContext
 
@@ -48,6 +49,7 @@ subroutine FlowRoutingSingleFlowDirection ()
 
   integer :: i, ijk, ijr
   double precision :: dx, dy,deltah
+  integer, intent(out):: ierr
 
   dx = xl/(nx - 1)
   dy = yl/(ny - 1)
@@ -66,7 +68,7 @@ subroutine FlowRoutingSingleFlowDirection ()
   call find_stack (rec, don, ndon, nn, catch0, stack, catch)
 
   ! removes local minima
-  call LocalMinima (stack,rec,bounds_bc,ndon,don,h,length,nx,ny,dx,dy)
+  call LocalMinima (stack,rec,bounds_bc,ndon,don,h,length,nx,ny,dx,dy,ierr);FSCAPE_CHKERR(ierr)
 
   ! find hwater
 
@@ -145,8 +147,11 @@ end subroutine FlowAccumulationSingleFlowDirection
 !--------------------------------------------------------------------------------------------
 
 subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,dy,p,p_mfd_exp, &
-  bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic)
+  bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic,ierr)
 
+  use FastScapeErrorCodes
+
+  implicit none
   ! subroutine to find multiple receiver information
   ! in input:
   ! h is topography
@@ -175,6 +180,7 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
   integer, dimension(:), allocatable :: ndon,vis,parse
   integer, dimension(:,:), allocatable :: don
   double precision, dimension(:), allocatable :: h0
+  integer, intent(inout):: ierr
 
   nn=nx*ny
 
@@ -289,7 +295,10 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
       enddo
     enddo
   enddo
-  if (nstack.ne.nn) stop 'error in stack'
+  
+  if (nstack.ne.nn) then
+    FSCAPE_RAISE_MESSAGE('Find_mult_rec: error in stack',ERR_Default,ierr);FSCAPE_CHKERR(ierr)
+  end if
 
   deallocate (ndon,don,vis,parse,h0)
 

@@ -14,7 +14,6 @@ subroutine Diffusion (ierr)
   character cbc*4
   integer ierr
 
-  ierr=0
   !print*,'Diffusion'
 
   write (cbc,'(i4)') bounds_ibc

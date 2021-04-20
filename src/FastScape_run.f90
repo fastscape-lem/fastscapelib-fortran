@@ -17,9 +17,11 @@ integer ierr
 nx=201
 ny=201
 nn=nx*ny
+allocate (h(nn),b(nn),u(nn),ux(nn),uy(nn),etot(nn),erate(nn),a(nn),chi(nn),catchment(nn),sedflux(nn),sedflux_shore(nn))
 
 call FastScape_Init(ierr);FSCAPE_CHKERR_ABORT(ierr)
 call FastScape_Set_NX_NY (nx,ny,ierr);FSCAPE_CHKERR_ABORT(ierr)
+call FastScape_Copy_H(h,ierr);FSCAPE_CHKERR_ABORT(ierr)
 call FastScape_Setup(ierr);FSCAPE_CHKERR_ABORT(ierr)
 
 xl=200.d3
@@ -61,7 +63,6 @@ call FastScape_Set_Marine_Parameters (sealevel, poro1, poro2, z1, z2, ratio, L, 
 
 call FastScape_Set_BC (1010,ierr);FSCAPE_CHKERR_ABORT(ierr)
 
-allocate (h(nn),b(nn),u(nn),ux(nn),uy(nn),etot(nn),erate(nn),a(nn),chi(nn),catchment(nn),sedflux(nn),sedflux_shore(nn))
 allocate (field(nn,2))
 call random_number (h)
   do j=1,ny

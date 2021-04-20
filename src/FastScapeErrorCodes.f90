@@ -7,13 +7,17 @@ module FastScapeErrorCodes
                         ERR_FileOpenFailed      = 3,  &
                         ERR_ParameterInvalid    = 4,  &
                         ERR_ParameterOutOfRange = 5,  &
-                        ERR_TridagNotSolvable   = 6
+                        ERR_TridagNotSolvable   = 6,  &
+                        ERR_SetupNotRun         = 7,  &
+                        ERR_NotConvergedError   = 8
 
-  character(len=50), dimension(6) :: err_names = [character(len=50) :: "Default run time error", &
+  character(len=50), dimension(8) :: err_names = [character(len=50) :: "Default run time error", &
       "File error: File not found",        &
       "File error: File open failed",      &
       "Parameter error: Input invalid",    &
       "Parameter error: Out of range" ,    &
-      "Tridage cannot solve system"        ]
+      "Tridage cannot solve system",       &
+      "You need to run SetUp first",       &
+      "Solver error: not converged "  ]
 
 end module FastScapeErrorCodes

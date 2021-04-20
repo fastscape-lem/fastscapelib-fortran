@@ -1,4 +1,5 @@
-subroutine Marine()
+#include "Error.fpp"
+subroutine Marine(ierr)
 
   ! Marine transport component
   ! using silt and sand coupling diffusion solver
@@ -15,6 +16,7 @@ subroutine Marine()
   double precision, dimension(:,:), allocatable :: mmwrec,mmlrec
   double precision shelfslope,ratio1,ratio2,dx,dy
   integer ij,ijr,ijk,k
+  integer, intent(out):: ierr
 
   allocate (flux(nn),shelfdepth(nn),ht(nn),Fs(nn),dh(nn),dh1(nn),dh2(nn),Fmixt(nn),flag(nn))
   allocate (dhs(nn),dhs1(nn),F1(nn),F2(nn),zi(nn),zo(nn))
@@ -110,7 +112,7 @@ subroutine Marine()
 
   ! silt and sand coupling diffusion in ocean
   call SiltSandCouplingDiffusion (h,Fmix,flux*Fs,flux*(1.d0-Fs), &
-  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,bounds_ibc)
+  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,bounds_ibc,ierr);FSCAPE_CHKERR(ierr)
 
   ! pure silt and sand during deposition/erosion
   dh1=((h-ht)*Fmix+layer*(Fmix-Fmixt))*(1.d0-poro1)
@@ -169,7 +171,9 @@ end subroutine Marine
 !----------------------------------------------------------------------------------
 
 subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
-  sealevel,L,kdsea1,kdsea2,niter,flag,ibc)
+  sealevel,L,kdsea1,kdsea2,niter,flag,ibc,ierr)
+
+  use FastScapeErrorCodes
 
   implicit none
 
@@ -183,6 +187,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
   double precision dx,dy,dt,sealevel,L,kdsea1,kdsea2
   double precision K1,K2,tol,err1,err2
   double precision Ap,Bp,Cp,Dp,Ep,Mp,Np
+  integer, intent(out):: ierr
 
   character*4 cbc
 
@@ -483,8 +488,8 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
     !print*,'niter',niter,minval(h-hp),sum(h-hp)/nn,maxval(h-hp),err1
 
     if (niter.gt.1000) then
-      print*,'Multi-lithology diffusion not convergning; decrease time step'
-      stop
+      FSCAPE_RAISE_MESSAGE('Marine error: Multi-lithology diffusion not convergning; decrease time step',ERR_NotConvergedError,ierr)
+      FSCAPE_CHKERR(ierr)
     endif
 
     ! end of iteration

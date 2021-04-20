@@ -174,8 +174,6 @@ module FastScapeContext
 
     double precision, intent(out), dimension(*) :: hp
 
-    if (.not.setup_has_been_run) stop 'CopyH - You need to run SetUp first'
-
     hp(1:nn)=h
 
     return
@@ -187,8 +185,6 @@ module FastScapeContext
   subroutine CopyBasement (bp)
 
     double precision, intent(out), dimension(*) :: bp
-
-    if (.not.setup_has_been_run) stop 'CopyB - You need to run SetUp first'
 
     bp(1:nn)=b
 
@@ -202,8 +198,6 @@ module FastScapeContext
 
     double precision, intent(inout), dimension(*) :: etotp
 
-    if (.not.setup_has_been_run) stop 'CopyEtot - You need to run SetUp first'
-
     etotp(1:nn)=etot
 
     return
@@ -216,8 +210,6 @@ module FastScapeContext
 
     double precision, intent(inout), dimension(*) :: ap
 
-    if (.not.setup_has_been_run) stop 'CopyArea - You need to run SetUp first'
-
     ap(1:nn)=a
 
     return
@@ -229,8 +221,6 @@ module FastScapeContext
   subroutine CopyErate (eratep)
 
     double precision, intent(inout), dimension(*) :: eratep
-
-    if (.not.setup_has_been_run) stop 'CopyErate - You need to run SetUp first'
 
     eratep(1:nn)=erate
 
@@ -246,8 +236,6 @@ module FastScapeContext
     double precision, dimension(:), allocatable :: chi
     integer ij,ijk
     double precision dx,dy,a0
-
-    if (.not.setup_has_been_run) stop 'CopyChi - You need to run SetUp first'
 
     allocate (chi(nn))
     chi=0.d0
@@ -273,8 +261,6 @@ module FastScapeContext
     double precision, dimension(:), allocatable :: s
     double precision dx,dy
 
-    if (.not.setup_has_been_run) stop 'CopySlope - You need to run SetUp first'
-
     allocate (s(nn))
     dx=xl/(nx-1)
     dy=yl/(ny-1)
@@ -294,8 +280,6 @@ module FastScapeContext
     double precision, dimension(:), allocatable :: c
     double precision dx,dy
 
-    if (.not.setup_has_been_run) stop 'CopyCurvature - You need to run SetUp first'
-
     allocate (c(nn))
     dx=xl/(nx-1)
     dy=yl/(ny-1)
@@ -313,8 +297,6 @@ module FastScapeContext
 
     double precision, intent(inout), dimension(*) :: catchp
 
-    if (.not.setup_has_been_run) stop 'CopyCatchment - You need to run SetUp first'
-
     catchp(1:nn)=catch
 
     return
@@ -326,8 +308,6 @@ module FastScapeContext
   subroutine CopyF (Fmixp)
 
     double precision, intent(out), dimension(*) :: Fmixp
-
-    if (.not.setup_has_been_run) stop 'CopyF - You need to run SetUp first'
 
     Fmixp(1:nn) = Fmix
 
@@ -341,8 +321,6 @@ module FastScapeContext
 
     double precision, intent(out), dimension(*) :: Lp
 
-    if (.not.setup_has_been_run) stop 'CopyLakeDepth - You need to run SetUp first'
-
     Lp(1:nn) = lake_depth
 
     return
@@ -354,8 +332,6 @@ module FastScapeContext
   subroutine InitH (hp)
 
     double precision, intent(in), dimension(*) :: hp
-
-    if (.not.setup_has_been_run) stop 'InitH - You need to run SetUp first'
 
     h = hp(1:nn)
     b = h
@@ -369,8 +345,6 @@ module FastScapeContext
   subroutine InitF (Fmixp)
 
     double precision, intent(in), dimension(*) :: Fmixp
-
-    if (.not.setup_has_been_run) stop 'InitF - You need to run SetUp first'
 
     Fmix = Fmixp(1:nn)
 
