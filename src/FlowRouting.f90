@@ -49,7 +49,7 @@ subroutine FlowRoutingSingleFlowDirection (ierr)
 
   integer :: i, ijk, ijr
   double precision :: dx, dy,deltah
-  integer, intent(out):: ierr
+  integer, intent(inout):: ierr
 
   dx = xl/(nx - 1)
   dy = yl/(ny - 1)
@@ -147,7 +147,7 @@ end subroutine FlowAccumulationSingleFlowDirection
 !--------------------------------------------------------------------------------------------
 
 subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,dy,p,p_mfd_exp, &
-  bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic,ierr)
+  bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic, ierr)
 
   use FastScapeErrorCodes
 
@@ -295,12 +295,12 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
       enddo
     enddo
   enddo
-  
+
+  deallocate (ndon,don,vis,parse,h0)
+
   if (nstack.ne.nn) then
     FSCAPE_RAISE_MESSAGE('Find_mult_rec: error in stack',ERR_Default,ierr);FSCAPE_CHKERR(ierr)
   end if
-
-  deallocate (ndon,don,vis,parse,h0)
 
   return
 

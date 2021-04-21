@@ -21,7 +21,6 @@ allocate (h(nn),b(nn),u(nn),ux(nn),uy(nn),etot(nn),erate(nn),a(nn),chi(nn),catch
 
 call FastScape_Init(ierr);FSCAPE_CHKERR_ABORT(ierr)
 call FastScape_Set_NX_NY (nx,ny,ierr);FSCAPE_CHKERR_ABORT(ierr)
-call FastScape_Copy_H(h,ierr);FSCAPE_CHKERR_ABORT(ierr)
 call FastScape_Setup(ierr);FSCAPE_CHKERR_ABORT(ierr)
 
 xl=200.d3

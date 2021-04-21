@@ -177,7 +177,7 @@ end subroutine Diffusion
       allocate (gam(n))
 
       if(b(1).eq.0.d0) then
-        FSCAPE_RAISE_MESSAGE('Tridag error b(1)=0: cannot solve system',ERR_TridagNotSolvable,ierr);FSCAPE_CHKERR(ierr)
+        FSCAPE_RAISE_MESSAGE('Tridag error b(1)=0: cannot solve system',ERR_TridiagNotSolvable,ierr);FSCAPE_CHKERR(ierr)
       end if
       !if(b(1).eq.0.d0) stop 'in tridag'
 
@@ -189,7 +189,7 @@ do 11 j=2,n
   gam(j)=c(j-1)/bet
   bet=b(j)-a(j)*gam(j)
   if(bet.eq.0.) then
-    FSCAPE_RAISE_MESSAGE('Tridag error bet=0: cannot solve system',ERR_TridagNotSolvable,ierr);FSCAPE_CHKERR(ierr)
+    FSCAPE_RAISE_MESSAGE('Tridag error bet=0: cannot solve system',ERR_TridiagNotSolvable,ierr);FSCAPE_CHKERR(ierr)
     ! print*,'tridag failed'
     ! stop
   endif

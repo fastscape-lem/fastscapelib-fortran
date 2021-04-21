@@ -46,7 +46,7 @@ subroutine LocalMinima (stack,rec,bc,ndon,donor,h,length,nx,ny,dx,dy,ierr)
   integer nbasins,basin0,nconn,nconn_max,tree_size
 
   integer nn,k,nlocmin
-  integer, intent(out):: ierr
+  integer, intent(inout):: ierr
 
   !continuous_flow = .true.
   continuous_flow = .false.
@@ -353,7 +353,7 @@ subroutine mst_kruskal(conn_weights, conn_basins, nbasins, nconn, mstree, mstree
 
   integer, dimension(:), allocatable :: sort_id,parent,rank
   integer mstree_size,eid,eeid,f0,f1,b0,b1
-  integer, intent(out):: ierr
+  integer, intent(inout):: ierr
 
   allocate (sort_id(nconn))
   mstree_size = 0
@@ -960,7 +960,7 @@ subroutine loc_min_3_indexx(n,arr,indx,ierr)
   parameter (M=7,NSTACK=50)
   integer i,indxt,ir,itemp,j,jstack,k,l,istack(NSTACK)
   double precision a
-  integer, intent(out):: ierr
+  integer, intent(inout):: ierr
 
   do j=1,n
     indx(j)=j

@@ -16,7 +16,7 @@ subroutine Marine(ierr)
   double precision, dimension(:,:), allocatable :: mmwrec,mmlrec
   double precision shelfslope,ratio1,ratio2,dx,dy
   integer ij,ijr,ijk,k
-  integer, intent(out):: ierr
+  integer, intent(inout):: ierr
 
   allocate (flux(nn),shelfdepth(nn),ht(nn),Fs(nn),dh(nn),dh1(nn),dh2(nn),Fmixt(nn),flag(nn))
   allocate (dhs(nn),dhs1(nn),F1(nn),F2(nn),zi(nn),zo(nn))
@@ -56,7 +56,7 @@ subroutine Marine(ierr)
   allocate (mmrec(8,nn),mmnrec(nn),mmwrec(8,nn),mmlrec(8,nn),mmstack(nn),mwater(nn))
 
   call find_mult_rec (h,rec,stack,mwater,mmrec,mmnrec,mmwrec,mmlrec,mmstack,nx,ny,dx,dy,0.d0,p_mfd_exp, &
-    bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic)
+    bounds_i1, bounds_i2, bounds_j1, bounds_j2, bounds_xcyclic, bounds_ycyclic, ierr)
 
   !print*,count(flux>0.and.mmnrec==0),count(flux>0),count(mmstack==0)
 
@@ -187,7 +187,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
   double precision dx,dy,dt,sealevel,L,kdsea1,kdsea2
   double precision K1,K2,tol,err1,err2
   double precision Ap,Bp,Cp,Dp,Ep,Mp,Np
-  integer, intent(out):: ierr
+  integer, intent(inout):: ierr
 
   character*4 cbc
 
@@ -488,7 +488,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
     !print*,'niter',niter,minval(h-hp),sum(h-hp)/nn,maxval(h-hp),err1
 
     if (niter.gt.1000) then
-      FSCAPE_RAISE_MESSAGE('Marine error: Multi-lithology diffusion not convergning; decrease time step',ERR_NotConvergedError,ierr)
+      FSCAPE_RAISE_MESSAGE('Marine error: Multi-lithology diffusion not converging; decrease time step',ERR_NotConverged,ierr)
       FSCAPE_CHKERR(ierr)
     endif
 
