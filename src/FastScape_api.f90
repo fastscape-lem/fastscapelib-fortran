@@ -166,7 +166,7 @@ subroutine FastScape_Setup(ierr)
   use FastScapeContext
   implicit none
 
-  integer, intent(inout):: ierr
+  integer, intent(out):: ierr
 
   ierr=0
 

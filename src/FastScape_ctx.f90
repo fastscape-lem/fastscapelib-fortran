@@ -61,21 +61,8 @@ module FastScapeContext
 
   !---------------------------------------------------------------
 
-  subroutine SetUp(ierr)
+  subroutine SetUp()
     implicit none
-
-    integer, intent(inout) :: ierr
-
-    ierr = 0 ! Initialize to zero
-
-    if (nx.eq.0) then
-      FSCAPE_RAISE(ERR_ParameterInvalid, ierr)
-    end if
-    if (ny.eq.0) then
-      FSCAPE_RAISE_MESSAGE('FastScapeSetup(): You need to set ny first',ERR_ParameterInvalid,ierr)
-    end if
-    FSCAPE_CHKERR(ierr)
-
 
     nn=nx*ny
 
