@@ -63,7 +63,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. ${{ cmake-generator }} -DBUILD_EXAMPLES=ON -DBUILD_FASTSCAPELIB_SHARED=ON -DCMAKE_BUILD_TYPE=Debug
+          cmake .. ${{ matrix.cmake-generator }} -DBUILD_EXAMPLES=ON -DBUILD_FASTSCAPELIB_SHARED=ON -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build library and examples
         shell: bash
