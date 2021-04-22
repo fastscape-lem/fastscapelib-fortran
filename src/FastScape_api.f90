@@ -184,7 +184,7 @@ subroutine FastScape_Setup(ierr)
   end if
   FSCAPE_CHKERR(ierr) ! Call FSCAPE_CHKERR() so that all possible exceptions above will be displayed
 
-  call SetUp(ierr)
+  call SetUp()
 
   return
 
