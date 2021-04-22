@@ -6,8 +6,10 @@ c subroutines called:
 c NONE
 
       SUBROUTINE REALFT(DATA,N,ISIGN)
+      IMPLICIT INTEGER (A-Z)
       common /vocal/ ivocal
-      REAL*8 WR,WI,WPR,WPI,WTEMP,THETA
+      REAL*8 WR,WI,WPR,WPI,WTEMP,WRS,WIS,THETA
+      REAL*8 C1,C2,H1R,H1I,H2R,H2I
       REAL*8 DATA(*)
       THETA=6.28318530717959D0/2.0D0/DBLE(N)
       C1=0.5

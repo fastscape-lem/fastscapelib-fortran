@@ -4,13 +4,13 @@ subroutine VTK (h,name,nf,f,fname,nx,ny,dx,dy,istep,vex)
 
     implicit none
 
-    double precision h(nx,ny),f(nx,ny,nf),dx,dy,vex
     integer nx,ny,nf,istep,nheader,nfooter,npart1,npart2,nn,namel
+    double precision h(nx,ny),f(nx,ny,nf),dx,dy,vex
     character header*1024,footer*1024,part1*1024,part2*1024,nxc*6,nyc*6,nnc*12
     character*(*) name,fname(nf)
 
     integer i,j,k
-    character*7 cstep
+    character cstep*7
 
     namel = sum(len_trim(fname(:)))
 
@@ -61,7 +61,7 @@ subroutine VTK (h,name,nf,f,fname,nx,ny,dx,dy,istep,vex)
 
     open(unit=77,file='VTK/'//trim(name)//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
     recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
-    +nf*(npart1+npart2+4*nn)+namel,convert='big_endian')
+    +nf*(npart1+npart2+4*nn)+namel)
     write (77,rec=1) &
     header(1:nheader), &
     ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(h(i,j)*vex),i=1,nx),j=1,ny), &
@@ -79,8 +79,8 @@ subroutine VTK_CUBE (fields, nx, ny, nf, nreflector, xl, yl, fname)
 
     implicit none
 
-    double precision, dimension(nx,ny,nf,nreflector) :: fields
     integer :: nx, ny, nf, nreflector
+    double precision, dimension(nx,ny,nf,nreflector) :: fields
     double precision :: xl, yl
     integer nheader,nfooter,npart1,npart2,nn,namel
     character header*1024,footer*1024,part1*1024,part2*1024,nxc*6,nyc*6,nnc*12,nrefc*3
@@ -117,7 +117,7 @@ subroutine VTK_CUBE (fields, nx, ny, nf, nreflector, xl, yl, fname)
     npart2=len_trim(part2)
 
     open(unit=77,file='VTK/CUBE.vtk',status='unknown',form='unformatted',access='direct', &
-    recl=nheader+3*4*nn+nfooter+nf*(npart1+npart2+4*nn)+namel,convert='big_endian')
+    recl=nheader+3*4*nn+nfooter+nf*(npart1+npart2+4*nn)+namel)
     write (77,rec=1) &
     header(1:nheader), &
     (((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(dz*(k-1)),i=1,nx),j=1,ny),k=1,nreflector), &
@@ -145,7 +145,7 @@ subroutine VTK_filled (basement, nreflector, reflector, nfield, fields, names, n
   integer :: nx, ny, nreflector, nfield, istep, i, j, k, l, ij 
   double precision basement(nx*ny), reflector(nx*ny,nreflector), dx, dy, vex, distb(nx*ny)
   double precision fields(nx*ny,nfield,nreflector)
-  character*30 names(nfield)
+  character names(nfield)*30
 
   character cstep*7, name*128
   integer iunit, nnode, nelem

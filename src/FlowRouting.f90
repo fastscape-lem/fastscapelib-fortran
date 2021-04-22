@@ -424,20 +424,22 @@ recursive subroutine find_stack_recursively (ij,don,ndon,nn,stack,nstack,catch)
 
 ! recursive routine to go through all nodes following donor information
 
-implicit none
-integer don(8,nn),ndon(nn),stack(nn)
-double precision catch(nn)
-integer k,ij,ijk,nn,nstack
+  implicit none
 
-do k=1,ndon(ij)
-  ijk=don(k,ij)
-  nstack=nstack+1
-  stack(nstack)=ijk
-  catch(ijk)=catch(ij)
-  call find_stack_recursively (ijk,don,ndon,nn,stack,nstack,catch)
-enddo
+  integer k,ij,ijk,nn,nstack
+  integer don(8,nn),ndon(nn),stack(nn)
+  double precision catch(nn)
 
-return
+  do k=1,ndon(ij)
+    ijk=don(k,ij)
+    nstack=nstack+1
+    stack(nstack)=ijk
+    catch(ijk)=catch(ij)
+    call find_stack_recursively (ijk,don,ndon,nn,stack,nstack,catch)
+  enddo
+
+  return
+
 end subroutine find_stack_recursively
 
 !--------------------------------------------------------------------------------------------

@@ -45,17 +45,23 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
 # =====
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Flang|GNU")
-    set(dialect "-ffree-form -std=f2008 -fimplicit-none")
+    set(dialect "-ffree-form -std=f2008 -fimplicit-none -fall-intrinsics")
+    set(ioflags "-fconvert=big-endian")
+    set(f77flags "-ffixed-form -std=legacy")
     set(bounds "-fbounds-check")
     set(warnings "-Wall -Wno-unused-dummy-argument")
 endif()
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
     set(dialect "-stand f08 -free -implicitnone")
+    set(ioflags "-convert big_endian")
+    set(f77flags "-stand none -fixed")
     set(bounds "-check bounds")
     set(warnings "-warn all")
 endif()
 if(CMAKE_Fortran_COMPILER_ID MATCHES "PGI")
     set(dialect "-Mfreeform -Mdclchk -Mstandard -Mallocatable=03")
+    set(ioflags "")
+    set(f77flags "-Mfixed")
     set(bounds "-C")
     set(warnings "-Wall")
 endif()
@@ -64,7 +70,12 @@ set(CMAKE_Fortran_FLAGS_DEBUG
   "${CMAKE_Fortran_FLAGS_DEBUG} ${bounds} ${warnings}")
 
 # TODO: check dialect flags and other release optimization flags
-# set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect}")
+set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect} ${ioflags}")
+
+# override flags for old-school F77 files
+set_source_files_properties(${FLEXURE_SRC_DIR}/four1.f PROPERTIES COMPILE_FLAGS ${f77flags})
+set_source_files_properties(${FLEXURE_SRC_DIR}/realft.f PROPERTIES COMPILE_FLAGS ${f77flags})
+set_source_files_properties(${FLEXURE_SRC_DIR}/sinft.f PROPERTIES COMPILE_FLAGS ${f77flags})
 
 # Build options
 # =============

@@ -11,10 +11,10 @@ subroutine Strati (b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
   double precision fields(nx*ny,nfield,nreflector), xl, yl,sealevel
   double precision, dimension(nx*ny) :: length
   integer, dimension(nx*ny) :: stack,rec
-  character*30 names(nfield)
+  character names(nfield)*30
 
   double precision, dimension(:), allocatable :: s,dist
-  character*3 :: ref
+  character :: ref*3
 
   ! 1: current depth
   ! 2: current slope
@@ -50,7 +50,7 @@ subroutine Strati (b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
       fields(:,7,i) = dist
       fields(:,8,i) = F
     endif
-    fields(:,9,i) = max(dt*(nreflector-i),0.)
+    fields(:,9,i) = max(dt*(nreflector-i),0.d0)
   enddo
 
   names(1) = '1.CurrentDepth(m)'

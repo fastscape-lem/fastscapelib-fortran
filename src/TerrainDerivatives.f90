@@ -4,8 +4,8 @@ subroutine slope (h,s,nx,ny,dx,dy)
 
   implicit none
 
-  double precision h(nx*ny),s(nx*ny),dx,dy
   integer nx,ny
+  double precision h(nx*ny),s(nx*ny),dx,dy
 
   integer i,j,ij,ia,ib,ic,id,ie,if,ig,ih,ii
   double precision dzdx,dzdy,con
@@ -40,8 +40,9 @@ subroutine curvature (h,curv,nx,ny,dx,dy)
 
   implicit none
 
-  double precision h(nx*ny),curv(nx*ny),dx,dy
   integer nx,ny
+  double precision dx,dy
+  double precision h(nx*ny),curv(nx*ny)
 
   integer i,j,ij,i1,i2,i3,i4,i5,i6,i7,i8,i9
   double precision a,b,c,d,e,f
