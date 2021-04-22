@@ -1,7 +1,7 @@
 subroutine LocalMinima (stack,rec,bc,ndon,donor,h,length,nx,ny,dx,dy)
 
   ! subroutine to compute and remove local inima by recomputing the receiver connectivty
-  ! using Guillaume Cordonnier's algorithm as helped by Benoit Bovy and debuged with Jean Braun
+  ! using Guillaume Cordonnier s algorithm as helped by Benoit Bovy and debuged with Jean Braun
   ! This is (at first) a fortran translation of a python routine provided to me by Gullaume
   ! on October 24 2017
 

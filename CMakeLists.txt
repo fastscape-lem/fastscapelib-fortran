@@ -47,7 +47,7 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Flang|GNU")
     set(dialect "-ffree-form -std=f2008 -fimplicit-none -fall-intrinsics")
     set(ioflags "-fconvert=big-endian")
-    set(f77flags "-ffixed-form -std=legacy")
+    set(f77flags "-std=legacy -ffixed-form")
     set(bounds "-fbounds-check")
     set(warnings "-Wall -Wno-unused-dummy-argument")
 endif()
@@ -69,8 +69,10 @@ endif()
 set(CMAKE_Fortran_FLAGS_DEBUG
   "${CMAKE_Fortran_FLAGS_DEBUG} ${bounds} ${warnings}")
 
-# TODO: check dialect flags and other release optimization flags
-set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect} ${ioflags}")
+# let F2PY (scikit-build) configure flags for F77 and F90 source
+if(NOT SKBUILD)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect} ${ioflags}")
+endif()
 
 # override flags for old-school F77 files
 set_source_files_properties(${FLEXURE_SRC_DIR}/four1.f PROPERTIES COMPILE_FLAGS ${f77flags})
