@@ -31,6 +31,10 @@ jobs:
           - os: macos-latest
             os-arch: macos-x86_64
 
+          - os: windows-latest
+            os-arch: windows-x86_64
+            exe: .exe
+
     env:
       FC: gfortran
       GCC_V: ${{ matrix.gcc_v }}
