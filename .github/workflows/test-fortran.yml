@@ -20,7 +20,7 @@ env:
 
 jobs:
   gcc-build:
-    name: test fortran gcc (${{ matrix.os }})
+    name: gcc (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -54,7 +54,7 @@ jobs:
           ./Fan
 
   mingw-build:
-    name: test fortran mingw (${{ matrix.os }})
+    name: mingw (windows-latest)
     runs-on: windows-latest
     defaults:
       run:
