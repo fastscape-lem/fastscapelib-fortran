@@ -22,6 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
         gcc_v: [9]
         include:
           - os: ubuntu-latest
@@ -62,10 +63,11 @@ jobs:
       - name: Build library and examples
         shell: bash
         run: |
+          ls -all
           cmake --build .
 
       - name: Run Fan example
         shell: bash
         run: |
           cd examples
-          ./Fan
+          ./Fan${{ matrix.exe }}
