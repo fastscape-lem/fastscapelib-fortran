@@ -45,10 +45,44 @@ jobs:
       - name: Configure build
         run: cmake -B ${BUILD_DIR} ${CMAKE_OPTIONS}
 
-      - name: Build library and examples
+      - name: Build project
         run: cmake --build ${BUILD_DIR}
 
       - name: Run Fan example
         run: |
           cd ${BUILD_DIR}/examples
           ./Fan
+
+  mingw-build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: false
+        install: >-
+          git
+          mingw-w64-x86_64-gcc-fortran
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-ninja
+    - name: Install fypp
+      run: pip install fypp
+
+    - name: Configure build
+      run: cmake -B ${BUILD_DIR} -G Ninja ${CMAKE_OPTIONS}
+      env:
+        FC: gfortran
+        CC: gcc
+
+    - name: Build project
+      run: cmake --build ${BUILD_DIR}
+
+    - name: Run Fan example
+      run: |
+        cd ${BUILD_DIR}/examples
+        ./Fan.exe
