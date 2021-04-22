@@ -8,14 +8,21 @@ on:
     branches:
     - 'master'
 
+env:
+  HOMEBREW_NO_ANALYTICS: "ON" # Make Homebrew installation a little quicker
+  HOMEBREW_NO_AUTO_UPDATE: "ON"
+  HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK: "ON"
+  HOMEBREW_NO_GITHUB_API: "ON"
+  HOMEBREW_NO_INSTALL_CLEANUP: "ON"
+
 jobs:
   test:
     name: test fortran (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
-      gcc_v: [9]
       matrix:
+        gcc_v: [9]
         include:
           - os: ubuntu-latest
             os-arch: linux-x86_64
