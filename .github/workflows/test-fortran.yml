@@ -54,6 +54,7 @@ jobs:
           ./Fan
 
   mingw-build:
+    name: test fortran mingw (${{ matrix.os }})
     runs-on: windows-latest
     defaults:
       run:
@@ -66,12 +67,9 @@ jobs:
         msystem: MINGW64
         update: false
         install: >-
-          git
           mingw-w64-x86_64-gcc-fortran
           mingw-w64-x86_64-cmake
           mingw-w64-x86_64-ninja
-    - name: Install fypp
-      run: pip install fypp
 
     - name: Configure build
       run: cmake -B ${BUILD_DIR} -G Ninja ${CMAKE_OPTIONS}
