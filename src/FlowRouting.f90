@@ -170,8 +170,8 @@ subroutine find_mult_rec (h,rec0,stack0,water,rec,nrec,wrec,lrec,stack,nx,ny,dx,
   double precision h(nx*ny),wrec(8,nx*ny),lrec(8,nx*ny),dx,dy,p,water(nx*ny),p_mfd_exp(nx*ny)
   integer rec(8,nx*ny),nrec(nx*ny),stack(nx*ny),rec0(nx*ny),stack0(nx*ny)
 
-  integer :: nn,i,j,ii,jj,iii,jjj,ijk,k,ijr,nparse,nstack,ijn
-  double  precision :: slopemax,sumweight,deltah
+  integer :: nn,i,j,ii,jj,iii,jjj,ijk,k,ijr,nparse,nstack,ijn,ij
+  double  precision :: slopemax,sumweight,deltah,slope
   integer, dimension(:), allocatable :: ndon,vis,parse
   integer, dimension(:,:), allocatable :: don
   double precision, dimension(:), allocatable :: h0
