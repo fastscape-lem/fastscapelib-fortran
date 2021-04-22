@@ -43,7 +43,7 @@ jobs:
           echo "CC=gcc-9" >> $GITHUB_ENV
 
       - name: Configure build
-        run: cmake .. -B ${BUILD_DIR} ${CMAKE_OPTIONS}
+        run: cmake -B ${BUILD_DIR} ${CMAKE_OPTIONS}
 
       - name: Build library and examples
         run: cmake --build ${BUILD_DIR}
