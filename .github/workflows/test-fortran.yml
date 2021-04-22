@@ -63,11 +63,11 @@ jobs:
       - name: Build library and examples
         shell: bash
         run: |
-          ls -all
+          cd build
           cmake --build .
 
       - name: Run Fan example
         shell: bash
         run: |
-          cd examples
+          cd build/examples
           ./Fan${{ matrix.exe }}
