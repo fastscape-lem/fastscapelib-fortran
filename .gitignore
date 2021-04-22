@@ -37,6 +37,9 @@ build/
 # VSCode
 .vscode/
 
+# Emacs
+.dir-locals.el
+
 # Python
 __pycache__/
 *.py[cod]
