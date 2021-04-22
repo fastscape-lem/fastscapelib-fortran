@@ -34,6 +34,7 @@ jobs:
           - os: windows-latest
             os-arch: windows-x86_64
             exe: .exe
+            cmake-generator: "-G Ninja"
 
     env:
       FC: gfortran
@@ -62,7 +63,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake .. -DBUILD_EXAMPLES=ON -DBUILD_FASTSCAPELIB_SHARED=ON -DCMAKE_BUILD_TYPE=Debug
+          cmake .. ${{ cmake-generator }} -DBUILD_EXAMPLES=ON -DBUILD_FASTSCAPELIB_SHARED=ON -DCMAKE_BUILD_TYPE=Debug
 
       - name: Build library and examples
         shell: bash
