@@ -49,4 +49,6 @@ jobs:
         run: cmake --build ${BUILD_DIR}
 
       - name: Run Fan example
-        run: cd ${BUILD_DIR}/examples ./Fan
+        run: |
+          cd ${BUILD_DIR}/examples
+          ./Fan
