@@ -34,7 +34,7 @@ jobs:
           - os: windows-latest
             os-arch: windows-x86_64
             exe: .exe
-            cmake-generator: "-G Ninja"
+            cmake-generator: "-G NMake Makefiles"
 
     env:
       FC: gfortran
