@@ -833,7 +833,7 @@ module FastScapeContext
       if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
         if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
         call Strati (b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
-        fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
+        fields, nfield, vexref, dt*nfreqref, rec, sealevel)
       endif
 
     end subroutine run_Strati
