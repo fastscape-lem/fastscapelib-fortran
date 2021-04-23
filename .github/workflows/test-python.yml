@@ -62,11 +62,16 @@ jobs:
           miniforge-version: latest
 
       - name: Build and install project
-        shell: bash -l {0}
+        shell: cmd
         run: |
-          conda install cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
-          set FC="$CONDA_PREFIX\Library\bin\flang.exe"
-          python setup.py bdist_wheel --dist-dir="dist" -G "NMake Makefiles" -- -DCMAKE_Fortran_COMPILER:FILEPATH="$FC"
+          conda create -n test python=3.8 cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
+
+      - name: Build and install project
+        shell: cmd
+        run: |
+          conda activate test &&
+          set FC="%CONDA_PREFIX%\Library\bin\flang.exe" &&
+          python setup.py bdist_wheel --dist-dir="dist" -G "NMake Makefiles" -- -DCMAKE_Fortran_COMPILER:FILEPATH="%FC%" &&
           python -m pip install --no-index --find-links="dist" fastscapelib_fortran -vvv
 
       - name: Test import Python module
