@@ -61,7 +61,7 @@ jobs:
           python-version: 3.8
           miniforge-version: latest
 
-      - name: Install Python dependencies
+      - name: Install Python dependencies, build and install project
         run: |
           conda install cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
           set FC="%CONDA_PREFIX%\Library\bin\flang.exe"
