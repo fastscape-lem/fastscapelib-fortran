@@ -1,7 +1,9 @@
 # Fastscapelib-fortran
 
-[![Build Status](https://travis-ci.org/fastscape-lem/fastscapelib-fortran.svg?branch=master)](https://travis-ci.org/fastscape-lem/fastscapelib-fortran)
+[![Build Status](https://github.com/fastscape-lem/fastscapelib-fortran/workflows/test-fortran/badge.svg)](https://github.com/fastscape-lem/fastscapelib-fortran/actions)
+[![Build Status](https://github.com/fastscape-lem/fastscapelib-fortran/workflows/test-python/badge.svg)](https://github.com/fastscape-lem/fastscapelib-fortran/actions)
 [![Build status](https://ci.appveyor.com/api/projects/status/c0wfit5kj1gpo1a7/branch/master?svg=true)](https://ci.appveyor.com/project/benbovy/fastscapelib-fortran/branch/master)
+[![Build Doc](https://github.com/fastscape-lem/fastscapelib-fortran/workflows/deploy-doc/badge.svg)](https://github.com/fastscape-lem/fastscapelib-fortran/actions)
 [![DOI](https://zenodo.org/badge/167184498.svg)](https://zenodo.org/badge/latestdoi/167184498)
 
 A Fortran (+ Python bindings) library of efficient algorithms for
