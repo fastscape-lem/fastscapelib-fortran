@@ -1,0 +1,86 @@
+name: test-fortran
+
+on:
+  push:
+    branches:
+    - 'master'
+  pull_request:
+    branches:
+    - 'master'
+
+env:
+  HOMEBREW_NO_ANALYTICS: "ON" # Make Homebrew installation a little quicker
+  HOMEBREW_NO_AUTO_UPDATE: "ON"
+  HOMEBREW_NO_BOTTLE_SOURCE_FALLBACK: "ON"
+  HOMEBREW_NO_GITHUB_API: "ON"
+  HOMEBREW_NO_INSTALL_CLEANUP: "ON"
+  BUILD_DIR: _build
+  CMAKE_OPTIONS: >-
+    -DBUILD_EXAMPLES=ON -DBUILD_FASTSCAPELIB_SHARED=ON -DCMAKE_BUILD_TYPE=Debug
+
+jobs:
+  gcc-build:
+    name: gcc (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set Compiler (Linux)
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          echo "FC=gfortran" >> $GITHUB_ENV
+          echo "CC=gcc" >> $GITHUB_ENV
+
+      - name: Set Compiler (MacOS)
+        if: contains(matrix.os, 'macos')
+        run: |
+          echo "FC=gfortran-9" >> $GITHUB_ENV
+          echo "CC=gcc-9" >> $GITHUB_ENV
+
+      - name: Configure build
+        run: cmake -B ${BUILD_DIR} ${CMAKE_OPTIONS}
+
+      - name: Build project
+        run: cmake --build ${BUILD_DIR}
+
+      - name: Run Fan example
+        run: |
+          cd ${BUILD_DIR}/examples
+          ./Fan
+
+  mingw-build:
+    name: mingw (windows-latest)
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        update: false
+        install: >-
+          mingw-w64-x86_64-gcc-fortran
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-ninja
+
+    - name: Configure build
+      run: cmake -B ${BUILD_DIR} -G Ninja ${CMAKE_OPTIONS}
+      env:
+        FC: gfortran
+        CC: gcc
+
+    - name: Build project
+      run: cmake --build ${BUILD_DIR}
+
+    - name: Run Fan example
+      run: |
+        cd ${BUILD_DIR}/examples
+        ./Fan.exe

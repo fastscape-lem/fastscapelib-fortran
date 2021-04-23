@@ -1,0 +1,80 @@
+name: test-python
+
+on:
+  push:
+    branches:
+    - 'master'
+  pull_request:
+    branches:
+    - 'master'
+
+jobs:
+  unix:
+    name: 3.8 (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          python -m pip install numpy scikit-build ninja
+
+      - name: Set Compiler (Linux)
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          echo "FC=gfortran" >> $GITHUB_ENV
+          echo "CC=gcc" >> $GITHUB_ENV
+
+      - name: Set Compiler (MacOS)
+        if: contains(matrix.os, 'macos')
+        run: |
+          echo "FC=gfortran-9" >> $GITHUB_ENV
+          echo "CC=gcc-9" >> $GITHUB_ENV
+
+      - name: Build and install Python bindings
+        run: python -m pip install . -v --no-build-isolation --no-deps --ignore-installed --no-cache-dir
+
+      - name: Test import Python module
+        run: python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"
+
+  windows:
+    name: 3.8 (windows-latest)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: 3.8
+          miniforge-version: latest
+
+      - name: Install dependencies
+        shell: cmd
+        run: |
+          conda create -n test python=3.8 cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
+
+      - name: Build and install project
+        shell: cmd
+        run: >-
+          conda activate test &&
+          ls %CONDA%\envs\test &&
+          ls %CONDA%\envs\test\Library\bin &&
+          set FC="C:/Miniconda3/envs/test/Library/bin/flang.exe" &&
+          python setup.py bdist_wheel --dist-dir="dist" -G "NMake Makefiles" -- -DCMAKE_Fortran_COMPILER:FILEPATH="%FC%" &&
+          python -m pip install --no-index --find-links="dist" fastscapelib_fortran -vvv
+
+      - name: Test import Python module
+        run: python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"

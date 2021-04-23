@@ -1,0 +1,23 @@
+name: deploy-doc
+
+on:
+  push:
+    branches:
+    - 'master'
+
+jobs:
+  adoc-build-deploy:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Build docs
+      uses: avattathil/asciidoctor-action@v2
+      with:
+          program: "asciidoctor docs/index.adoc -o docs/index.html"
+    - name: Deploy docs to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_branch: gh-pages
+        publish_dir: ./docs
