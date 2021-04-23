@@ -71,17 +71,14 @@ jobs:
       - name: Set Compiler
         shell: bash -l {0}
         run: |
-          echo "FC=$CONDA_PREFIX/Library/bin/flang.exe" >> $GITHUB_ENV
-          echo $CONDA_PREFIX
-          echo $LIB
-          echo $FC
-          echo %CC
+          echo "FC=$CONDA_PREFIX\Library\bin\flang.exe" >> $GITHUB_ENV
 
       - name: Build and install Python bindings
         shell: bash -l {0}
         run: |
+          conda activate test
           mkdir dist
-          python setup.py bdist_wheel --dist-dir="dist" -G "Ninja" -- -DCMAKE_Fortran_COMPILER:FILEPATH="$FC"
+          python setup.py bdist_wheel --dist-dir="dist" -G "NMake Makefiles" -- -DCMAKE_Fortran_COMPILER:FILEPATH="$FC"
           python -m pip install --no-index --find-links="dist" fastscapelib_fortran -vvv
 
       - name: Test import Python module
