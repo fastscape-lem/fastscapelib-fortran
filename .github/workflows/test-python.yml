@@ -49,7 +49,7 @@ jobs:
         run: python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"
 
   windows:
-    name: 3.8 (windows)
+    name: 3.8 (windows-latest)
     runs-on: windows-latest
     steps:
       - name: Checkout
@@ -66,12 +66,12 @@ jobs:
       - name: Install Python dependencies
         shell: bash -l {0}
         run: |
-          mamba install cmake fortran-compiler scikit-build pip wheel setuptools numpy
+          mamba install cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
 
       - name: Set Compiler
         shell: bash -l {0}
         run: |
-          echo "FC=$BUILD_PREFIX/Library/bin/flang.exe" >> $GITHUB_ENV
+          echo "FC=$CONDA_PREFIX/Library/bin/flang.exe" >> $GITHUB_ENV
 
       - name: Build and install Python bindings
         shell: bash -l {0}
