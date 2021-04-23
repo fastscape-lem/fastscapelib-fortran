@@ -68,7 +68,7 @@ jobs:
 
       - name: Build and install project
         shell: cmd
-        run: |
+        run: >-
           conda activate test &&
           set FC="%CONDA_PREFIX%\Library\bin\flang.exe" &&
           python setup.py bdist_wheel --dist-dir="dist" -G "NMake Makefiles" -- -DCMAKE_Fortran_COMPILER:FILEPATH="%FC%" &&
