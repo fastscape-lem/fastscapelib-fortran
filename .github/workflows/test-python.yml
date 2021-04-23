@@ -62,6 +62,7 @@ jobs:
           miniforge-version: latest
 
       - name: Install Python dependencies, build and install project
+        shell: cmd
         run: |
           conda install cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
           set FC="%CONDA_PREFIX%\Library\bin\flang.exe"
