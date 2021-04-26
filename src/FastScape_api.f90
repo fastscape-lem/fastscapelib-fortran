@@ -153,9 +153,10 @@ module FastScapeAPI
     use FastScapeContext
     implicit none
 
-    integer, optional, intent(out):: ierr
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    if (present(ierr)) print *, 'present'
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Init()')
 
     call Init()
 
@@ -170,23 +171,24 @@ module FastScapeAPI
     use FastScapeContext
     implicit none
 
-    integer, intent(out):: ierr
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Setup()')
 
     if (nx.eq.0) then
-      FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be zero',ERR_ParameterInvalid,ierr)
+      FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be zero',ERR_ParameterInvalid,ierr_)
     end if
     if (nx.le.0) then
-       FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be negative',ERR_ParameterOutOfRange,ierr)
+       FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be negative',ERR_ParameterOutOfRange,ierr_)
     end if
     if (ny.eq.0) then
-       FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be zero',ERR_ParameterInvalid,ierr)
+       FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be zero',ERR_ParameterInvalid,ierr_)
     end if
     if (ny.le.0) then
-      FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be negative',ERR_ParameterOutOfRange,ierr)
+      FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be negative',ERR_ParameterOutOfRange,ierr_)
     end if
-    FSCAPE_CHKERR(ierr) ! Call FSCAPE_CHKERR() so that all possible exceptions above will be displayed
+    FSCAPE_CHKERR_OPT(ierr, ierr_) ! Call FSCAPE_CHKERR() so that all possible exceptions above will be displayed
 
     call SetUp()
 
@@ -202,9 +204,10 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Destroy()')
 
     call Destroy()
 
@@ -220,9 +223,10 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_View()')
 
     call View()
 
@@ -237,10 +241,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     real :: time_in, time_out
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Execute_Step()')
 
     if (runAdvect) then
       call cpu_time (time_in)
@@ -259,11 +264,11 @@ module FastScapeAPI
     if (runSPL) then
       call cpu_time (time_in)
       if (SingleFlowDirection) then
-        call FlowRoutingSingleFlowDirection (ierr);FSCAPE_CHKERR(ierr)
+        call FlowRoutingSingleFlowDirection (ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
         call FlowAccumulationSingleFlowDirection ()
         call StreamPowerLawSingleFlowDirection ()
       else
-        call FlowRouting (ierr);FSCAPE_CHKERR(ierr)
+        call FlowRouting (ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
         call FlowAccumulation ()
         call StreamPowerLaw ()
       endif
@@ -273,14 +278,14 @@ module FastScapeAPI
 
     if (runDiffusion) then
       call cpu_time (time_in)
-      call Diffusion (ierr);FSCAPE_CHKERR(ierr)
+      call Diffusion (ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
       call cpu_time (time_out)
       timeDiffusion = timeDiffusion + time_out-time_in
     endif
 
     if (runMarine) then
        call cpu_time (time_in)
-       call Marine (ierr);FSCAPE_CHKERR(ierr)
+       call Marine (ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
        call cpu_time (time_out)
        timeMarine = timeMarine + time_out-time_in
     endif
@@ -306,12 +311,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, optional, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: hp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    if (present(ierr)) ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Init_H()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call InitH(hp)
@@ -328,12 +335,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: Fmixp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Init_F()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call InitF (Fmixp)
@@ -350,12 +359,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: hp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_H()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyH(hp)
@@ -372,12 +383,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: bp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Basement()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyBasement(bp)
@@ -394,12 +407,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: etotp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Total_Erosion()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyEtot(etotp)
@@ -416,12 +431,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: ap
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Drainage_Area()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyArea(ap)
@@ -438,12 +455,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: eratep
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Erosion_Rate()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyERate(eratep)
@@ -460,12 +479,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: chip
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Chi()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyChi(chip)
@@ -482,12 +503,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: slopep
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Slope()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopySlope(slopep)
@@ -504,13 +527,14 @@ module FastScapeAPI
 
     implicit none
 
-
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: curvaturep
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Curvature()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyCurvature(curvaturep)
@@ -527,12 +551,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: catchp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Catchment()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyCatchment (catchp)
@@ -549,12 +575,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: Fmixp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_F()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyF(Fmixp)
@@ -571,12 +599,14 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: Lp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Lake_Depth()')
+
     if (.not.setup_has_been_run) then
-      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr_);FSCAPE_CHKERR_OPT(ierr, ierr_)
     end if
 
     call CopyLakeDepth(Lp)
@@ -593,10 +623,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     integer, intent(in) :: nnx,nny
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_NX_NY()')
 
     call SetNXNY (nnx,nny)
 
@@ -612,10 +643,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(in) :: xxl,yyl
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_XL_YL()')
 
     call SetXLYL (xxl,yyl)
 
@@ -631,10 +663,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(in) :: dtt
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_DT()')
 
     call SetDT (dtt)
 
@@ -650,11 +683,12 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(in), dimension(*) :: kkf,kkd
     double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Erosional_Parameters()')
 
     call SetErosionalParam (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
 
@@ -666,18 +700,19 @@ module FastScapeAPI
 
   subroutine FastScape_Set_Marine_Parameters (sl, p1, p2, z1, z2, r, l, kds1, kds2,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
+    double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-  ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Marine_Parameters()')
 
-  call SetMarineParam (sl, p1, p2, z1, z2, r, l, kds1, kds2)
+    call SetMarineParam (sl, p1, p2, z1, z2, r, l, kds1, kds2)
 
-  return
+    return
 
   end subroutine FastScape_Set_Marine_Parameters
 
@@ -689,10 +724,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     integer, intent(out) :: nnx,nny
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Get_Sizes()')
 
     call GetSizes (nnx,nny)
 
@@ -708,10 +744,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     integer, intent(out) :: sstep
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Get_Step()')
 
     call GetStep (sstep)
 
@@ -727,9 +764,10 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Debug()')
 
     call Debug()
 
@@ -745,10 +783,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     integer, intent(in) :: jbc
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_BC()')
 
     call SetBC (jbc)
 
@@ -764,10 +803,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(in), dimension(*) :: up
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_U()')
 
     call SetU(up)
 
@@ -783,10 +823,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(in), dimension(*) :: ux,uy
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_V()')
 
     call SetV(ux,uy)
 
@@ -802,9 +843,10 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Reset_Cumulative_Erosion()')
 
     call ResetCumulativeErosion ()
 
@@ -820,10 +862,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: hp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_H()')
 
     call SetH(hp)
 
@@ -839,10 +882,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: dhp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_All_Layers()')
 
     call SetAllLayers(dhp)
 
@@ -858,10 +902,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: bp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Basement()')
 
     call SetBasement(bp)
 
@@ -877,10 +922,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(inout), dimension(*) :: precipp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Precip()')
 
     call SetPrecip (precipp)
 
@@ -896,11 +942,12 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(in), dimension(*) :: fp
     double precision, intent(in) :: vexp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_VTK()')
 
     call Make_VTK (fp, vexp)
 
@@ -916,11 +963,12 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     integer, intent(inout) :: nstepp, nreflectorp, nfreqp
     double precision, intent(inout) :: vexp
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Strati()')
 
     call Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
 
@@ -936,10 +984,11 @@ module FastScapeAPI
 
     implicit none
 
-    integer, intent(out):: ierr
     double precision, intent(out) :: ttectonic_flux, eerosion_flux, bboundary_flux
+    integer, optional, intent(out) :: ierr
+    integer :: ierr_
 
-    ierr=0
+    FSCAPE_INITERR(ierr, ierr_, 'FastScape_Get_Fluxes()')
 
     call compute_fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
 
