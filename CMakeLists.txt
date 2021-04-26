@@ -100,9 +100,15 @@ endif()
 # Fortran library (static/shared)
 # ===============================
 
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod)
+
 if(BUILD_FASTSCAPELIB_STATIC OR BUILD_FASTSCAPELIB_SHARED)
+  # build temp library
   set(FASTSCAPELIB_OBJECTS libfastscape_objects)
   add_library(${FASTSCAPELIB_OBJECTS} OBJECT ${FASTSCAPELIB_SRC_FILES})
+
+  # install api Fortran module
+  install(FILES ${CMAKE_Fortran_MODULE_DIRECTORY}/fastscapeapi.mod DESTINATION include)
 endif()
 
 if(BUILD_FASTSCAPELIB_STATIC)

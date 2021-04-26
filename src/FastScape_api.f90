@@ -144,801 +144,807 @@
 ! -----------------------------------------------------------------------------------------
 #include "Error.fpp"
 
-subroutine FastScape_Init(ierr)
+module FastScapeAPI
 
-  use FastScapeContext
-  implicit none
+  contains
 
-  integer, intent(out):: ierr
+  subroutine FastScape_Init(ierr)
 
-  ierr=0
+    use FastScapeContext
+    implicit none
 
-  call Init()
+    integer, optional, intent(out):: ierr
 
-  return
+    if (present(ierr)) print *, 'present'
 
-end subroutine FastScape_Init
+    call Init()
 
-!--------------------------------------------------------------------------
+    !return
 
-subroutine FastScape_Setup(ierr)
+  end subroutine FastScape_Init
 
-  use FastScapeContext
-  implicit none
+  !--------------------------------------------------------------------------
 
-  integer, intent(out):: ierr
+  subroutine FastScape_Setup(ierr)
 
-  ierr=0
+    use FastScapeContext
+    implicit none
 
-  if (nx.eq.0) then
-    FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be zero',ERR_ParameterInvalid,ierr)
-  end if
-  if (nx.le.0) then
-     FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be negative',ERR_ParameterOutOfRange,ierr)
-  end if
-  if (ny.eq.0) then
-     FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be zero',ERR_ParameterInvalid,ierr)
-  end if
-  if (ny.le.0) then
-    FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be negative',ERR_ParameterOutOfRange,ierr)
-  end if
-  FSCAPE_CHKERR(ierr) ! Call FSCAPE_CHKERR() so that all possible exceptions above will be displayed
+    integer, intent(out):: ierr
 
-  call SetUp()
+    ierr=0
 
-  return
+    if (nx.eq.0) then
+      FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be zero',ERR_ParameterInvalid,ierr)
+    end if
+    if (nx.le.0) then
+       FSCAPE_RAISE_MESSAGE('FastScape_Setup(): nx cannot be negative',ERR_ParameterOutOfRange,ierr)
+    end if
+    if (ny.eq.0) then
+       FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be zero',ERR_ParameterInvalid,ierr)
+    end if
+    if (ny.le.0) then
+      FSCAPE_RAISE_MESSAGE('FastScape_Setup(): ny cannot be negative',ERR_ParameterOutOfRange,ierr)
+    end if
+    FSCAPE_CHKERR(ierr) ! Call FSCAPE_CHKERR() so that all possible exceptions above will be displayed
 
-end subroutine FastScape_Setup
+    call SetUp()
 
-!--------------------------------------------------------------------------
+    return
 
-subroutine FastScape_Destroy(ierr)
+  end subroutine FastScape_Setup
 
-  use FastScapeContext
+  !--------------------------------------------------------------------------
 
-  implicit none
+  subroutine FastScape_Destroy(ierr)
 
-  integer, intent(out):: ierr
+    use FastScapeContext
 
-  ierr=0
+    implicit none
 
-  call Destroy()
+    integer, intent(out):: ierr
 
-  return
+    ierr=0
 
-end subroutine FastScape_Destroy
+    call Destroy()
 
-!--------------------------------------------------------------------------
+    return
 
-subroutine FastScape_View(ierr)
+  end subroutine FastScape_Destroy
 
-  use FastScapeContext
+  !--------------------------------------------------------------------------
 
-  implicit none
+  subroutine FastScape_View(ierr)
 
-  integer, intent(out):: ierr
+    use FastScapeContext
 
-  ierr=0
+    implicit none
 
-  call View()
+    integer, intent(out):: ierr
 
-  return
+    ierr=0
 
-end subroutine FastScape_View
+    call View()
 
-!--------------------------------------------------------------------------
-subroutine FastScape_Execute_Step(ierr)
+    return
 
-  use FastScapeContext
+  end subroutine FastScape_View
 
-  implicit none
+  !--------------------------------------------------------------------------
+  subroutine FastScape_Execute_Step(ierr)
 
-  integer, intent(out):: ierr
-  real :: time_in, time_out
+    use FastScapeContext
 
-  ierr=0
+    implicit none
 
-  if (runAdvect) then
-    call cpu_time (time_in)
-    call Advect ()
-    call cpu_time (time_out)
-    timeAdvect = timeAdvect + time_out-time_in
-  endif
+    integer, intent(out):: ierr
+    real :: time_in, time_out
 
-  if (runUplift) then
-    call cpu_time (time_in)
-    call Uplift()
-    call cpu_time (time_out)
-    timeUplift = timeUplift + time_out-time_in
-  endif
+    ierr=0
 
-  if (runSPL) then
-    call cpu_time (time_in)
-    if (SingleFlowDirection) then
-      call FlowRoutingSingleFlowDirection (ierr);FSCAPE_CHKERR(ierr)
-      call FlowAccumulationSingleFlowDirection ()
-      call StreamPowerLawSingleFlowDirection ()
-    else
-      call FlowRouting (ierr);FSCAPE_CHKERR(ierr)
-      call FlowAccumulation ()
-      call StreamPowerLaw ()
+    if (runAdvect) then
+      call cpu_time (time_in)
+      call Advect ()
+      call cpu_time (time_out)
+      timeAdvect = timeAdvect + time_out-time_in
     endif
-    call cpu_time (time_out)
-    timeSPL = timeSPL + time_out-time_in
-  endif
 
-  if (runDiffusion) then
-    call cpu_time (time_in)
-    call Diffusion (ierr);FSCAPE_CHKERR(ierr)
-    call cpu_time (time_out)
-    timeDiffusion = timeDiffusion + time_out-time_in
-  endif
+    if (runUplift) then
+      call cpu_time (time_in)
+      call Uplift()
+      call cpu_time (time_out)
+      timeUplift = timeUplift + time_out-time_in
+    endif
 
-  if (runMarine) then
-     call cpu_time (time_in)
-     call Marine (ierr);FSCAPE_CHKERR(ierr)
-     call cpu_time (time_out)
-     timeMarine = timeMarine + time_out-time_in
-  endif
+    if (runSPL) then
+      call cpu_time (time_in)
+      if (SingleFlowDirection) then
+        call FlowRoutingSingleFlowDirection (ierr);FSCAPE_CHKERR(ierr)
+        call FlowAccumulationSingleFlowDirection ()
+        call StreamPowerLawSingleFlowDirection ()
+      else
+        call FlowRouting (ierr);FSCAPE_CHKERR(ierr)
+        call FlowAccumulation ()
+        call StreamPowerLaw ()
+      endif
+      call cpu_time (time_out)
+      timeSPL = timeSPL + time_out-time_in
+    endif
 
-  if (runStrati) then
-     call cpu_time (time_in)
-     call Run_Strati ()
-     call cpu_time (time_out)
-     timeStrati = timeStrati + time_out-time_in
-  endif
+    if (runDiffusion) then
+      call cpu_time (time_in)
+      call Diffusion (ierr);FSCAPE_CHKERR(ierr)
+      call cpu_time (time_out)
+      timeDiffusion = timeDiffusion + time_out-time_in
+    endif
 
-  step=step+1
+    if (runMarine) then
+       call cpu_time (time_in)
+       call Marine (ierr);FSCAPE_CHKERR(ierr)
+       call cpu_time (time_out)
+       timeMarine = timeMarine + time_out-time_in
+    endif
 
-  return
+    if (runStrati) then
+       call cpu_time (time_in)
+       call Run_Strati ()
+       call cpu_time (time_out)
+       timeStrati = timeStrati + time_out-time_in
+    endif
 
-end subroutine FastScape_Execute_Step
+    step=step+1
 
-!--------------------------------------------------------------------------
+    return
 
-subroutine FastScape_Init_H(hp,ierr)
+  end subroutine FastScape_Execute_Step
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Init_H(hp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, optional, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: hp
+
+    if (present(ierr)) ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call InitH(hp)
+
+    return
+
+  end subroutine FastScape_Init_H
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Init_F(Fmixp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: Fmixp
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call InitF (Fmixp)
+
+    return
+
+  end subroutine FastScape_Init_F
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_H(hp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: hp
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyH(hp)
+
+    return
+
+  end subroutine FastScape_Copy_H
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Basement(bp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: bp
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyBasement(bp)
+
+    return
+
+  end subroutine FastScape_Copy_Basement
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Total_Erosion (etotp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: etotp
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyEtot(etotp)
+
+    return
+
+  end subroutine FastScape_Copy_Total_Erosion
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Drainage_Area (ap,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: ap
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyArea(ap)
+
+    return
+
+  end subroutine FastScape_Copy_Drainage_Area
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Erosion_Rate (eratep,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: eratep
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyERate(eratep)
+
+    return
+
+  end subroutine FastScape_Copy_Erosion_Rate
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Chi (chip,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: chip
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyChi(chip)
+
+    return
+
+  end subroutine FastScape_Copy_Chi
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Slope (slopep,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: slopep
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopySlope(slopep)
+
+    return
+
+  end subroutine FastScape_Copy_Slope
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Curvature (curvaturep,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: curvaturep
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyCurvature(curvaturep)
+
+    return
+
+  end subroutine FastScape_Copy_Curvature
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Catchment (catchp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: catchp
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyCatchment (catchp)
+
+    return
+
+  end subroutine FastScape_Copy_Catchment
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_F(Fmixp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: Fmixp
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyF(Fmixp)
+
+    return
+
+  end subroutine FastScape_Copy_F
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Copy_Lake_Depth(Lp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: Lp
+
+    ierr=0
+    if (.not.setup_has_been_run) then
+      FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
+    end if
+
+    call CopyLakeDepth(Lp)
+
+    return
+
+  end subroutine FastScape_Copy_Lake_Depth
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Set_NX_NY (nnx,nny,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    integer, intent(in) :: nnx,nny
+
+    ierr=0
+
+    call SetNXNY (nnx,nny)
+
+    return
+
+  end subroutine FastScape_Set_NX_NY
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Set_XL_YL (xxl,yyl,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(in) :: xxl,yyl
+
+    ierr=0
+
+    call SetXLYL (xxl,yyl)
+
+    return
+
+  end subroutine FastScape_Set_XL_YL
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Set_DT (dtt,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(in) :: dtt
+
+    ierr=0
+
+    call SetDT (dtt)
+
+    return
+
+  end subroutine FastScape_Set_DT
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Set_Erosional_Parameters (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp,ierr)
+
+    use FastScapeContext
+
+    implicit none
+
+    integer, intent(out):: ierr
+    double precision, intent(in), dimension(*) :: kkf,kkd
+    double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
+
+    ierr=0
+
+    call SetErosionalParam (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
+
+    return
+
+  end subroutine FastScape_Set_Erosional_Parameters
+
+  !--------------------------------------------------------------------------
+
+  subroutine FastScape_Set_Marine_Parameters (sl, p1, p2, z1, z2, r, l, kds1, kds2,ierr)
 
   use FastScapeContext
 
   implicit none
 
   integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: hp
+  double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
 
   ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
 
-  call InitH(hp)
+  call SetMarineParam (sl, p1, p2, z1, z2, r, l, kds1, kds2)
 
   return
 
-end subroutine FastScape_Init_H
+  end subroutine FastScape_Set_Marine_Parameters
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Init_F(Fmixp,ierr)
+  subroutine FastScape_Get_Sizes (nnx,nny,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: Fmixp
+    integer, intent(out):: ierr
+    integer, intent(out) :: nnx,nny
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call InitF (Fmixp)
+    call GetSizes (nnx,nny)
 
-  return
+    return
 
-end subroutine FastScape_Init_F
+  end subroutine FastScape_Get_Sizes
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_H(hp,ierr)
+  subroutine FastScape_Get_Step (sstep,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: hp
+    integer, intent(out):: ierr
+    integer, intent(out) :: sstep
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call CopyH(hp)
+    call GetStep (sstep)
 
-  return
+    return
 
-end subroutine FastScape_Copy_H
+  end subroutine FastScape_Get_Step
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_Basement(bp,ierr)
+  subroutine FastScape_Debug(ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: bp
+    integer, intent(out):: ierr
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call CopyBasement(bp)
+    call Debug()
 
-  return
+    return
 
-end subroutine FastScape_Copy_Basement
+  end subroutine FastScape_Debug
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_Total_Erosion (etotp,ierr)
+  subroutine FastScape_Set_BC(jbc,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: etotp
+    integer, intent(out):: ierr
+    integer, intent(in) :: jbc
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call CopyEtot(etotp)
+    call SetBC (jbc)
 
-  return
+    return
 
-end subroutine FastScape_Copy_Total_Erosion
+  end subroutine FastScape_Set_BC
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_Drainage_Area (ap,ierr)
+  subroutine FastScape_Set_U (up,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: ap
+    integer, intent(out):: ierr
+    double precision, intent(in), dimension(*) :: up
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call CopyArea(ap)
+    call SetU(up)
 
-  return
+    return
 
-end subroutine FastScape_Copy_Drainage_Area
+  end subroutine FastScape_Set_U
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_Erosion_Rate (eratep,ierr)
+  subroutine FastScape_Set_V (ux,uy,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: eratep
+    integer, intent(out):: ierr
+    double precision, intent(in), dimension(*) :: ux,uy
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call CopyERate(eratep)
+    call SetV(ux,uy)
 
-  return
+    return
 
-end subroutine FastScape_Copy_Erosion_Rate
+  end subroutine FastScape_Set_V
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_Chi (chip,ierr)
+  subroutine FastScape_Reset_Cumulative_Erosion (ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: chip
+    integer, intent(out):: ierr
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call CopyChi(chip)
+    call ResetCumulativeErosion ()
 
-  return
+    return
 
-end subroutine FastScape_Copy_Chi
+  end subroutine FastScape_Reset_Cumulative_Erosion
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_Slope (slopep,ierr)
+  subroutine FastScape_Set_H(hp,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: slopep
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: hp
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    ierr=0
 
-  call CopySlope(slopep)
+    call SetH(hp)
 
-  return
+    return
 
-end subroutine FastScape_Copy_Slope
+  end subroutine FastScape_Set_H
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
-subroutine FastScape_Copy_Curvature (curvaturep,ierr)
+  subroutine FastScape_Set_All_Layers (dhp,ierr)
 
-  use FastScapeContext
+    use FastScapeContext
 
-  implicit none
+    implicit none
 
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: dhp
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: curvaturep
+    ierr=0
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    call SetAllLayers(dhp)
 
-  call CopyCurvature(curvaturep)
+    return
 
-  return
+  end subroutine FastScape_Set_All_Layers
 
-end subroutine FastScape_Copy_Curvature
+  !--------------------------------------------------------------------------
 
-!--------------------------------------------------------------------------
+  subroutine FastScape_Set_Basement(bp,ierr)
 
-subroutine FastScape_Copy_Catchment (catchp,ierr)
+    use FastScapeContext
 
-  use FastScapeContext
+    implicit none
 
-  implicit none
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: bp
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: catchp
+    ierr=0
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    call SetBasement(bp)
 
-  call CopyCatchment (catchp)
+    return
 
-  return
+  end subroutine FastScape_Set_Basement
 
-end subroutine FastScape_Copy_Catchment
+  !--------------------------------------------------------------------------
 
-!--------------------------------------------------------------------------
+  subroutine FastScape_Set_Precip (precipp,ierr)
 
-subroutine FastScape_Copy_F(Fmixp,ierr)
+    use FastScapeContext
 
-  use FastScapeContext
+    implicit none
 
-  implicit none
+    integer, intent(out):: ierr
+    double precision, intent(inout), dimension(*) :: precipp
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: Fmixp
+    ierr=0
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    call SetPrecip (precipp)
 
-  call CopyF(Fmixp)
+    return
 
-  return
+  end subroutine FastScape_Set_Precip
 
-end subroutine FastScape_Copy_F
+  !--------------------------------------------------------------------------
 
-!--------------------------------------------------------------------------
+  subroutine FastScape_VTK (fp, vexp, ierr)
 
-subroutine FastScape_Copy_Lake_Depth(Lp,ierr)
+    use FastScapeContext
 
-  use FastScapeContext
+    implicit none
 
-  implicit none
+    integer, intent(out):: ierr
+    double precision, intent(in), dimension(*) :: fp
+    double precision, intent(in) :: vexp
 
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: Lp
+    ierr=0
 
-  ierr=0
-  if (.not.setup_has_been_run) then
-    FSCAPE_RAISE(ERR_SetupNotRun,ierr);FSCAPE_CHKERR(ierr)
-  end if
+    call Make_VTK (fp, vexp)
 
-  call CopyLakeDepth(Lp)
+    return
 
-  return
+  end subroutine FastScape_VTK
 
-end subroutine FastScape_Copy_Lake_Depth
+  !--------------------------------------------------------------------------
 
-!--------------------------------------------------------------------------
+  subroutine FastScape_Strati (nstepp, nreflectorp, nfreqp, vexp, ierr)
 
-subroutine FastScape_Set_NX_NY (nnx,nny,ierr)
+    use FastScapeContext
 
-  use FastScapeContext
+    implicit none
 
-  implicit none
+    integer, intent(out):: ierr
+    integer, intent(inout) :: nstepp, nreflectorp, nfreqp
+    double precision, intent(inout) :: vexp
 
-  integer, intent(out):: ierr
-  integer, intent(in) :: nnx,nny
+    ierr=0
 
-  ierr=0
+    call Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
 
-  call SetNXNY (nnx,nny)
+    return
 
-  return
+  end subroutine FastScape_Strati
 
-end subroutine FastScape_Set_NX_NY
+  !--------------------------------------------------------------------------
 
-!--------------------------------------------------------------------------
+  subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux, ierr)
 
-subroutine FastScape_Set_XL_YL (xxl,yyl,ierr)
+    use FastScapeContext
 
-  use FastScapeContext
+    implicit none
 
-  implicit none
+    integer, intent(out):: ierr
+    double precision, intent(out) :: ttectonic_flux, eerosion_flux, bboundary_flux
 
-  integer, intent(out):: ierr
-  double precision, intent(in) :: xxl,yyl
+    ierr=0
 
-  ierr=0
+    call compute_fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
 
-  call SetXLYL (xxl,yyl)
+    return
 
-  return
+  end subroutine FastScape_Get_Fluxes
 
-end subroutine FastScape_Set_XL_YL
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_DT (dtt,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(in) :: dtt
-
-  ierr=0
-
-  call SetDT (dtt)
-
-  return
-
-end subroutine FastScape_Set_DT
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_Erosional_Parameters (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(in), dimension(*) :: kkf,kkd
-  double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
-
-  ierr=0
-
-  call SetErosionalParam (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp)
-
-  return
-
-end subroutine FastScape_Set_Erosional_Parameters
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_Marine_Parameters (sl, p1, p2, z1, z2, r, l, kds1, kds2,ierr)
-
-use FastScapeContext
-
-implicit none
-
-integer, intent(out):: ierr
-double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
-
-ierr=0
-
-call SetMarineParam (sl, p1, p2, z1, z2, r, l, kds1, kds2)
-
-return
-
-end subroutine FastScape_Set_Marine_Parameters
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Get_Sizes (nnx,nny,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  integer, intent(out) :: nnx,nny
-
-  ierr=0
-
-  call GetSizes (nnx,nny)
-
-  return
-
-end subroutine FastScape_Get_Sizes
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Get_Step (sstep,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  integer, intent(out) :: sstep
-
-  ierr=0
-
-  call GetStep (sstep)
-
-  return
-
-end subroutine FastScape_Get_Step
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Debug(ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-
-  ierr=0
-
-  call Debug()
-
-  return
-
-end subroutine FastScape_Debug
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_BC(jbc,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  integer, intent(in) :: jbc
-
-  ierr=0
-
-  call SetBC (jbc)
-
-  return
-
-end subroutine FastScape_Set_BC
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_U (up,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(in), dimension(*) :: up
-
-  ierr=0
-
-  call SetU(up)
-
-  return
-
-end subroutine FastScape_Set_U
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_V (ux,uy,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(in), dimension(*) :: ux,uy
-
-  ierr=0
-
-  call SetV(ux,uy)
-
-  return
-
-end subroutine FastScape_Set_V
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Reset_Cumulative_Erosion (ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-
-  ierr=0
-
-  call ResetCumulativeErosion ()
-
-  return
-
-end subroutine FastScape_Reset_Cumulative_Erosion
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_H(hp,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: hp
-
-  ierr=0
-
-  call SetH(hp)
-
-  return
-
-end subroutine FastScape_Set_H
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_All_Layers (dhp,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: dhp
-
-  ierr=0
-
-  call SetAllLayers(dhp)
-
-  return
-
-end subroutine FastScape_Set_All_Layers
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_Basement(bp,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: bp
-
-  ierr=0
-
-  call SetBasement(bp)
-
-  return
-
-end subroutine FastScape_Set_Basement
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Set_Precip (precipp,ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: precipp
-
-  ierr=0
-
-  call SetPrecip (precipp)
-
-  return
-
-end subroutine FastScape_Set_Precip
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_VTK (fp, vexp, ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(inout), dimension(*) :: fp
-  double precision, intent(inout) :: vexp
-
-  ierr=0
-
-  call Make_VTK (fp, vexp)
-
-  return
-
-end subroutine FastScape_VTK
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Strati (nstepp, nreflectorp, nfreqp, vexp, ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  integer, intent(inout) :: nstepp, nreflectorp, nfreqp
-  double precision, intent(inout) :: vexp
-
-  ierr=0
-
-  call Activate_Strati (nstepp, nreflectorp, nfreqp, vexp)
-
-  return
-
-end subroutine FastScape_Strati
-
-!--------------------------------------------------------------------------
-
-subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux, ierr)
-
-  use FastScapeContext
-
-  implicit none
-
-  integer, intent(out):: ierr
-  double precision, intent(out) :: ttectonic_flux, eerosion_flux, bboundary_flux
-
-  ierr=0
-
-  call compute_fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
-
-  return
-
-end subroutine FastScape_Get_Fluxes
+end module FastScapeAPI
