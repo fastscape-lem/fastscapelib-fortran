@@ -46,7 +46,7 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
 # =====
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "Flang|GNU")
-    set(dialect "-ffree-form -std=f2008 -fimplicit-none")
+    set(dialect "-ffree-form -std=f2008 -fimplicit-none -ffree-line-length-none")
     set(bounds "-fbounds-check")
     set(warnings "-Wall -Wno-unused-dummy-argument")
 endif()
