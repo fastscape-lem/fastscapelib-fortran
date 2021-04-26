@@ -178,18 +178,18 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
   implicit none
 
   ! define the parameters
+  integer i,j,ij,ipj,imj,ijp,ijm,nn,nx,ny,niter,ibc
   double precision h(nx*ny),f(nx*ny),Q1(nx*ny),Q2(nx*ny)
   double precision, dimension(:), allocatable :: hp,fp,ht,ft,hhalf,fhalf,fhalfp
   double precision, dimension(:), allocatable :: diag,sup,inf,rhs,res,tint
   integer flag(nx*ny)
 
-  integer i,j,ij,ipj,imj,ijp,ijm,nn,nx,ny,niter,ibc
   double precision dx,dy,dt,sealevel,L,kdsea1,kdsea2
   double precision K1,K2,tol,err1,err2
   double precision Ap,Bp,Cp,Dp,Ep,Mp,Np
   integer, intent(inout):: ierr
 
-  character*4 cbc
+  character cbc*4
 
   write (cbc,'(i4)') ibc
 

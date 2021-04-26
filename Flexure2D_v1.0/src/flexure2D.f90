@@ -30,7 +30,7 @@ subroutine flexure (hh2,hp2,nx,ny,xl,yl,rhos2,rhoa,eet,ibc)
   double precision hx,hy,dflex,d,xk,pihx,pihy,g,fi,fj,tij,dx,dy,r,s,h1,h2,h3,h4
   double precision ddxf,ddyf,xloc,yloc,dw,xflexloc,yflexloc
   integer iflexmin,iflexmax,jflexmin,jflexmax
-  character*4 cbc
+  character cbc*4
 
   double precision, dimension(:,:,:), allocatable :: hw
   integer, dimension(:,:), allocatable :: iiw,jjw
@@ -196,9 +196,9 @@ subroutine addw (w,nxflex,nyflex,iflexmin,iflexmax,jflexmin,jflexmax,cbc)
 
   implicit none
 
-  double precision w(nxflex,nyflex)
   integer :: nxflex,nyflex,i,j,iflexmin,iflexmax,jflexmin,jflexmax
-  character*4 cbc
+  double precision w(nxflex,nyflex)
+  character cbc*4
 
   if (cbc(1:1).eq.'0') w(:,jflexmin)=w(:,jflexmin+1)
   if (cbc(2:2).eq.'0') w(iflexmax,:)=w(iflexmax-1,:)
