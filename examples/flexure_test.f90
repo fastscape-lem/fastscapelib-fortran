@@ -2,6 +2,7 @@ program flexure_test
 
   ! test example to demonstrate how to use the flexure routine
   ! see relevant section below for explanations
+  use FastScapeAPI
 
   implicit none
 

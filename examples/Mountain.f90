@@ -8,6 +8,8 @@ program Mountain
   ! nonlinear erosion law (n=1.5, m=0.6)
   ! transport coefficient g = 1
 
+  use FastScapeAPI
+
   implicit none
 
   integer :: nx, ny, istep, nstep
