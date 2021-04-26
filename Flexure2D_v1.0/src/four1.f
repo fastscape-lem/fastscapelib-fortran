@@ -7,8 +7,10 @@ c subroutines called:
 c NONE
 
       SUBROUTINE FOUR1(DATA,NN,ISIGN)
+      IMPLICIT INTEGER (A-Z)
       common /vocal/ ivocal
       REAL*8 WR,WI,WPR,WPI,WTEMP,THETA
+      REAL*8 TEMPI,TEMPR
       REAL*8 DATA(*)
       N=2*NN
       J=1

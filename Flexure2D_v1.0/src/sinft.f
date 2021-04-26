@@ -6,8 +6,10 @@ c subroutines called:
 c NONE
 
       SUBROUTINE SINFT(Y,N)
+      IMPLICIT INTEGER (A-Z)
       common /vocal/ ivocal
       REAL*8 WR,WI,WPR,WPI,WTEMP,THETA
+      REAL*8 Y1,Y2,SUM
       REAL*8 Y(N)
       THETA=3.14159265358979D0/DBLE(N)
       WR=1.0D0

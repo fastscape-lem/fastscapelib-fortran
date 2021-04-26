@@ -567,7 +567,7 @@ module FastScapeContext
     implicit none
 
     integer, intent(in) :: jbc
-    character*4 :: cbc
+    character :: cbc*4
 
     bounds_ibc = jbc
 
@@ -701,7 +701,7 @@ module FastScapeContext
     integer nheader,nfooter,npart1,npart2
     character header*1024,footer*1024,part1*1024,part2*1024,nxc*6,nyc*6,nnc*12
     integer i,j
-    character*7 cstep
+    character cstep*7
     double precision dx,dy
 
     dx = xl/(nx - 1)
@@ -743,7 +743,7 @@ module FastScapeContext
 
       open(unit=77,file='VTK/Topography'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
       recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
-      +(npart1+5+npart2+4*nn),convert='big_endian')
+      +(npart1+5+npart2+4*nn))
       write (77,rec=1) &
       header(1:nheader), &
       ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(h(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
@@ -755,7 +755,7 @@ module FastScapeContext
       if (vex.lt.0.d0) then
         open(unit=77,file='VTK/Basement'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
         recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
-        +(npart1+5+npart2+4*nn),convert='big_endian')
+        +(npart1+5+npart2+4*nn))
         write (77,rec=1) &
         header(1:nheader), &
         ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(b(i+(j-1)*nx)*abs(vex)),i=1,nx),j=1,ny), &
@@ -764,7 +764,7 @@ module FastScapeContext
         part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
         close(77)
         open(unit=77,file='VTK/SeaLevel'//cstep//'.vtk',status='unknown',form='unformatted',access='direct', &
-        recl=nheader+3*4*nn+nfooter+(npart1+2+npart2+4*nn),convert='big_endian')
+        recl=nheader+3*4*nn+nfooter+(npart1+2+npart2+4*nn))
         write (77,rec=1) &
         header(1:nheader), &
         ((sngl(dx*(i-1)),sngl(dy*(j-1)),sngl(sealevel*abs(vex)),i=1,nx),j=1,ny), &
@@ -819,7 +819,7 @@ module FastScapeContext
 
       ! updates erosion below each reflector
       do i= 1, ireflector
-        fields(:,10,i) = fields(:,10,i)+max(0.,reflector(:,i)-h)
+        fields(:,10,i) = fields(:,10,i)+max(0.d0,reflector(:,i)-h)
       enddo
 
       do i = 1, ireflector - 1
@@ -833,7 +833,7 @@ module FastScapeContext
       if (((step+1)/nfreq)*nfreq.eq.(step+1)) then
         if (((step+1)/nfreqref)*nfreqref.eq.(step+1)) ireflector = ireflector + 1
         call Strati (b, Fmix, nx, ny, xl, yl, reflector, nreflector, ireflector, step + 1, &
-        fields, nfield, vexref, dt*nfreqref, stack, rec, length, sealevel)
+        fields, nfield, vexref, dt*nfreqref, rec, sealevel)
       endif
 
     end subroutine run_Strati
