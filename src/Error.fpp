@@ -7,6 +7,18 @@
 !
 
 !
+! Initialize ierr argument in API functions
+!
+#define FSCAPE_INITERR(ierr, ierr_, fname)        \
+  ierr_ = 0;                                      \
+  if (present(ierr)) then;                        \
+    ierr = ierr_;                                 \
+  else;                                           \
+    print '(A)', "*** Depreciation warning *** "; \
+    print '(A,A,A)', "Calling ", TRIM((fname)), " without 'ierr' argument (integer) is depreciated! Please update your code!"; \
+  end if;
+
+!
 ! Raise an exception by pushing the name of the exception + file name, line number to stdout
 ! Sets ierr to the error type specified by err_type
 !
@@ -29,6 +41,22 @@
 #define FSCAPE_CHKERR(ierr) \
   if (ierr /= 0) then;      \
     return;                 \
+  end if;
+
+!
+! Either calls return or stop if error code is non-zero, dependening on whether the
+! the ierr argument is present.
+!
+#define FSCAPE_CHKERR_OPT(ierr, ierr_)                                         \
+  if (ierr_ /= 0) then;                                                        \
+    if (present(ierr)) then;                                                   \
+      ierr = ierr_;                                                            \
+      return;                                                                  \
+    else;                                                                      \
+      print '(A)', "*** Execution being halted by calling stop!";               \
+      print '(A)', "Call all API routine with 'ierr' argument to avoid this."; \
+      stop;                                                                    \
+    end if;                                                                    \
   end if;
 
 !
