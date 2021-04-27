@@ -9,30 +9,33 @@
 !
 ! Initialize ierr argument in API functions
 !
-#define FSCAPE_INITERR(ierr, ierr_, fname)        \
-  ierr_ = 0;                                      \
-  if (present(ierr)) then;                        \
-    ierr = ierr_;                                 \
-  else;                                           \
-    print '(A)', "*** Depreciation warning *** "; \
-    print '(A,A,A)', "Calling ", TRIM((fname)), " without 'ierr' argument (integer) is depreciated! Please update your code!"; \
+#define FSCAPE_INITERR(ierr, ierr_, fname)                   \
+  ierr_ = 0;                                                 \
+  if (present(ierr)) then;                                   \
+    ierr = ierr_;                                            \
+  else;                                                      \
+    print '(A)', "*** FastScape depreciation warning *** ";  \
+    print '(A)', "When calling " // TRIM((fname));           \
+    print '(A)', "Calling API functions without 'ierr' argument (integer) is depreciated! Please update your code!"; \
   end if;
 
 !
 ! Raise an exception by pushing the name of the exception + file name, line number to stdout
 ! Sets ierr to the error type specified by err_type
 !
-#define FSCAPE_RAISE(err_type, ierr) \
-  ierr = (err_type);                 \
-  print '(A,I4,A)', "*** FastScape exception *** -> " // TRIM(err_names((ierr))) // " (" // __FILE__ // ", line", __LINE__, ")";
+#define FSCAPE_RAISE(err_type, ierr)                                         \
+  ierr = (err_type);                                                         \
+  print '(A)', "*** FastScape exception *** -> " // TRIM(err_names((ierr))); \
+  print '(A,I4,A)', "In file " // __FILE__ // ", line", __LINE__;
 
 !
 ! Raise an exception by pushing custom user provided message to stdout,
 ! along with the name of the exception + file name, line number to stdout
 ! Sets ierr to the error type specified by err_type
 !
-#define FSCAPE_RAISE_MESSAGE(msg, err_type, ierr)                    \
-  print '(A,A)', "*** FastScape exception *** ", TRIM((msg)) // "!"; \
+#define FSCAPE_RAISE_MESSAGE(msg, err_type, ierr) \
+  print '(A)', "*** FastScape exception *** ";    \
+  print '(A)', TRIM((msg)) // "!";                \
   FSCAPE_RAISE(err_type, ierr);
 
 !
