@@ -33,7 +33,7 @@ program Fan
   ! initialize FastScape
   call FastScape_Init ()
   call FastScape_Set_NX_NY (nx,ny,ierr)
-  call FastScape_Setup ()
+  call FastScape_Setup (ierr)
 
   ! set model dimensions
   xl=10.d3

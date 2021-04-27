@@ -40,6 +40,10 @@ if(WIN32)
   add_compile_definitions(ON_WINDOWS)
 endif()
 
+if(SKBUILD)
+  add_compile_definitions(NO_ERROR_MSG)
+endif()
+
 set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
 
 # Flags
