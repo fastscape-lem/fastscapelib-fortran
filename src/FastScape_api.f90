@@ -146,14 +146,16 @@
 
 module FastScapeAPI
 
+  use iso_c_binding
+
   contains
 
-  subroutine FastScape_Init(ierr)
+  subroutine FastScape_Init(ierr) bind(C, name='fastscape_init')
 
     use FastScapeContext
     implicit none
 
-    integer, optional, intent(out) :: ierr
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Init()')
@@ -166,12 +168,12 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Setup(ierr)
+  subroutine FastScape_Setup(ierr) bind(C, name='fastscape_setup')
 
     use FastScapeContext
     implicit none
 
-    integer, optional, intent(out) :: ierr
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Setup()')
@@ -198,13 +200,13 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Destroy(ierr)
+  subroutine FastScape_Destroy(ierr) bind(C, name='fastscape_destroy')
 
     use FastScapeContext
 
     implicit none
 
-    integer, optional, intent(out) :: ierr
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Destroy()')
@@ -217,13 +219,13 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_View(ierr)
+  subroutine FastScape_View(ierr) bind(C, name='fastscape_view')
 
     use FastScapeContext
 
     implicit none
 
-    integer, optional, intent(out) :: ierr
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_View()')
@@ -235,14 +237,14 @@ module FastScapeAPI
   end subroutine FastScape_View
 
   !--------------------------------------------------------------------------
-  subroutine FastScape_Execute_Step(ierr)
+  subroutine FastScape_Execute_Step(ierr) bind(C, name='fastscape_execute_step')
 
     use FastScapeContext
 
     implicit none
 
     real :: time_in, time_out
-    integer, optional, intent(out) :: ierr
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Execute_Step()')
@@ -305,14 +307,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Init_H(hp,ierr)
+  subroutine FastScape_Init_H(hp,ierr) bind(C, name='fastscape_init_h')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: hp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: hp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Init_H()')
@@ -329,14 +331,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Init_F(Fmixp,ierr)
+  subroutine FastScape_Init_F(Fmixp,ierr) bind(C, name='fastscape_init_f')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: Fmixp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: Fmixp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Init_F()')
@@ -353,14 +355,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_H(hp,ierr)
+  subroutine FastScape_Copy_H(hp,ierr) bind(C, name='fastscape_copy_h')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: hp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: hp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_H()')
@@ -377,14 +379,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Basement(bp,ierr)
+  subroutine FastScape_Copy_Basement(bp,ierr) bind(C, name='fastscape_copy_basement')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: bp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: bp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Basement()')
@@ -401,14 +403,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Total_Erosion (etotp,ierr)
+  subroutine FastScape_Copy_Total_Erosion (etotp,ierr)  bind(C, name='fastscape_copy_total_erosion')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: etotp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: etotp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Total_Erosion()')
@@ -425,14 +427,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Drainage_Area (ap,ierr)
+  subroutine FastScape_Copy_Drainage_Area (ap,ierr) bind(C, name='fastscape_copy_drainage_area')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: ap
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: ap
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Drainage_Area()')
@@ -449,14 +451,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Erosion_Rate (eratep,ierr)
+  subroutine FastScape_Copy_Erosion_Rate (eratep,ierr) bind(C, name='fastscape_copy_erosion_rate')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: eratep
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: eratep
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Erosion_Rate()')
@@ -473,14 +475,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Chi (chip,ierr)
+  subroutine FastScape_Copy_Chi (chip,ierr) bind(C, name='fastscape_copy_chi')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: chip
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: chip
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Chi()')
@@ -497,14 +499,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Slope (slopep,ierr)
+  subroutine FastScape_Copy_Slope (slopep,ierr) bind(C, name='fastscape_copy_slope')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: slopep
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: slopep
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Slope()')
@@ -521,14 +523,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Curvature (curvaturep,ierr)
+  subroutine FastScape_Copy_Curvature (curvaturep,ierr) bind(C, name='fastscape_copy_curvature')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: curvaturep
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: curvaturep
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Curvature()')
@@ -545,14 +547,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Catchment (catchp,ierr)
+  subroutine FastScape_Copy_Catchment (catchp,ierr) bind(C, name='fastscape_copy_catchment')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: catchp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: catchp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Catchment()')
@@ -569,14 +571,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_F(Fmixp,ierr)
+  subroutine FastScape_Copy_F(Fmixp,ierr) bind(C, name='fastscape_copy_f')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: Fmixp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: Fmixp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_F()')
@@ -593,14 +595,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Copy_Lake_Depth(Lp,ierr)
+  subroutine FastScape_Copy_Lake_Depth(Lp,ierr) bind(C, name='fastscape_copy_lake_depth')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: Lp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: Lp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Copy_Lake_Depth()')
@@ -617,14 +619,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_NX_NY (nnx,nny,ierr)
+  subroutine FastScape_Set_NX_NY (nnx,nny,ierr) bind(C, name='fastscape_set_nx_ny')
 
     use FastScapeContext
 
     implicit none
 
-    integer, intent(in) :: nnx,nny
-    integer, optional, intent(out) :: ierr
+    integer(c_int), intent(in) :: nnx,nny
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_NX_NY()')
@@ -637,14 +639,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_XL_YL (xxl,yyl,ierr)
+  subroutine FastScape_Set_XL_YL (xxl,yyl,ierr) bind(C, name='fastscape_set_xl_yl')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(in) :: xxl,yyl
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(in) :: xxl,yyl
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_XL_YL()')
@@ -657,14 +659,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_DT (dtt,ierr)
+  subroutine FastScape_Set_DT (dtt,ierr) bind(C, name='fastscape_set_dt')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(in) :: dtt
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(in) :: dtt
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_DT()')
@@ -677,15 +679,15 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_Erosional_Parameters (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp,ierr)
+  subroutine FastScape_Set_Erosional_Parameters (kkf,kkfsed,mm,nnn,kkd,kkdsed,gg1,gg2,pp,ierr)  bind(C, name='fastscape_set_erosional_parameters')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(in), dimension(*) :: kkf,kkd
-    double precision, intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(in), dimension(*) :: kkf,kkd
+    real(c_double), intent(in) :: kkfsed,mm,nnn,kkdsed,gg1,gg2,pp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Erosional_Parameters()')
@@ -698,14 +700,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_Marine_Parameters (sl, p1, p2, z1, z2, r, l, kds1, kds2,ierr)
+  subroutine FastScape_Set_Marine_Parameters (sl, p1, p2, z1, z2, r, l, kds1, kds2,ierr) bind(C, name='fastscape_set_marine_parameters')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(in) :: sl, p1, p2, z1, z2, r, l, kds1, kds2
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Marine_Parameters()')
@@ -718,14 +720,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Get_Sizes (nnx,nny,ierr)
+  subroutine FastScape_Get_Sizes (nnx,nny,ierr) bind(C, name='fastscape_get_sizes')
 
     use FastScapeContext
 
     implicit none
 
-    integer, intent(out) :: nnx,nny
-    integer, optional, intent(out) :: ierr
+    integer(c_int), intent(out) :: nnx,nny
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Get_Sizes()')
@@ -738,14 +740,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Get_Step (sstep,ierr)
+  subroutine FastScape_Get_Step (sstep,ierr) bind(C, name='fastscape_get_step')
 
     use FastScapeContext
 
     implicit none
 
-    integer, intent(out) :: sstep
-    integer, optional, intent(out) :: ierr
+    integer(c_int), intent(out) :: sstep
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Get_Step()')
@@ -758,13 +760,13 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Debug(ierr)
+  subroutine FastScape_Debug(ierr) bind(C, name='fastscape_debug')
 
     use FastScapeContext
 
     implicit none
 
-    integer, optional, intent(out) :: ierr
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Debug()')
@@ -777,14 +779,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_BC(jbc,ierr)
+  subroutine FastScape_Set_BC(jbc,ierr) bind(C, name='fastscape_set_bc')
 
     use FastScapeContext
 
     implicit none
 
-    integer, intent(in) :: jbc
-    integer, optional, intent(out) :: ierr
+    integer(c_int), intent(in) :: jbc
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_BC()')
@@ -797,14 +799,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_U (up,ierr)
+  subroutine FastScape_Set_U (up,ierr) bind(C, name='fastscape_set_u')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(in), dimension(*) :: up
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(in), dimension(*) :: up
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_U()')
@@ -817,14 +819,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_V (ux,uy,ierr)
+  subroutine FastScape_Set_V (ux,uy,ierr) bind(C, name='fastscape_set_v')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(in), dimension(*) :: ux,uy
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(in), dimension(*) :: ux,uy
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_V()')
@@ -837,13 +839,13 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Reset_Cumulative_Erosion (ierr)
+  subroutine FastScape_Reset_Cumulative_Erosion (ierr) bind(C, name='fastscape_reset_cumulative_erosion')
 
     use FastScapeContext
 
     implicit none
 
-    integer, optional, intent(out) :: ierr
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Reset_Cumulative_Erosion()')
@@ -856,14 +858,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_H(hp,ierr)
+  subroutine FastScape_Set_H(hp,ierr) bind(C, name='fastscape_set_h')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: hp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: hp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_H()')
@@ -876,14 +878,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_All_Layers (dhp,ierr)
+  subroutine FastScape_Set_All_Layers (dhp,ierr) bind(C, name='fastscape_set_all_layers')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: dhp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: dhp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_All_Layers()')
@@ -896,14 +898,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_Basement(bp,ierr)
+  subroutine FastScape_Set_Basement(bp,ierr) bind(C, name='fastscape_set_basement')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: bp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: bp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Basement()')
@@ -916,14 +918,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Set_Precip (precipp,ierr)
+  subroutine FastScape_Set_Precip (precipp,ierr) bind(C, name='fastscape_set_precip')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(inout), dimension(*) :: precipp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(inout), dimension(*) :: precipp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Set_Precip()')
@@ -936,15 +938,15 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_VTK (fp, vexp, ierr)
+  subroutine FastScape_VTK (fp, vexp, ierr) bind(C, name='fastscape_vtk')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(in), dimension(*) :: fp
-    double precision, intent(in) :: vexp
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(in), dimension(*) :: fp
+    real(c_double), intent(in) :: vexp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_VTK()')
@@ -957,15 +959,15 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Strati (nstepp, nreflectorp, nfreqp, vexp, ierr)
+  subroutine FastScape_Strati (nstepp, nreflectorp, nfreqp, vexp, ierr) bind(C, name='fastscape_strati')
 
     use FastScapeContext
 
     implicit none
 
-    integer, intent(inout) :: nstepp, nreflectorp, nfreqp
-    double precision, intent(inout) :: vexp
-    integer, optional, intent(out) :: ierr
+    integer(c_int), intent(inout) :: nstepp, nreflectorp, nfreqp
+    real(c_double), intent(inout) :: vexp
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Strati()')
@@ -978,14 +980,14 @@ module FastScapeAPI
 
   !--------------------------------------------------------------------------
 
-  subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux, ierr)
+  subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux, ierr) bind(C, name='fastscape_get_fluxes')
 
     use FastScapeContext
 
     implicit none
 
-    double precision, intent(out) :: ttectonic_flux, eerosion_flux, bboundary_flux
-    integer, optional, intent(out) :: ierr
+    real(c_double), intent(out) :: ttectonic_flux, eerosion_flux, bboundary_flux
+    integer(c_int), optional, intent(out) :: ierr
     integer :: ierr_
 
     FSCAPE_INITERR(ierr, ierr_, 'FastScape_Get_Fluxes()')
