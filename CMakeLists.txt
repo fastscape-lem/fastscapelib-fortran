@@ -50,7 +50,7 @@ set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -cpp")
 # =====
 
 if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
-    set(dialect "-ffree-form -std=f2008 -fimplicit-none -fall-intrinsics -ffree-line-length-none")
+    set(dialect "-ffree-form -std=f2018 -fimplicit-none -fall-intrinsics -ffree-line-length-none")
     set(ioflags "-fconvert=big-endian")
     set(pythonflags "-ffree-line-length-none")
     set(f77flags "-std=legacy -ffixed-form")
