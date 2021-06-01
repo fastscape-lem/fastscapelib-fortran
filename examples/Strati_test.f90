@@ -13,6 +13,8 @@ program Strati_test
   ! of the nodes on the grid; these are used to define the uplift function and
   ! the initial topography
 
+  use FastScapeAPI
+
   implicit none
 
   integer :: nx, ny, istep, nstep, nfreq, i, j, nreflector

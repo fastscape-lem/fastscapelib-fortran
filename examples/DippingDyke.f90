@@ -5,6 +5,8 @@ program DippingDyke
   ! and is progressively exhumed by erosion; for this we use the total erosion
   ! to define the erodibility array kf
 
+  use FastScapeAPI
+
   implicit none
 
   integer :: nx, ny, istep, nstep, i, j

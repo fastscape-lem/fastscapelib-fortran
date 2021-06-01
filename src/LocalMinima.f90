@@ -1,4 +1,5 @@
-subroutine LocalMinima (stack,rec,bc,ndon,donor,h,length,nx,ny,dx,dy)
+#include "Error.fpp"
+subroutine LocalMinima (stack,rec,bc,ndon,donor,h,length,nx,ny,dx,dy,ierr)
 
   ! subroutine to compute and remove local inima by recomputing the receiver connectivty
   ! using Guillaume Cordonnier s algorithm as helped by Benoit Bovy and debuged with Jean Braun
@@ -45,6 +46,7 @@ subroutine LocalMinima (stack,rec,bc,ndon,donor,h,length,nx,ny,dx,dy)
   integer nbasins,basin0,nconn,nconn_max,tree_size
 
   integer nn,k,nlocmin
+  integer, intent(inout):: ierr
 
   !continuous_flow = .true.
   continuous_flow = .false.
@@ -91,7 +93,7 @@ subroutine LocalMinima (stack,rec,bc,ndon,donor,h,length,nx,ny,dx,dy)
   allocate (tree(nbasins-1))
   tree_size=0
 
-  call mst_kruskal(conn_weights,conn_basins,nbasins,nconn,tree,tree_size)
+  call mst_kruskal(conn_weights,conn_basins,nbasins,nconn,tree,tree_size,ierr);FSCAPE_CHKERR(ierr)
 
   allocate (sills(nbasins,2))
   allocate (basin_stack(nbasins))
@@ -330,7 +332,7 @@ end subroutine connect_basins
 
 !----------------------
 
-subroutine mst_kruskal(conn_weights, conn_basins, nbasins, nconn, mstree, mstree_size)
+subroutine mst_kruskal(conn_weights, conn_basins, nbasins, nconn, mstree, mstree_size,ierr)
 
   !kruskal algorithm to compute a Minimal Spanning Tree
 
@@ -351,12 +353,13 @@ subroutine mst_kruskal(conn_weights, conn_basins, nbasins, nconn, mstree, mstree
 
   integer, dimension(:), allocatable :: sort_id,parent,rank
   integer mstree_size,eid,eeid,f0,f1,b0,b1
+  integer, intent(inout):: ierr
 
   allocate (sort_id(nconn))
   mstree_size = 0
 
   ! sort edges
-  call loc_min_3_indexx (nconn,conn_weights,sort_id)
+  call loc_min_3_indexx (nconn,conn_weights,sort_id,ierr);FSCAPE_CHKERR(ierr)
   !print*,'weights',conn_weights(sort_id)
 
   allocate (parent(nbasins),rank(nbasins))
@@ -944,7 +947,9 @@ end subroutine loc_min_3_find_stack_recurs
 
 !-----------------------
 
-subroutine loc_min_3_indexx(n,arr,indx)
+subroutine loc_min_3_indexx(n,arr,indx,ierr)
+
+  use FastScapeErrorCodes
 
   implicit none
 
@@ -953,6 +958,7 @@ subroutine loc_min_3_indexx(n,arr,indx)
   parameter (M=7,NSTACK=50)
   integer i,indxt,ir,itemp,j,jstack,k,l,istack(NSTACK)
   double precision a
+  integer, intent(inout):: ierr
 
   do j=1,n
     indx(j)=j
@@ -1027,7 +1033,9 @@ subroutine loc_min_3_indexx(n,arr,indx)
     indx(j)=indxt
     jstack=jstack+2
 
-    if(jstack.gt.NSTACK) stop 'NSTACK too small in loc_min_3_indexx'
+    if(jstack.gt.NSTACK) then
+      FSCAPE_RAISE_MESSAGE('loc_min_3_indexx error: NSTACK too small',ERR_Default,ierr);FSCAPE_CHKERR(ierr)
+    end if
 
     if(ir-i+1.ge.j-l)then
       istack(jstack)=ir
