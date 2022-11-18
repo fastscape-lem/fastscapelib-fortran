@@ -38,7 +38,8 @@ subroutine StreamPowerLaw ()
   if (count(mstack==0).ne.0) print*,'incomplete stack',count(mstack==0),nn
 
   ! calculate the elevation / SPL, including sediment flux
-  tol=1.d-4*(maxval(abs(h)) + 1.d0)
+  ! Jean Braun modification on 18/11/2022: decreased tolerance to 10^-6
+  tol=1.d-6*(maxval(abs(h)) + 1.d0)
   err=2.d0*tol
 
   ! store the elevation at t
@@ -49,37 +50,11 @@ subroutine StreamPowerLaw ()
 
   lake_sediment=0.d0
   lake_sill=0.d0
-
+  dh=0.d0
+  hp=h
+  
   do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
-    ! guess/update the elevation at t+Δt (k)
-    hp=h
-
-    ! calculate erosion/deposition at each node
-    dh=ht-hp
-
-    ! sum the erosion in stack order
-    do ij=1,nn
-      ijk=mstack(ij)
-      ijr1=rec(ijk)
-      if (ijr1.ne.ijk) then
-        dh(ijk)=dh(ijk)-(ht(ijk)-hp(ijk))
-        if (lake_sill(ijk).eq.ijk) then
-          if (dh(ijk).le.0.d0) then
-            lake_sediment(ijk)=0.d0
-          else
-            lake_sediment(ijk)=dh(ijk)
-          endif
-        endif
-        dh(ijk)=dh(ijk)+(ht(ijk)-hp(ijk))
-        do k=1,mnrec(ijk)
-          ijr=mrec(k,ijk)
-          dh(ijr)=dh(ijr)+dh(ijk)*mwrec(k,ijk)
-        enddo
-      else
-        lake_sediment(ijk)=dh(ijk)
-      endif
-    enddo
 
     where (bounds_bc)
       elev=ht
@@ -178,8 +153,39 @@ subroutine StreamPowerLaw ()
       endif
 
       err=sqrt(sum((h-hp)**2)/nn)
+    ! Jean Braun modification 18/11/2022: moved the computation of redistribution of sediment in lakes
+    ! following Sebastian Wolf's suggestion; this ensures mass conservation in multi-minima cases
+    ! guess/update the elevation at t+Δt (k)
+    hp=h
+
+    ! calculate erosion/deposition at each node
+    dh=ht-hp
+
+    ! sum the erosion in stack order
+    do ij=1,nn
+      ijk=mstack(ij)
+      ijr1=rec(ijk)
+      if (ijr1.ne.ijk) then
+        dh(ijk)=dh(ijk)-(ht(ijk)-hp(ijk))
+        if (lake_sill(ijk).eq.ijk) then
+          if (dh(ijk).le.0.d0) then
+            lake_sediment(ijk)=0.d0
+          else
+            lake_sediment(ijk)=dh(ijk)
+          endif
+        endif
+        dh(ijk)=dh(ijk)+(ht(ijk)-hp(ijk))
+        do k=1,mnrec(ijk)
+          ijr=mrec(k,ijk)
+          dh(ijr)=dh(ijr)+dh(ijk)*mwrec(k,ijk)
+        enddo
+      else
+        lake_sediment(ijk)=dh(ijk)
+      endif
+    enddo
+
+
       if (maxval(g).lt.tiny(g)) err=0.d0
-      if (nGSStreamPowerLaw.eq.99) print*,'Beware Gauss-Siedel scheme not convergent'
 
     enddo
 
@@ -243,7 +249,8 @@ subroutine StreamPowerLaw ()
     if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
     ! calculate the elevation / SPL, including sediment flux
-    tol=1.d-4*(maxval(abs(h))+1.d0)
+    ! Jean Braun modification on 18/11/2022: decreased tolerance to 10^-6
+    tol=1.d-6*(maxval(abs(h)) + 1.d0)
     err=2.d0*tol
 
     ! store the elevation at t
@@ -253,35 +260,11 @@ subroutine StreamPowerLaw ()
     nGSStreamPowerLaw=0
 
     lake_sediment=0.d0
+    dh=0.d0
+    hp=h
 
     do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
       nGSStreamPowerLaw=nGSStreamPowerLaw+1
-      ! guess/update the elevation at t+Δt (k)
-      hp=h
-
-       ! calculate erosion/deposition at each node
-      dh=ht-hp
-
-      ! sum the erosion in stack order
-      do ij=nn,1,-1
-        ijk=stack(ij)
-        ijr=rec(ijk)
-        if (ijr.ne.ijk) then
-          dh(ijk)=dh(ijk)-(ht(ijk)-hp(ijk))
-          if (lake_sill(ijk).eq.ijk) then
-            if (dh(ijk).le.0.d0) then
-              lake_sediment(ijk)=0.d0
-            else
-              lake_sediment(ijk)=dh(ijk)
-            endif
-          endif
-          dh(ijk)=dh(ijk)+(ht(ijk)-hp(ijk))
-          dh(ijr)=dh(ijr)+dh(ijk)
-        else
-          lake_sediment(ijk)=dh(ijk)
-        endif
-      enddo
-
       where (bounds_bc)
         elev=ht
       elsewhere
@@ -373,11 +356,43 @@ subroutine StreamPowerLaw ()
         endif
 
         err=sqrt(sum((h-hp)**2)/nn)
+
+      ! Jean Braun modification 18/11/2022: moved the computation of redistribution of sediment in lakes
+      ! following Sebastian Wolf's suggestion; this ensures mass conservation in multi-minima cases
+      ! guess/update the elevation at t+Δt (k)
+      hp=h
+
+       ! calculate erosion/deposition at each node
+      dh=ht-hp
+
+      ! sum the erosion in stack order
+      do ij=nn,1,-1
+        ijk=stack(ij)
+        ijr=rec(ijk)
+        if (ijr.ne.ijk) then
+          dh(ijk)=dh(ijk)-(ht(ijk)-hp(ijk))
+          if (lake_sill(ijk).eq.ijk) then
+            if (dh(ijk).le.0.d0) then
+              lake_sediment(ijk)=0.d0
+            else
+              lake_sediment(ijk)=min(dh(ijk),lake_water_volume(ijk))
+              dh(ijk) = dh(ijk)-lake_water_volume(ijk) !remove the sediment that is going to be deposited in the lake from the dh stack
+              if (dh(ijk)<0.d0) dh(ijk)=0.d0
+            endif
+          endif
+          dh(ijk)=dh(ijk)+(ht(ijk)-hp(ijk))
+          dh(ijr)=dh(ijr)+dh(ijk)
+        else
+          lake_sediment(ijk)=dh(ijk)
+        endif
+      enddo
+
+
         if (maxval(g).lt.tiny(g)) err=0.d0
-        if (nGSStreamPowerLaw.eq.99) print*,'Beware Gauss-Siedel scheme not convergent'
       enddo
 
       b=min(h,b)
+
 
       do ij=1,nn
         if (lake_sill(ij).ne.0) then
