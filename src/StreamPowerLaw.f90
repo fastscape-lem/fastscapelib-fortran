@@ -39,7 +39,10 @@ subroutine StreamPowerLaw ()
 
   ! calculate the elevation / SPL, including sediment flux
   ! Jean Braun modification on 18/11/2022: decreased tolerance to 10^-6
-  tol=1.d-6*(maxval(abs(h)) + 1.d0)
+  ! tol=1.d-6*(maxval(abs(h)) + 1.d0)
+  ! modified by Jean Braun (20/11/2022) to allow for relative versus
+  ! absolute tolerance
+  tol = tol_rel*maxval(abs(h)) + tol_abs
   err=2.d0*tol
 
   ! store the elevation at t
@@ -53,7 +56,7 @@ subroutine StreamPowerLaw ()
   dh=0.d0
   hp=h
   
-  do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
+  do while (err.gt.tol.and.nGSStreamPowerLaw.lt.nGSStreamPowerLawMax-1)
     nGSStreamPowerLaw=nGSStreamPowerLaw+1
 
     where (bounds_bc)
@@ -251,6 +254,9 @@ subroutine StreamPowerLaw ()
     ! calculate the elevation / SPL, including sediment flux
     ! Jean Braun modification on 18/11/2022: decreased tolerance to 10^-6
     tol=1.d-6*(maxval(abs(h)) + 1.d0)
+    ! modified by Jean Braun (20/11/2022) to allow for relative versus
+    ! absolute tolerance
+    tol = tol_rel*maxval(abs(h)) + tol_abs 
     err=2.d0*tol
 
     ! store the elevation at t
@@ -263,7 +269,7 @@ subroutine StreamPowerLaw ()
     dh=0.d0
     hp=h
 
-    do while (err.gt.tol.and.nGSStreamPowerLaw.lt.99)
+    do while (err.gt.tol.and.nGSStreamPowerLaw.lt.nGSStreamPowerLawMax-1)
       nGSStreamPowerLaw=nGSStreamPowerLaw+1
       where (bounds_bc)
         elev=ht
