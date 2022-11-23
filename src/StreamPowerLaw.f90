@@ -37,9 +37,6 @@ subroutine StreamPowerLaw ()
 
   if (count(mstack==0).ne.0) print*,'incomplete stack',count(mstack==0),nn
 
-  ! calculate the elevation / SPL, including sediment flux
-  ! Jean Braun modification on 18/11/2022: decreased tolerance to 10^-6
-  ! tol=1.d-6*(maxval(abs(h)) + 1.d0)
   ! modified by Jean Braun (20/11/2022) to allow for relative versus
   ! absolute tolerance
   tol = tol_rel*maxval(abs(h)) + tol_abs
@@ -251,9 +248,6 @@ subroutine StreamPowerLaw ()
     kfint=kf
     if (kfsed.gt.0.d0) where ((h-b).gt.1.d0) kfint=kfsed
 
-    ! calculate the elevation / SPL, including sediment flux
-    ! Jean Braun modification on 18/11/2022: decreased tolerance to 10^-6
-    tol=1.d-6*(maxval(abs(h)) + 1.d0)
     ! modified by Jean Braun (20/11/2022) to allow for relative versus
     ! absolute tolerance
     tol = tol_rel*maxval(abs(h)) + tol_abs 
