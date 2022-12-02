@@ -109,8 +109,8 @@ module FastScapeContext
 
     setup_has_been_run = .true.
 
-    tol_rel = 1e-3
-    tol_abs = 1e-3
+    tol_rel = 1.d-4
+    tol_abs = 1.d-4
     nGSStreamPowerLawMax = 100
 
     return
