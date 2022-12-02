@@ -478,6 +478,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_fastscape_set_h">FastScape_Set_H</a></li>
 <li><a href="#_fastscape_set_basement">FastScape_Set_Basement</a></li>
 <li><a href="#_fastscape_set_all_layers">FastScape_Set_All_Layers</a></li>
+<li><a href="#_fastscape_set_tolerance">FastScape_Set_Tolerance</a></li>
+<li><a href="#_fastscape_get_gssiterations">FastScape_Get_GSSIterations</a></li>
 <li><a href="#_fastscape_copy_h">FastScape_Copy_H</a></li>
 <li><a href="#_fastscape_copy_f">FastScape_Copy_F</a></li>
 <li><a href="#_fastscape_copy_basement">FastScape_Copy_Basement</a></li>
@@ -1301,6 +1303,54 @@ required to build the package (i.e., CMake, NumPy, scikit-build).</p>
 <dt class="hdlist1"><code>dh</code> </dt>
 <dd>
 <p>array of dimension <code>(nx*ny)</code> containing the topographic increment in meters to be added to the topography <code>h</code>, the basement <code>b</code> and the stratigraphic horizons created when the <strong>Stratigraphy</strong> option has been turned on by calling the <code>FastScape_Strati</code> routine (double precision)</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fastscape_set_tolerance">FastScape_Set_Tolerance</h3>
+<div class="paragraph">
+<p>This routine can be used to set the convergence parameters for the Gauss-Seidel iterations performed while numerically solving the Stream Power law.</p>
+</div>
+<div class="paragraph">
+<p>Arguments:</p>
+</div>
+<div class="paragraph">
+<p><code>FastScape_Set_Tolerance ( tol_relp, tol_absp, nGSStreamPowerLawMaxp)</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>tol_relp</code> </dt>
+<dd>
+<p>relative tolerance (applied to the current max. topographic elevation)</p>
+</dd>
+<dt class="hdlist1"><code>tol_absp</code> </dt>
+<dd>
+<p>absolute tolerance</p>
+</dd>
+<dt class="hdlist1"><code>nGSStreamPowerLawMaxp</code> </dt>
+<dd>
+<p>maximum number of Gauss-Seidel iterations</p>
+</dd>
+</dl>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fastscape_get_gssiterations">FastScape_Get_GSSIterations</h3>
+<div class="paragraph">
+<p>This routine is used to get the actual number of Gauss-Seidel iterations performed while numerically solving the Stream Power law during the last time step.</p>
+</div>
+<div class="paragraph">
+<p>Arguments:</p>
+</div>
+<div class="paragraph">
+<p><code>FastScape_Get_GSSIterations ( nGSSp)</code></p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>nGSSp</code> </dt>
+<dd>
+<p>number of Gauss-Seidel iterations</p>
 </dd>
 </dl>
 </div>
@@ -2157,7 +2207,7 @@ building the library with f2py) #22</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-11-18 11:11:03 UTC
+Last updated 2022-12-02 13:47:21 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
