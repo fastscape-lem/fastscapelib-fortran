@@ -341,6 +341,38 @@ Arguments:
 
 array of dimension `(nx*ny)` containing the topographic increment in meters to be added to the topography `h`, the basement `b` and the stratigraphic horizons created when the **Stratigraphy** option has been turned on by calling the `FastScape_Strati` routine (double precision)
 
+=== FastScape_Set_Tolerance
+
+This routine can be used to set the convergence parameters for the Gauss-Seidel iterations performed while numerically solving the Stream Power law.
+
+Arguments:
+
+`FastScape_Set_Tolerance ( tol_relp, tol_absp, nGSStreamPowerLawMaxp)`
+
+`tol_relp` ::
+
+relative tolerance (applied to the current max. topographic elevation)
+
+`tol_absp` ::
+
+absolute tolerance
+
+`nGSStreamPowerLawMaxp` ::
+
+maximum number of Gauss-Seidel iterations
+
+=== FastScape_Get_GSSIterations
+
+This routine is used to get the actual number of Gauss-Seidel iterations performed while numerically solving the Stream Power law during the last time step.
+
+Arguments:
+
+`FastScape_Get_GSSIterations ( nGSSp)`
+
+`nGSSp` ::
+
+number of Gauss-Seidel iterations
+
 === FastScape_Copy_H
 
 This routine is used to extract from the model the current topography in meters

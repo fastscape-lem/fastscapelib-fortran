@@ -14,6 +14,8 @@ module FastScapeContext
   integer :: step
   integer :: nGSStreamPowerLaw, nGSMarine
   logical :: setup_has_been_run
+  double precision :: tol_rel, tol_abs
+  integer :: nGSStreamPowerLawMax
   double precision, target, dimension(:), allocatable :: h,u,vx,vy,length,a,erate,etot,catch,catch0,b,precip,kf,kd
   double precision, target, dimension(:), allocatable :: Sedflux, Fmix
   double precision, target, dimension(:), allocatable :: g
@@ -34,7 +36,6 @@ module FastScapeContext
   integer, dimension(:), allocatable :: mnrec,mstack
   integer, dimension(:,:), allocatable :: mrec
   double precision, dimension(:,:), allocatable :: mwrec,mlrec
-
   contains
 
   subroutine Init()
@@ -107,6 +108,10 @@ module FastScapeContext
     nGSMarine = 0
 
     setup_has_been_run = .true.
+
+    tol_rel = 1.d-4
+    tol_abs = 1.d-4
+    nGSStreamPowerLawMax = 100
 
     return
 
@@ -885,4 +890,37 @@ module FastScapeContext
 
     end subroutine compute_fluxes
 
+!---------------------------------------------------------------
+
+    subroutine set_tolerance (rel, abs, nGSSmax)
+
+      ! internal routine to set the relative and aboslute tolerance and maximum 
+      ! number of GSS iterations for the streamPowerLaw that includes sediment
+
+      implicit none
+
+      double precision :: rel, abs
+      integer :: nGSSmax
+
+      tol_rel = rel
+      tol_abs = abs
+      nGSStreamPowerLawMax = nGSSmax
+
+    end subroutine set_tolerance
+  
+!---------------------------------------------------------------
+
+    subroutine get_nGSSiterations (nGSS)
+
+      ! internal routine to get the number of GSS iterations for the
+      ! StreamPowerLaw computations (with sediment)
+  
+      implicit none
+  
+      integer :: nGSS
+  
+      nGSS = nGSStreamPowerLaw
+  
+    end subroutine get_nGSSiterations
+  
   end module FastScapeContext

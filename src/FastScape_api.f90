@@ -772,3 +772,36 @@ subroutine FastScape_Get_Fluxes (ttectonic_flux, eerosion_flux, bboundary_flux)
   return
 
 end subroutine FastScape_Get_Fluxes
+
+!--------------------------------------------------------------------------
+
+subroutine FastScape_Set_Tolerance (tol_relp, tol_absp, nGSStreamPowerLawMaxp)
+
+  use FastScapeContext
+
+  implicit none
+
+  double precision :: tol_relp, tol_absp
+  integer :: nGSStreamPowerLawMaxp
+
+  call set_tolerance (tol_relp, tol_absp, nGSStreamPowerLawMaxp)
+
+  return
+
+end subroutine FastScape_Set_Tolerance
+
+!--------------------------------------------------------------------------
+
+subroutine FastScape_Get_GSSIterations (nGSSp)
+
+  use FastScapeContext
+
+  implicit none
+
+  integer :: nGSSp
+
+  call get_nGSSiterations (nGSSp)
+
+  return
+
+end subroutine FastScape_Get_GSSIterations
