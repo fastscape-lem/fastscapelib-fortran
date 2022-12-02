@@ -7,6 +7,20 @@
 
 ==== Bug fixes
 
+=== Version 2.8.3 (2 December 2022)
+
+==== Changes
+
+- Added user parametrable relative and absolute convergence parameters #51
+- VTK: set output files endianness using flags instead of within the code #47
+- VTK: added Filled Stratigraphic file for easier viewing and producing wells #41
+
+==== Bug fixes
+
+- Fixed various warnings and errors #47
+- Added a couple of missing type declaration statements #43
+- Fixed bug in estimating erosional flux #39
+
 === Version 2.8.2 (19 May 2020)
 
 ==== Changes
