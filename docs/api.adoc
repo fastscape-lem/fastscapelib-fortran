@@ -175,19 +175,19 @@ sea level in meters (double precision)
 
 `p1`::
 
-reference/surface porosity for sand (double precision)
+reference/surface porosity for silt (double precision)
 
 `p2`::
 
-reference/surface porosity for silt (double precision)
+reference/surface porosity for sand (double precision)
 
 `z1`::
 
-e-folding depth for exponential porosity law for sand (double precision)
+e-folding depth for exponential porosity law for silt (double precision)
 
 `z2`::
 
-e-folding depth for exponential porosity law for silt (double precision)
+e-folding depth for exponential porosity law for sand (double precision)
 
 `r` ::
 
@@ -199,11 +199,11 @@ averaging depth/thickness needed to solve the silt-sand equation in meters (doub
 
 `kds1` ::
 
-marine transport coefficient (diffusivity) for sand in meters squared per year (double precision)
+marine transport coefficient (diffusivity) for silt in meters squared per year (double precision)
 
 `kds2` ::
 
-marine transport coefficient (diffusivity) for silt in meters squared per year (double precision)
+marine transport coefficient (diffusivity) for sand in meters squared per year (double precision)
 
 [WARNING]
 ====
