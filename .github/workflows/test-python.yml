@@ -39,7 +39,7 @@ jobs:
       - name: Install and Set Compiler (MacOS)
         if: contains(matrix.os, 'macos')
         run: |
-          brew install gfortran
+          brew reinstall gfortran
           echo "FC=gfortran" >> $GITHUB_ENV
           echo "CC=gcc" >> $GITHUB_ENV
 
