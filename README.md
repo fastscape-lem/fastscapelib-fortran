@@ -6,6 +6,8 @@
 [![Build Doc](https://github.com/fastscape-lem/fastscapelib-fortran/workflows/deploy-doc/badge.svg)](https://github.com/fastscape-lem/fastscapelib-fortran/actions)
 [![DOI](https://zenodo.org/badge/167184498.svg)](https://zenodo.org/badge/latestdoi/167184498)
 
+**PLEASE NOTE: this repository is in maintenance-only mode, further development (new features and reworked API) is happening in the https://github.com/fastscape-lem/fastscapelib repository.**
+
 A Fortran (+ Python bindings) library of efficient algorithms for
 landscape evolution modeling.
 
