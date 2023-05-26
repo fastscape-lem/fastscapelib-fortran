@@ -155,7 +155,7 @@ subroutine StreamPowerLaw ()
       err=sqrt(sum((h-hp)**2)/nn)
     ! Jean Braun modification 18/11/2022: moved the computation of redistribution of sediment in lakes
     ! following Sebastian Wolf's suggestion; this ensures mass conservation in multi-minima cases
-    ! guess/update the elevation at t+Δt (k)
+    ! guess/update the elevation at t+Dt (k)
     hp=h
 
     ! calculate erosion/deposition at each node
@@ -359,7 +359,7 @@ subroutine StreamPowerLaw ()
 
       ! Jean Braun modification 18/11/2022: moved the computation of redistribution of sediment in lakes
       ! following Sebastian Wolf's suggestion; this ensures mass conservation in multi-minima cases
-      ! guess/update the elevation at t+Δt (k)
+      ! guess/update the elevation at t+Dt (k)
       hp=h
 
        ! calculate erosion/deposition at each node
