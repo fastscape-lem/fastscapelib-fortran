@@ -39,9 +39,9 @@ jobs:
       - name: Install and Set Compiler (MacOS)
         if: contains(matrix.os, 'macos')
         run: |
-          brew install --cask gfortran
-          echo "FC=gfortran-10" >> $GITHUB_ENV
-          echo "CC=gcc-10" >> $GITHUB_ENV
+          brew install gfortran
+          echo "FC=gfortran" >> $GITHUB_ENV
+          echo "CC=gcc" >> $GITHUB_ENV
 
       - name: Configure build
         run: cmake -B ${BUILD_DIR} ${CMAKE_OPTIONS}
