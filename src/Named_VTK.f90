@@ -53,7 +53,7 @@ subroutine Fastscape_Named_VTK (f, vex, istep, foldername, k)
     npart2=len_trim(part2)
 
     ! Formatting to output the correct size for each visualization field.
-    open(unit=77,file=(foldername//'/VTK/Topography'//cstep//'.vtk'),status='unknown', &
+    open(unit=77,file=(foldername//'/Topography'//cstep//'.vtk'),status='unknown', &
     form='unformatted',access='direct', recl=nheader+3*4*nn+nfooter+(npart1+10+npart2+4*nn) &
     +(npart1+5+npart2+4*nn)+(npart1+8+npart2+4*nn)+(npart1+12+npart2+4*nn)+(npart1+13+npart2+4*nn) &
     +(npart1+13+npart2+4*nn)+(npart1+9+npart2+4*nn))
@@ -71,7 +71,7 @@ subroutine Fastscape_Named_VTK (f, vex, istep, foldername, k)
     close(77)
 
     if (vex.lt.0.d0) then
-      open(unit=77,file=(foldername//'/VTK/Basement'//cstep//'.vtk'),status='unknown',form='unformatted',access='direct', &
+      open(unit=77,file=(foldername//'/Basement'//cstep//'.vtk'),status='unknown',form='unformatted',access='direct', &
       recl=nheader+3*4*nn+nfooter+(npart1+1+npart2+4*nn) &
       +(npart1+5+npart2+4*nn))
       write (77,rec=1) &
@@ -81,7 +81,7 @@ subroutine Fastscape_Named_VTK (f, vex, istep, foldername, k)
       part1(1:npart1)//'B'//part2(1:npart2),sngl(b(1:nn)), &
       part1(1:npart1)//'HHHHH'//part2(1:npart2),sngl(f(1:nn))
       close(77)
-      open(unit=77,file=(foldername//'/VTK/SeaLevel'//cstep//'.vtk'),status='unknown',form='unformatted',access='direct', &
+      open(unit=77,file=(foldername//'/SeaLevel'//cstep//'.vtk'),status='unknown',form='unformatted',access='direct', &
       recl=nheader+3*4*nn+nfooter+(npart1+2+npart2+4*nn))
       write (77,rec=1) &
       header(1:nheader), &
