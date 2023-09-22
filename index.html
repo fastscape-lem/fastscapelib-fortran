@@ -847,7 +847,7 @@ required to build the package (i.e., CMake, NumPy, scikit-build).</p>
 <div class="sect2">
 <h3 id="_fastscape_init_f">FastScape_Init_F</h3>
 <div class="paragraph">
-<p>This routine is used to initialize the sand-shale ratio</p>
+<p>This routine is used to initialize the silt fraction</p>
 </div>
 <div class="paragraph">
 <p>Arguments:</p>
@@ -859,7 +859,7 @@ required to build the package (i.e., CMake, NumPy, scikit-build).</p>
 <dl>
 <dt class="hdlist1"><code>F</code> </dt>
 <dd>
-<p>array of dimension <code>(nx*ny)</code> containing the initial sand-shale ratio (double precision)</p>
+<p>array of dimension <code>(nx*ny)</code> containing the initial silt fraction (double precision)</p>
 </dd>
 </dl>
 </div>
@@ -1020,35 +1020,35 @@ required to build the package (i.e., CMake, NumPy, scikit-build).</p>
 </dd>
 <dt class="hdlist1"><code>p1</code></dt>
 <dd>
-<p>reference/surface porosity for sand (double precision)</p>
+<p>reference/surface porosity for silt (double precision)</p>
 </dd>
 <dt class="hdlist1"><code>p2</code></dt>
 <dd>
-<p>reference/surface porosity for shale (double precision)</p>
+<p>reference/surface porosity for sand (double precision)</p>
 </dd>
 <dt class="hdlist1"><code>z1</code></dt>
 <dd>
-<p>e-folding depth for exponential porosity law for sand (double precision)</p>
+<p>e-folding depth for exponential porosity law for silt (double precision)</p>
 </dd>
 <dt class="hdlist1"><code>z2</code></dt>
 <dd>
-<p>e-folding depth for exponential porosity law for shale (double precision)</p>
+<p>e-folding depth for exponential porosity law for sand (double precision)</p>
 </dd>
 <dt class="hdlist1"><code>r</code> </dt>
 <dd>
-<p>sand-shale ratio for material leaving the continent (double precision)</p>
+<p>silt fraction for material leaving the continent (double precision)</p>
 </dd>
 <dt class="hdlist1"><code>L</code> </dt>
 <dd>
-<p>averaging depth/thickness needed to solve the sand-shale equation in meters (double precision)</p>
+<p>averaging depth/thickness needed to solve the silt-sand equation in meters (double precision)</p>
 </dd>
 <dt class="hdlist1"><code>kds1</code> </dt>
 <dd>
-<p>marine transport coefficient (diffusivity) for sand in meters squared per year (double precision)</p>
+<p>marine transport coefficient (diffusivity) for silt in meters squared per year (double precision)</p>
 </dd>
 <dt class="hdlist1"><code>kds2</code> </dt>
 <dd>
-<p>marine transport coefficient (diffusivity) for shale in meters squared per year (double precision)</p>
+<p>marine transport coefficient (diffusivity) for sand in meters squared per year (double precision)</p>
 </dd>
 </dl>
 </div>
@@ -1376,7 +1376,7 @@ required to build the package (i.e., CMake, NumPy, scikit-build).</p>
 <div class="sect2">
 <h3 id="_fastscape_copy_f">FastScape_Copy_F</h3>
 <div class="paragraph">
-<p>This routine is used to extract from the model the current sand-shale ratio</p>
+<p>This routine is used to extract from the model the current silt fraction</p>
 </div>
 <div class="paragraph">
 <p>Arguments:</p>
@@ -1388,7 +1388,7 @@ required to build the package (i.e., CMake, NumPy, scikit-build).</p>
 <dl>
 <dt class="hdlist1"><code>F</code> </dt>
 <dd>
-<p>array of dimension <code>(nx*ny)</code> containing the extracted sand-shale ratio (double precision)</p>
+<p>array of dimension <code>(nx*ny)</code> containing the extracted silt fraction (double precision)</p>
 </dd>
 </dl>
 </div>
@@ -1842,7 +1842,7 @@ required to build the package (i.e., CMake, NumPy, scikit-build).</p>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">8</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Sand/ShaleRatio</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Sand to shale ratio at time of deposition</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Silt fraction at time of deposition</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">9</p></td>
@@ -2240,7 +2240,7 @@ building the library with f2py) #22</p>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-05-26 13:00:52 UTC
+Last updated 2023-09-22 11:48:36 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
