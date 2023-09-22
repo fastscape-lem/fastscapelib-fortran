@@ -43,13 +43,13 @@
 ! FastScape_Set_Marine_Parameters (sealevel, poro1, poro2, zporo1, zporo2, ratio, length, kds1, kds2)
 ! sets the value of the marine transport parameters
 ! sl is sea level (in m)
-! poro1 is surface porosity for shale (dimensionless)
+! poro1 is surface porosity for silt (dimensionless)
 ! poro2 is surface porosity for sand (dimensionless)
-! zporo1 is e-folding porosity depth for shale (in m)
+! zporo1 is e-folding porosity depth for silt (in m)
 ! zporo2 is e-folding porosity depth for sand (in m)
 ! ratio is the ratio of sand in the incoming flux from the continent (dimensionless)
 ! length is the thickness of the "mixed" surface layer (in m) at the bottom of the ocean
-! kds1 and kds2 are the marine transport coefficients (diffusivities) for shale and sand respectively (in m^2/yr)
+! kds1 and kds2 are the marine transport coefficients (diffusivities) for silt and sand respectively (in m^2/yr)
 
 ! FastScape_Set_DT (dt)
 ! sets the time step length (in yr)
@@ -78,7 +78,7 @@
 ! h is double precision of size nn
 
 ! FastScape_Init_F (F)
-! sets the initial sand to shale ratio to F
+! sets the initial silt fraction to F
 ! an array of dimension nn(=nx*ny) should be passed
 ! F is double precision of size nn
 
@@ -93,7 +93,7 @@
 ! b is double precision of size nn
 
 ! FastScape_Copy_F (F)
-! returns the current surface sand-to-shale ratio (in m)
+! returns the current surface silt fraction (in m)
 ! as an array of dimension nn(=nx*ny)
 ! F is double precision of size nn
 

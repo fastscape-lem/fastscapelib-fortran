@@ -59,7 +59,7 @@ subroutine Strati (b,F,nx,ny,xl,yl,reflector,nreflector,ireflector,istep,fields,
   names(5) = '5.DepositionalBathymetry(m)'
   names(6) = '6.DepositionalSlope(Deg)'
   names(7) = '7.DistanceToShore(m)'
-  names(8) = '8.Sand/ShaleRatio'
+  names(8) = '8.SiltFraction'
   names(9) = '9.ReflectorAge(yr)'
   names(10) = 'A.ThicknessErodedBelow(m)'
 
