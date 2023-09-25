@@ -41,6 +41,10 @@ subroutine Marine()
 
   ! set nodes at transition between ocean and continent
   !where (flux.gt.tiny(flux)) flag=1
+  do ij=1,nn
+    ijr=rec(ij)
+    if (h(ij).ge.sealevel.and.h(ijr).le.sealevel) flag(ijr)=1
+  enddo
 
   ! decompact volume of pure solid phase (silt and sand) from onshore
   ratio1=ratio/(1.d0-poro1)
