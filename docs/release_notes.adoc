@@ -1,11 +1,15 @@
 [#release_notes]
 == Release notes
 
-=== Version 2.9.0 (Unreleased)
+=== Version 2.8.4 (29 September 2023)
 
 ==== Changes
 
+- Update source and online documentation of silt fraction #54
+
 ==== Bug fixes
+
+- Fixed compilation issues #56
 
 === Version 2.8.3 (2 December 2022)
 
