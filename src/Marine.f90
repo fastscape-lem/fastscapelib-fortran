@@ -8,7 +8,7 @@ subroutine Marine()
 
   implicit none
  
-  double precision dhs(nn),dhs1(nn)   !!update to avoid the invalid2024
+  double precision dhs(nn),dhs1(nn)
 
   double precision, dimension(:), allocatable :: flux,shelfdepth,ht,Fs,dh,dh1,dh2,Fmixt,mwater
   double precision, dimension(:), allocatable :: F1, F2, zi, zo
@@ -26,7 +26,7 @@ subroutine Marine()
 
   dx=xl/(nx-1)
   dy=yl/(ny-1)
-  ! WRITE(*,*) 'It works 1 !'
+
   ! computing flux from continental erosion
   flux=0.d0
   where (h.gt.sealevel) flux=Sedflux
@@ -36,7 +36,6 @@ subroutine Marine()
     if (ijr.ne.ijk.and.h(ijk).gt.sealevel) then
       flux(ijr)=flux(ijr)+flux(ijk)
     endif
- !  WRITE(*,*) 'It works 2 !'
   enddo
   ! here the integral of erosion/deposition has been done
   ! and distributed as flux to ocean
@@ -50,7 +49,7 @@ subroutine Marine()
   ratio2=(1.d0-ratio)/(1.d0-poro2)
   ! total volume of silt and sand after decompaction
   flux=flux*(ratio1+ratio2)
-  ! WRITE(*,*) 'It works 3 !'
+
   ! modifications made by Jean for multiple flow to distribute continental flux to ocean on the shelf
   ! Dec 2018
 
@@ -73,7 +72,6 @@ subroutine Marine()
         shelfdepth(ijr)=min(shelfdepth(ijr),shelfdepth(ijk)+mmlrec(k,ijk)*shelfslope)
         shelfdepth(ijr)=max(shelfdepth(ijr),h(ijr))
       endif
-!  WRITE(*,*) 'It works 4 !'
     enddo
   enddo
   ! end modifications
@@ -87,7 +85,6 @@ subroutine Marine()
     do k=1,mmnrec(ijk)
       ijr=mmrec(k,ijk)
       flux(ijr)=flux(ijr)+max(0.d0,flux(ijk)*mmwrec(k,ijk))
- !   WRITE(*,*) 'It works 5 !'
     enddo
   enddo
   ! modifications made by Jean
@@ -98,18 +95,18 @@ subroutine Marine()
   where (flux.le.0.d0.and.h.lt.sealevel) flux=flux-(h-shelfdepth)
   where (h.ge.sealevel) flux=0.d0
   flux=max(flux,0.d0)
- !  WRITE(*,*) 'It works 6 !'
+
   ! silt fraction (after decompaction) in shelf
   Fs=0.d0
   where (flux.gt.0.d0) Fs=ratio1/(ratio1+ratio2)
- !  WRITE(*,*) 'It works 7 !'
+
   ! scales flux by time step
   flux=flux/dt
-  ! WRITE(*,*) 'It works 8 !'
+
   ! stores initial height and fraction
   ht=h
   Fmixt=Fmix
-  ! WRITE(*,*) 'It works 9 !'
+
   !print*,'flux',minval(flux),sum(flux)/nx/ny,maxval(flux)
   !print*,'Fmix',minval(Fmix),sum(Fmix)/nx/ny,maxval(Fmix)
 
@@ -121,179 +118,25 @@ subroutine Marine()
   dh1=((h-ht)*Fmix+layer*(Fmix-Fmixt))*(1.d0-poro1)
   dh2=((h-ht)*(1.d0-Fmix)+layer*(Fmixt-Fmix))*(1.d0-poro2)
   dh=dh1+dh2
- !  WRITE(*,*) 'It works 10 !'
- ! do j=1,ny
- !   do i=1,nx
- !    ij=i+(j-1)*nx
- !    print*,i,j,dh1(ij)
- !    enddo
- !   enddo
- !  WRITE(*,*) 'It works 101_dh1 !'
- ! print *, istep, minval(dh1), sum(dh1)/nn, maxval(dh1)
-! do j=1,ny
-!    do i=1,nx
-!     ij=i+(j-1)*nx
-!     print*,i,j,dh2(ij)
-!     enddo
-!    enddo
-!   WRITE(*,*) 'It works 102_dh2 !'
-!  print *, istep, minval(dh2), sum(dh2)/nn, maxval(dh2)
-!do j=1,ny
-!    do i=1,nx
-!     ij=i+(j-1)*nx
-!     print*,i,j,dh(ij)
-!     enddo
-!    enddo
-!   WRITE(*,*) 'It works 103_dh !'
-!  print *, istep, minval(dh), sum(dh)/nn, maxval(dh)
+
   ! >>>>>>>> compaction starts added by Jean (Dec 2018)
-!   WRITE(*,*) 'It works 10000000 !'
-! dh1 = min(max(1.0d-30, dh1), 1.0d30)
-! dh = min(max(1.0d-30, dh), 1.0d30)
 
   ! sum of pure silt and solid phase
   if (step.eq.0) then
     dhs1=dh1
     dhs=dh
-!   WRITE(*,*) 'It works 11 !'
-! do j=1,ny
-!    do i=1,nx
-!     ij=i+(j-1)*nx
-!     print*,i,j,dhs1(ij)
-!     enddo
-!    enddo
-!  WRITE(*,*) 'It works 104_dhs1beginning !'
-!  print *, istep, minval(dhs1), sum(dhs1)/nn, maxval(dhs1)
-!  do j=1,ny
-!    do i=1,nx
-!     ij=i+(j-1)*nx
-!     print*,i,j,dhs(ij)
-!     enddo
-!    enddo
-!  WRITE(*,*) 'It works 105_dhsbeginning !'
-  
-!  print *, istep, minval(dhs), sum(dhs)/nn, maxval(dhs)
-   else
-!   WRITE(*,*) 'It works 1201 !'
-
- ! dhs1=0.d0      ! yuan 
- ! dhs=0.d0       ! yuan
-!  do j=1,ny
-!    do i=1,nx
-!     ij=i+(j-1)*nx
-!     print*,i,j,dhs1(ij)
-!     enddo
-!    enddo
-! WRITE(*,*) 'It works 1202_dhs1_artif !'
-! do j=1,ny
-!    do i=1,nx
-!     ij=i+(j-1)*nx
-!     print*,i,j,dhs(ij)
-!     enddo
-!    enddo
-! WRITE(*,*) 'It works 1203_dhs_artificial !'
-  
-!   print *, istep, minval(dhs1), maxval(dhs1)
-!  dhs1 = min(max(1.0d-30, dhs1), 1.0d30)
-!dh1 = min(max(1.0d-30, dh1), 1.0d30)
-
-    dhs1= dhs1+dh1
-
-!  do j=1,ny
-!    do i=1,nx
-!     ij=i+(j-1)*nx
-!     print*,i,j,dhs1(ij)
-!     enddo
-!    enddo
-! WRITE(*,*) 'It works 1204_dhs1_update !'
-
-  ! dhs1 = min(max(1.0d-314, (dhs1+dh1)), 1.0d300)
-
- !  WRITE(*,*) 'It works 1205 !'
-!   print *, istep, minval(dhs1), maxval(dhs1)
-!   dhs = min(max(1.0d-30, dhs), 1.0d30)
-!  WRITE(*,*) 'It works 1300_dhs_min !'
-!  do j=1,ny
-!    do i=1,nx
-!   ij=i+(j-1)*nx
-!    print*,i,j,dhs(ij)
-!    enddo
-!  enddo
-  
-  dhs=dhs+dh
-  !  dhs = min(max(1.0d-314, (dhs+dh)), 1.0d300)
-
-!   WRITE(*,*) 'It works 1301_dhs !'
-!  do j=1,ny
-!    do i=1,nx
-!   ij=i+(j-1)*nx
-!    print*,i,j,dhs(ij)
-!    enddo
-!  enddo
-
-
-! print *, istep, dhs
-! print *, istep, minval(dhs), maxval(dhs) 
-!   WRITE(*,*) 'It works 1302_dhs !'
+  else
+    dhs1=dhs1+dh1
+    dhs=dhs+dh
   endif
   where (dhs1.lt.0.d0) dhs1=0.d0
   where (dhs.lt.0.d0) dhs=0.d0
-   
-!   WRITE(*,*) 'It works 14_01_setdhs0 !'
- ! do j=1,ny
- !   do i=1,nx
- !    ij=i+(j-1)*nx
- !    print*,i,j,dhs1(ij)
- !    enddo
- !   enddo
-! WRITE(*,*) 'It works 1402_dhs1_set0 !'
-!  WRITE(*,*) 'It works 15_01_setdhs0 !'
- ! do j=1,ny
- !   do i=1,nx
- !    ij=i+(j-1)*nx
- !    print*,i,j,dhs(ij)
- !    enddo
- !   enddo
- !WRITE(*,*) 'It works 1502_dhs_set0 !'
 
   ! calculate the average silt (and sand) fraction in ocean part
   F1=0.d0;F2=0.d0
-  ! do j=1,ny
-   ! do i=1,nx
-     !ij=i+(j-1)*nx
-     !print*,i,j,F1(ij)
-    ! enddo
-   ! enddo
- !WRITE(*,*) 'It works 1601_F1_beginning !'
- 
-  ! do j=1,ny
-  !  do i=1,nx
-  !   ij=i+(j-1)*nx
- !    print*,i,j,F2(ij)
- !    enddo
- !   enddo
- !WRITE(*,*) 'It works 1602_F2_beginning !'
-
-
   where (h.le.sealevel.and.dhs.gt.0.d0) F1=dhs1/dhs
   F1=max(0.d0,F1);F1=min(1.d0,F1)
   where (h.le.sealevel.and.dhs.gt.0.d0) F2=1.d0-F1
-  ! WRITE(*,*) 'It works 14 !'
-  !  do j=1,ny
-  !  do i=1,nx
-  ! ij=i+(j-1)*nx
-  !  print*,i,j,F1(ij)
-  !  enddo
- ! enddo
- !  WRITE(*,*) 'It works 15_F1 !'
- !do j=1,ny
- !   do i=1,nx
- !  ij=i+(j-1)*nx
- !   print*,i,j,F2(ij)
- !   enddo
- ! enddo
- !  WRITE(*,*) 'It works 16_F2 !'
-
 
   ! calculate the thickness after compaction, initial thickness of sediments
   !zi=ht-b
@@ -315,12 +158,12 @@ subroutine Marine()
   where (h.ge.sealevel+1.d-3) Fmix=0.d-1
   Fmix=max(0.d0,Fmix)
   Fmix=min(1.d0,Fmix)
-!   WRITE(*,*) 'It works 15 !'
+
   ! updates basement
   b=min(h,b)
 
   deallocate (flux,shelfdepth,ht,Fs,dh,dh1,dh2,Fmixt)
-!   WRITE(*,*) 'It works 16 !'
+
   return
 
 end subroutine Marine
