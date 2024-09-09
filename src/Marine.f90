@@ -10,17 +10,17 @@ subroutine Marine()
 
   double precision, dimension(:), allocatable :: flux,shelfdepth,ht,Fs,dh,dh1,dh2,Fmixt,mwater
   double precision, dimension(:), allocatable :: dhs, dhs1, F1, F2, zi, zo
-  integer, dimension(:), allocatable :: flag,mmnrec,mmstack
+  integer, dimension(:), allocatable :: COTflag,mmnrec,mmstack
   integer, dimension(:,:), allocatable :: mmrec
   double precision, dimension(:,:), allocatable :: mmwrec,mmlrec
   double precision shelfslope,ratio1,ratio2,dx,dy
   integer ij,ijr,ijk,k
 
-  allocate (flux(nn),shelfdepth(nn),ht(nn),Fs(nn),dh(nn),dh1(nn),dh2(nn),Fmixt(nn),flag(nn))
+  allocate (flux(nn),shelfdepth(nn),ht(nn),Fs(nn),dh(nn),dh1(nn),dh2(nn),Fmixt(nn),COTflag(nn))
   allocate (dhs(nn),dhs1(nn),F1(nn),F2(nn),zi(nn),zo(nn))
 
   ! set nodes at transition between ocean and continent
-  flag=0
+  COTflag=0
 
   dx=xl/(nx-1)
   dy=yl/(ny-1)
@@ -40,10 +40,13 @@ subroutine Marine()
   where (h.gt.sealevel) flux=0.d0
 
   ! set nodes at transition between ocean and continent
-  !where (flux.gt.tiny(flux)) flag=1
+  !where (flux.gt.tiny(flux)) COTflag=1
+  ! use single flow direction to set the flag that marks
+  ! the recieving node below/at sealevel of a node above/at
+  ! sealevel as a continent-ocean transition node. 
   do ij=1,nn
     ijr=rec(ij)
-    if (h(ij).ge.sealevel.and.h(ijr).le.sealevel) flag(ijr)=1
+    if (h(ij).ge.sealevel.and.h(ijr).le.sealevel) COTflag(ijr)=1
   enddo
 
   ! decompact volume of pure solid phase (silt and sand) from onshore
@@ -114,7 +117,7 @@ subroutine Marine()
 
   ! silt and sand coupling diffusion in ocean
   call SiltSandCouplingDiffusion (h,Fmix,flux*Fs,flux*(1.d0-Fs), &
-  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,flag,bounds_ibc)
+  nx,ny,dx,dy,dt,sealevel,layer,kdsea1,kdsea2,nGSMarine,COTflag,bounds_ibc)
 
   ! pure silt and sand during deposition/erosion
   dh1=((h-ht)*Fmix+layer*(Fmix-Fmixt))*(1.d0-poro1)
@@ -173,7 +176,7 @@ end subroutine Marine
 !----------------------------------------------------------------------------------
 
 subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
-  sealevel,L,kdsea1,kdsea2,niter,flag,ibc)
+  sealevel,L,kdsea1,kdsea2,niter,COTflag,ibc)
 
   implicit none
 
@@ -182,7 +185,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
   double precision h(nx*ny),f(nx*ny),Q1(nx*ny),Q2(nx*ny)
   double precision, dimension(:), allocatable :: hp,fp,ht,ft,hhalf,fhalf,fhalfp
   double precision, dimension(:), allocatable :: diag,sup,inf,rhs,res,tint
-  integer flag(nx*ny)
+  integer COTflag(nx*ny)
 
   double precision dx,dy,dt,sealevel,L,kdsea1,kdsea2
   double precision K1,K2,tol,err1,err2
@@ -228,7 +231,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
         ijp=(j)*nx+i
         ijm=(j-2)*nx+i
         ! in ocean and not at ocean-continent transition
-        if (ht(ij).le.sealevel.and.flag(ij).eq.0) then
+        if (ht(ij).le.sealevel.and.COTflag(ij).eq.0) then
           if (i.eq.1) then
             if (cbc(4:4).eq.'1') then
               diag(i)=1.d0
@@ -302,7 +305,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
         ijp=(j)*nx+i
         ijm=(j-2)*nx+i
         ! in ocean and not at ocean-continent transition
-        if (ht(ij).le.sealevel.and.flag(ij).eq.0) then
+        if (ht(ij).le.sealevel.and.COTflag(ij).eq.0) then
           ! deposition
           if (hhalf(ij).ge.(1.d0+1.d-6)*ht(ij)) then
             Dp=(hhalf(ij)-ht(ij))/dt
@@ -359,7 +362,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
         ijp=(j)*nx+i
         ijm=(j-2)*nx+i
         ! in ocean and not at ocean-continent transition
-        if (ht(ij).le.sealevel.and.flag(ij).eq.0) then
+        if (ht(ij).le.sealevel.and.COTflag(ij).eq.0) then
           if (j.eq.1) then
             if (cbc(1:1).eq.'1') then
               diag(j)=1.d0
@@ -433,7 +436,7 @@ subroutine SiltSandCouplingDiffusion (h,f,Q1,Q2,nx,ny,dx,dy,dt, &
         ijp=(j)*nx+i
         ijm=(j-2)*nx+i
         ! in ocean and not at ocean-continent transition
-        if (ht(ij).le.sealevel.and.flag(ij).eq.0) then
+        if (ht(ij).le.sealevel.and.COTflag(ij).eq.0) then
           ! deposition
           if (h(ij).ge.(1.d0+1.d-6)*hhalf(ij)) then
             Dp=(h(ij)-hhalf(ij))/dt
