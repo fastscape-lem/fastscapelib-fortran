@@ -151,6 +151,10 @@ if(SKBUILD)
   find_package(F2PY REQUIRED)
   find_package(PythonExtensions REQUIRED)
 
+  # https://github.com/numpy/numpy/issues/25869 ?
+  # (seems problematic only on MacOS Mx)
+  add_compile_options(-Wno-error=incompatible-function-pointer-type)
+
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
 
   add_python_library(${F2PY_MODULE_NAME} MODULE
