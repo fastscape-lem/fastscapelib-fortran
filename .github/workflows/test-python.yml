@@ -10,7 +10,7 @@ on:
 
 jobs:
   unix:
-    name: 3.8 (${{ matrix.os }})
+    name: 3.12 (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -18,12 +18,12 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.8'
+          python-version: '3.12'
 
       - name: Install Python dependencies
         run: |
@@ -50,22 +50,22 @@ jobs:
         run: python -c "import sys; sys.path.pop(0); import fastscapelib_fortran"
 
   windows:
-    name: 3.8 (windows-latest)
+    name: 3.12 (windows-latest)
     runs-on: windows-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Conda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: 3.8
+          python-version: 3.12
           miniforge-version: latest
 
       - name: Install dependencies
         shell: cmd
         run: |
-          conda create -n test python=3.8 cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
+          conda create -n test python=3.12 cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
 
       - name: Build and install project
         shell: cmd
