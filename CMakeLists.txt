@@ -75,7 +75,7 @@ if(NOT SKBUILD)
 else()
   # https://github.com/numpy/numpy/issues/25869 ?
   # (seems problematic only on MacOS Mx)
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-error=incompatible-function-pointer-types")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=incompatible-function-pointer-types")
 endif()
 
 # override flags for old-school F77 files
