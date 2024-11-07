@@ -73,9 +73,11 @@ set(CMAKE_Fortran_FLAGS_DEBUG
 if(NOT SKBUILD)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect} ${ioflags}")
 else()
-  # https://github.com/numpy/numpy/issues/25869 ?
-  # (seems problematic only on MacOS Mx)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=incompatible-function-pointer-types")
+  if(APPLE AND MAKE_SYSTEM_PROCESSOR STREQUAL "arm64")
+    # https://github.com/numpy/numpy/issues/25869 ?
+    # (seems problematic only on MacOS Mx)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=incompatible-function-pointer-types")
+  endif()
 endif()
 
 # override flags for old-school F77 files
