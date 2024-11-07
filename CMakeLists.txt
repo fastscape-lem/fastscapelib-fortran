@@ -153,7 +153,7 @@ if(SKBUILD)
 
   # https://github.com/numpy/numpy/issues/25869 ?
   # (seems problematic only on MacOS Mx)
-  add_compile_options(-Wno-error=incompatible-function-pointer-type)
+  add_compile_options(-Wno-error=incompatible-function-pointer-types)
 
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
 
