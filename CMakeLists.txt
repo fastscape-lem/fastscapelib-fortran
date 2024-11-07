@@ -72,6 +72,10 @@ set(CMAKE_Fortran_FLAGS_DEBUG
 # let F2PY (scikit-build) configure flags for F77 and F90 source
 if(NOT SKBUILD)
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} ${dialect} ${ioflags}")
+else()
+  # https://github.com/numpy/numpy/issues/25869 ?
+  # (seems problematic only on MacOS Mx)
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -Wno-error=incompatible-function-pointer-types")
 endif()
 
 # override flags for old-school F77 files
@@ -150,10 +154,6 @@ if(SKBUILD)
   find_package(NumPy REQUIRED)
   find_package(F2PY REQUIRED)
   find_package(PythonExtensions REQUIRED)
-
-  # https://github.com/numpy/numpy/issues/25869 ?
-  # (seems problematic only on MacOS Mx)
-  add_compile_options(-Wno-error=incompatible-function-pointer-types)
 
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
 
