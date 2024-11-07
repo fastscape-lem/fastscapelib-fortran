@@ -66,7 +66,10 @@
 #   case, CMake is not used to find the compiler and configure the associated build system.
 #
 
-find_program(F2PY_EXECUTABLE NAMES f2py${PYTHON_VERSION_MAJOR} f2py)
+# temporarily disable and force searching the program path through the python numpy module (below)
+# (see patch added in https://github.com/conda-forge/fastscapelib-f2py-feedstock/pull/17)
+# (see https://github.com/conda-forge/numpy-feedstock/issues/276)
+# find_program(F2PY_EXECUTABLE NAMES f2py${PYTHON_VERSION_MAJOR} f2py)
 
 # XXX This is required to support NumPy < v0.15.0. See note in module documentation above.
 if(NOT F2PY_EXECUTABLE)
