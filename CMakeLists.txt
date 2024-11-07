@@ -153,9 +153,10 @@ if(SKBUILD)
   # TODO: remove when https://github.com/scikit-build/scikit-build/pull/495 is merged
   set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/" ${CMAKE_MODULE_PATH})
 
+  find_package(PythonLibs REQUIRED)
+  find_package(PythonExtensions REQUIRED)
   find_package(NumPy REQUIRED)
   find_package(F2PY REQUIRED)
-  find_package(PythonExtensions REQUIRED)
 
   set(F2PY_MODULE_NAME "_fastscapelib_fortran")
 
@@ -163,6 +164,16 @@ if(SKBUILD)
     SOURCES ${FASTSCAPELIB_SRC_FILES}
     INCLUDE_DIRECTORIES ${FASTSCAPELIB_SRC_DIR}
     )
+
+  if (UNIX)
+    if (APPLE)
+      set_target_properties(${F2PY_MODULE_NAME} PROPERTIES
+        LINK_FLAGS  '-Wl,-dylib,-undefined,dynamic_lookup')
+    else()
+      set_target_properties(${F2PY_MODULE_NAME} PROPERTIES
+        LINK_FLAGS  '-Wl,--allow-shlib-undefined')
+    endif()
+  endif()
 
   python_extension_module(${F2PY_MODULE_NAME})
 
