@@ -73,7 +73,7 @@ jobs:
           conda activate test &&
           ls %CONDA%\envs\test &&
           ls %CONDA%\envs\test\Library\bin &&
-          set FC="C:/Miniconda3/envs/test/Library/bin/flang.exe" &&
+          set FC=%CONDA%\envs\test\Library\bin\flang.exe &&
           python setup.py bdist_wheel --dist-dir="dist" -G "NMake Makefiles" -- -DCMAKE_Fortran_COMPILER:FILEPATH="%FC%" &&
           python -m pip install --no-index --find-links="dist" fastscapelib_fortran -vvv
 
