@@ -65,7 +65,7 @@ jobs:
       - name: Install dependencies
         shell: cmd
         run: |
-          conda create -n test python=3.12 cmake c-compiler fortran-compiler scikit-build pip wheel setuptools numpy
+          conda create -n test python=3.12 cmake c-compiler flang=5.0 scikit-build pip wheel setuptools numpy
 
       - name: Build and install project
         shell: cmd
