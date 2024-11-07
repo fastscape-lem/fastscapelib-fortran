@@ -67,12 +67,17 @@ jobs:
         run: |
           conda create -n test python=3.12 cmake c-compiler flang=5.0 scikit-build pip wheel setuptools numpy
 
+      - name: Conda env info
+        shell: cmd
+        run: >-
+          conda activate test &&
+          echo %CONDA% &&
+          ls %CONDA%\envs\test\Library\bin
+
       - name: Build and install project
         shell: cmd
         run: >-
           conda activate test &&
-          ls %CONDA%\envs\test &&
-          ls %CONDA%\envs\test\Library\bin &&
           set FC=%CONDA%\envs\test\Library\bin\flang.exe &&
           python setup.py bdist_wheel --dist-dir="dist" -G "NMake Makefiles" -- -DCMAKE_Fortran_COMPILER:FILEPATH="%FC%" &&
           python -m pip install --no-index --find-links="dist" fastscapelib_fortran -vvv
